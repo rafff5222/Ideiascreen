@@ -192,3 +192,50 @@
     @apply mt-8;
   }
 }
+
+/* Animações para os elementos de conversão */
+@keyframes text-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-text-blink {
+  animation: text-blink 1s ease-in-out infinite;
+}
+
+@keyframes slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out;
+}
+
+/* Estilos para a barra de oferta */
+.offer-bar {
+  @apply relative w-full h-6 bg-gray-100 rounded-full overflow-hidden;
+}
+
+.offer-bar .progress {
+  @apply absolute top-0 left-0 h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-1000 ease-out;
+}
+
+/* Barra flutuante de oferta */
+.floating-bar {
+  @apply fixed w-full z-50 top-0 left-0 right-0 transition-transform duration-300;
+}
+
+.floating-bar.hidden {
+  transform: translateY(-100%);
+}
+
+.floating-bar.visible {
+  transform: translateY(0);
+}

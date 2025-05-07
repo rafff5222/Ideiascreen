@@ -7,6 +7,11 @@ import CallToAction from "@/components/home/CallToAction";
 import { useEffect } from "react";
 import { Helmet } from 'react-helmet';
 
+// Componentes de conversão avançada
+import OfferProgressBar from "@/components/conversion/OfferProgressBar";
+import OneClickCheckout from "@/components/conversion/OneClickCheckout";
+import TechnicalOptimizations from "@/components/conversion/TechnicalOptimizations";
+
 export default function Home() {
   // Scroll to top when navigating to home page
   useEffect(() => {
@@ -64,12 +69,20 @@ export default function Home() {
         />
       </Helmet>
       
+      {/* Barra de oferta temporária com gatilho FOMO */}
+      <OfferProgressBar />
+      
+      {/* Componentes principais da página */}
       <Hero />
       <Features />
       <HowItWorks />
       <Pricing />
       <Testimonials />
       <CallToAction />
+      
+      {/* Componentes de Conversão */}
+      <OneClickCheckout />
+      <TechnicalOptimizations />
     </>
   );
 }

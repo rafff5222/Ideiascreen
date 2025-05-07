@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import VideoMockup from "./VideoMockup";
 import { ArrowRight, Sparkles } from "lucide-react";
+import DynamicCta from "@/components/conversion/DynamicCta";
 
 export default function Hero() {
   return (
@@ -23,13 +24,8 @@ export default function Hero() {
             </p>
             
             <div className="flex flex-wrap items-center gap-4 mb-8">
-              <Button 
-                className="btn-premium text-lg px-6 py-6 flex items-center"
-                onClick={() => window.location.href = '#planos'}
-              >
-                Começar agora
-                <ArrowRight size={20} className="ml-2" />
-              </Button>
+              {/* Substituído o botão estático pelo CTA dinâmico */}
+              <DynamicCta />
               
               <div className="text-sm text-gray-500 flex items-center">
                 <svg 
