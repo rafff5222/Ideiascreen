@@ -1,47 +1,112 @@
+import { CheckCircle2 } from "lucide-react";
+
 export default function HowItWorks() {
+  const steps = [
+    {
+      number: "01",
+      title: "Escolha o tipo de conteúdo",
+      description: "Selecione se deseja criar um script para Stories, Reels, ou obter ideias para novos vídeos."
+    },
+    {
+      number: "02",
+      title: "Defina o tema e estilo",
+      description: "Escolha o tema e o estilo de comunicação que melhor representa sua marca e público."
+    },
+    {
+      number: "03",
+      title: "Receba conteúdo otimizado",
+      description: "Nossa IA gera conteúdo pronto para uso em segundos, com estrutura otimizada para engajamento."
+    },
+    {
+      number: "04",
+      title: "Edição com 1-clique (Premium)",
+      description: "Transforme seu roteiro em um vídeo montado automaticamente com nosso recurso exclusivo."
+    }
+  ];
+
   return (
-    <section id="como-funciona" className="section bg-gradient-to-br from-primary/5 to-accent/5">
-      <div className="container">
+    <section id="como-funciona" className="py-20 bg-gray-50">
+      <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl mb-4">Como funciona</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">Três etapas simples para transformar suas ideias em conteúdo viral para suas redes sociais.</p>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Como funciona nossa plataforma
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Processo simples e intuitivo para criar conteúdo engajante em poucos minutos
+          </p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Step 1 */}
-          <div className="bg-white rounded-xl p-8 shadow-sm relative">
-            <div className="w-10 h-10 bg-primary rounded-full text-white flex items-center justify-center font-bold absolute -top-5 left-8">1</div>
-            <h3 className="font-poppins font-semibold text-xl mb-4 mt-2">Escolha o tipo de conteúdo</h3>
-            <p className="text-gray-600 mb-4">Selecione entre roteiros, legendas ou ideias de conteúdo para Instagram ou TikTok.</p>
-            <img 
-              src="https://images.unsplash.com/photo-1611162618071-b39a2ec055fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200&q=80" 
-              alt="Escolhendo tipo de conteúdo" 
-              className="w-full h-auto rounded-lg"
-            />
-          </div>
-
-          {/* Step 2 */}
-          <div className="bg-white rounded-xl p-8 shadow-sm relative">
-            <div className="w-10 h-10 bg-primary rounded-full text-white flex items-center justify-center font-bold absolute -top-5 left-8">2</div>
-            <h3 className="font-poppins font-semibold text-xl mb-4 mt-2">Detalhe seu nicho</h3>
-            <p className="text-gray-600 mb-4">Informe seu nicho, estilo e preferências para obter conteúdo personalizado.</p>
-            <img 
-              src="https://images.unsplash.com/photo-1552581234-26160f608093?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200&q=80" 
-              alt="Detalhando nicho e preferências" 
-              className="w-full h-auto rounded-lg"
-            />
-          </div>
-
-          {/* Step 3 */}
-          <div className="bg-white rounded-xl p-8 shadow-sm relative">
-            <div className="w-10 h-10 bg-primary rounded-full text-white flex items-center justify-center font-bold absolute -top-5 left-8">3</div>
-            <h3 className="font-poppins font-semibold text-xl mb-4 mt-2">Gere e personalize</h3>
-            <p className="text-gray-600 mb-4">Receba resultados instantâneos que você pode editar, salvar ou exportar facilmente.</p>
-            <img 
-              src="https://images.unsplash.com/photo-1661956602153-23384936a1d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200&q=80" 
-              alt="Gerando e personalizando conteúdo" 
-              className="w-full h-auto rounded-lg"
-            />
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+          {steps.map((step, index) => (
+            <div 
+              key={index} 
+              className="bg-white rounded-xl p-6 shadow-md relative"
+            >
+              <div className="absolute -top-5 -left-3 w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center text-xl font-bold">
+                {step.number}
+              </div>
+              
+              <h3 className="text-xl font-bold mb-3 mt-4">{step.title}</h3>
+              <p className="text-gray-600">{step.description}</p>
+            </div>
+          ))}
+        </div>
+        
+        <div className="bg-white rounded-xl p-8 shadow-lg">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h3 className="text-2xl font-bold mb-4">
+                Por que criadores de conteúdo escolhem nossa plataforma?
+              </h3>
+              
+              <div className="space-y-4 mb-6">
+                <div className="flex items-start">
+                  <CheckCircle2 className="text-green-500 mt-1 flex-shrink-0" size={20} />
+                  <p className="ml-3 text-gray-700">
+                    <strong>Economia de tempo</strong> – Reduza o processo de criação de horas para minutos
+                  </p>
+                </div>
+                
+                <div className="flex items-start">
+                  <CheckCircle2 className="text-green-500 mt-1 flex-shrink-0" size={20} />
+                  <p className="ml-3 text-gray-700">
+                    <strong>Conteúdo que converte</strong> – Algoritmos treinados para maximizar engajamento
+                  </p>
+                </div>
+                
+                <div className="flex items-start">
+                  <CheckCircle2 className="text-green-500 mt-1 flex-shrink-0" size={20} />
+                  <p className="ml-3 text-gray-700">
+                    <strong>Aumente sua produtividade</strong> – Crie mais conteúdo de qualidade com menos esforço
+                  </p>
+                </div>
+                
+                <div className="flex items-start">
+                  <CheckCircle2 className="text-green-500 mt-1 flex-shrink-0" size={20} />
+                  <p className="ml-3 text-gray-700">
+                    <strong>Foco nos resultados</strong> – Dedique mais tempo à estratégia e menos à produção
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="relative aspect-video rounded-lg overflow-hidden shadow-xl">
+              <img 
+                src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&h=394&q=80" 
+                alt="Criador de conteúdo usando um aplicativo de edição" 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+                <div className="p-6 text-white">
+                  <p className="font-medium">
+                    "Economizo pelo menos 15 horas por semana com a plataforma!"
+                  </p>
+                  <p className="text-sm opacity-90 mt-1">
+                    Maria S., Influencer com 128k seguidores
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

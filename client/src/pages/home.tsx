@@ -5,6 +5,7 @@ import Pricing from "@/components/home/Pricing";
 import Testimonials from "@/components/home/Testimonials";
 import CallToAction from "@/components/home/CallToAction";
 import { useEffect } from "react";
+import { Helmet } from 'react-helmet';
 
 export default function Home() {
   // Scroll to top when navigating to home page
@@ -14,41 +15,58 @@ export default function Home() {
 
   return (
     <>
+      <Helmet>
+        <title>ContentAI - Crie conteúdo viral para Instagram e TikTok com IA</title>
+        <meta 
+          name="description" 
+          content="Crie scripts, legendas e ideias virais para Instagram e TikTok usando IA. Economize tempo e aumente seu engajamento com conteúdo otimizado."
+        />
+        <meta 
+          property="og:title" 
+          content="ContentAI - Crie conteúdo viral para redes sociais com IA" 
+        />
+        <meta 
+          property="og:description" 
+          content="Ferramenta completa de IA para criadores de conteúdo do Instagram e TikTok: scripts, legendas otimizadas e montagem automática de vídeos."
+        />
+        <meta 
+          property="og:image" 
+          content="https://contentai.com.br/social-preview.jpg" 
+        />
+        <meta name="twitter:card" content="summary_large_image" />
+        
+        {/* Schema.org markup para melhorar a visualização nos resultados do Google */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "ContentAI",
+            "applicationCategory": "SocialMediaApplication",
+            "operatingSystem": "Web",
+            "offers": {
+              "@type": "Offer",
+              "price": "59.00",
+              "priceCurrency": "BRL"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.8",
+              "ratingCount": "2783"
+            }
+          })}
+        </script>
+        
+        {/* Preload de recursos críticos */}
+        <link 
+          rel="preload" 
+          href="https://cdn-icons-png.flaticon.com/512/196/196578.png" 
+          as="image"
+        />
+      </Helmet>
+      
       <Hero />
       <Features />
       <HowItWorks />
-      <section className="section bg-white">
-        <div className="container">
-          <div className="flex flex-col md:flex-row items-center gap-12">
-            <div className="md:w-1/2">
-              <img 
-                src="https://images.unsplash.com/photo-1587614382346-4ec70e388b28?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=450&q=80" 
-                alt="Trabalhando em roteiros de vídeo" 
-                className="w-full h-auto rounded-lg shadow-lg"
-              />
-            </div>
-            <div className="md:w-1/2">
-              <h2 className="text-3xl md:text-4xl mb-6">Veja nosso gerador de conteúdo em ação</h2>
-              <p className="text-gray-600 mb-8">Nossa plataforma intuitiva torna a criação de conteúdo para redes sociais mais rápida e eficiente do que nunca.</p>
-              <div className="flex flex-col space-y-4">
-                <a 
-                  href="/dashboard" 
-                  className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 rounded-lg transition text-center"
-                >
-                  Experimentar Agora
-                </a>
-                <a 
-                  href="#como-funciona" 
-                  className="w-full flex items-center justify-center gap-2 font-medium text-gray-700 hover:text-primary transition text-center"
-                >
-                  <i className="ri-play-circle-line text-xl"></i>
-                  Ver como funciona
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
       <Pricing />
       <Testimonials />
       <CallToAction />
