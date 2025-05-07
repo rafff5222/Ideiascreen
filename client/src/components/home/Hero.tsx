@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { Sparkles, Play } from "lucide-react";
+import VideoMockup from "./VideoMockup";
 
 export default function Hero() {
   return (
@@ -43,42 +44,13 @@ export default function Hero() {
             </div>
           </div>
           
-          {/* Mockup de vídeo */}
+          {/* Mockup de vídeo interativo */}
           <div className="md:w-1/2 relative">
             <div className="absolute -top-10 -left-10 w-40 h-40 bg-purple-400/10 rounded-full blur-2xl"></div>
             <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/10 rounded-full blur-2xl"></div>
             
-            <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 p-3 rounded-2xl shadow-2xl border border-gray-700">
-              <div className="rounded-lg overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-1.2.1&auto=format&fit=crop&w=1352&q=80" 
-                  alt="Vídeo sendo gerado no ContentPro" 
-                  className="w-full h-auto rounded-lg"
-                />
-                
-                {/* Overlay de "exemplo de geração de vídeo" */}
-                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-5">
-                  <div className="bg-white/20 backdrop-blur-md rounded-lg p-3 mb-3 w-3/4">
-                    <div className="h-2 bg-purple-500 rounded-full w-2/3 mb-2"></div>
-                    <div className="h-2 bg-purple-400/80 rounded-full w-1/2"></div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="text-white text-xs font-medium">Gerando vídeo com IA...</div>
-                    <div className="text-xs font-bold bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full">85% concluído</div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Mockup de controles */}
-              <div className="flex justify-between items-center mt-3 px-2">
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                </div>
-                <div className="text-xs text-white/80 font-medium">ContentPro • Gerador de Vídeo</div>
-              </div>
-            </div>
+            {/* Vídeo mockup interativo com botão de play */}
+            <VideoMockup />
           </div>
         </div>
       </div>
