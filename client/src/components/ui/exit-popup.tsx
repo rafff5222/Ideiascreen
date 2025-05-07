@@ -1,79 +1,111 @@
-import { useEffect, useState } from "react";
-import { X } from "lucide-react";
-import { Button } from "./button";
+import { useState, useEffect } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export default function ExitPopup() {
-  const [showPopup, setShowPopup] = useState(false);
-  const [hasTriggered, setHasTriggered] = useState(false);
-
-  const handleMouseLeave = (e: MouseEvent) => {
-    // Se o mouse sair pela parte superior da página e ainda não tiver exibido o popup
-    if (e.clientY <= 0 && !hasTriggered) {
-      setShowPopup(true);
-      setHasTriggered(true);
-    }
-  };
-
+  const [open, setOpen] = useState(false);
+  const [alreadyShown, setAlreadyShown] = useState(false);
+  
   useEffect(() => {
-    // Adiciona o event listener apenas após 5 segundos na página
-    // (evita que o popup seja exibido imediatamente ao entrar)
+    // Verifica se o popup já foi mostrado nesta sessão
+    const popupShown = sessionStorage.getItem('exitPopupShown');
+    if (popupShown) {
+      setAlreadyShown(true);
+    }
+    
+    const handleMouseLeave = (e: MouseEvent) => {
+      // Se o mouse sair do documento pela parte superior
+      if (
+        e.clientY <= 5 && // Quase no topo da página
+        !alreadyShown && // Não mostrou ainda nesta sessão
+        document.body.scrollTop > 100 // Já rolou um pouco
+      ) {
+        setOpen(true);
+        sessionStorage.setItem('exitPopupShown', 'true');
+        setAlreadyShown(true);
+      }
+    };
+    
+    // Só adiciona o listener depois de 10 segundos para evitar mostrar logo que a pessoa entrou
     const timer = setTimeout(() => {
-      document.addEventListener("mouseleave", handleMouseLeave);
-    }, 5000);
-
+      document.addEventListener('mouseleave', handleMouseLeave);
+    }, 10000);
+    
     return () => {
       clearTimeout(timer);
-      document.removeEventListener("mouseleave", handleMouseLeave);
+      document.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [hasTriggered]);
-
-  if (!showPopup) return null;
-
+  }, [alreadyShown]);
+  
+  const handleAccept = () => {
+    // Gera um código promocional temporário
+    const discountCode = `VOLTE${Math.floor(Math.random() * 1000)}`;
+    
+    // Salva o código no storage
+    localStorage.setItem('discountCode', discountCode);
+    
+    // Fecha o popup
+    setOpen(false);
+    
+    // Redireciona para a página de checkout com desconto
+    window.location.href = '/checkout?discount=true';
+  };
+  
   return (
-    <>
-      {/* Overlay */}
-      <div className="fixed inset-0 bg-black/60 z-[100] backdrop-blur-sm" />
-      
-      {/* Popup */}
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white z-[101] 
-                     rounded-xl shadow-2xl w-[90%] max-w-md p-8 border-4 border-purple-500">
-        <button 
-          onClick={() => setShowPopup(false)} 
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
-        >
-          <X className="h-6 w-6" />
-        </button>
-
-        <div className="text-center mb-6">
-          <div className="text-4xl mb-2">🚨</div>
-          <h3 className="text-2xl font-bold mb-2">Espere! Temos uma oferta especial para você!</h3>
-          <div className="bg-yellow-100 p-3 rounded-lg mb-4">
-            <p className="text-yellow-800 font-bold">
-              20% DE DESCONTO
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="max-w-md mx-auto bg-white p-0 rounded-lg overflow-hidden">
+        <div className="w-full bg-gradient-to-r from-blue-600 to-indigo-500 py-3 px-4">
+          <DialogTitle className="text-2xl text-white font-bold">
+            ESPERE! 🎁
+          </DialogTitle>
+        </div>
+        
+        <div className="p-6">
+          <DialogDescription className="text-gray-700 mb-6 text-lg">
+            <p className="mb-4 text-xl font-semibold text-black">
+              Antes de sair...
             </p>
-            <p className="text-sm text-yellow-700">
-              no plano Premium hoje
+            
+            <p className="mb-4">
+              Sabemos que tomar uma decisão nem sempre é fácil, por isso 
+              preparamos um <span className="font-bold">desconto exclusivo</span> de:
             </p>
-          </div>
-          <p className="text-gray-600 mb-4">Não perca esta oportunidade única! Esta oferta é válida apenas por hoje.</p>
+            
+            <div className="bg-red-50 border border-red-100 rounded-lg p-4 mb-4 text-center">
+              <span className="text-3xl font-bold text-red-600">20% OFF</span>
+              <p className="text-gray-600 text-sm mt-1">Válido apenas hoje!</p>
+            </div>
+            
+            <p className="text-sm text-gray-500 italic">
+              Esta oferta é exclusiva e não será exibida novamente.
+            </p>
+          </DialogDescription>
           
-          <div className="flex flex-col gap-3">
+          <DialogFooter className="flex flex-col gap-3">
             <Button 
-              className="bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold px-6 py-3 rounded-lg shadow-lg hover:brightness-110 hover:scale-105 transition duration-300"
-              onClick={() => setShowPopup(false)}
+              className="bg-gradient-to-r from-green-500 to-green-600 hover:brightness-110 text-white font-bold w-full py-5 text-lg"
+              onClick={handleAccept}
             >
-              QUERO MEU DESCONTO AGORA
+              QUERO APROVEITAR O DESCONTO AGORA!
             </Button>
             
-            <button 
-              onClick={() => setShowPopup(false)} 
-              className="text-sm text-gray-500 hover:text-gray-700"
+            <Button 
+              variant="link" 
+              className="text-gray-400 hover:text-gray-600"
+              onClick={() => setOpen(false)}
             >
               Não, obrigado
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </div>
-      </div>
-    </>
+      </DialogContent>
+    </Dialog>
   );
 }

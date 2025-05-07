@@ -1,53 +1,52 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function CountdownSpots() {
-  const [spots, setSpots] = useState(7);
-
+  // Estado para controlar a quantidade de vagas restantes
+  const [spotsLeft, setSpotsLeft] = useState(8);
+  // Capacidade total (fictícia) do programa
+  const totalSpots = 100;
+  // Porcentagem de vagas preenchidas
+  const percentFilled = Math.round(((totalSpots - spotsLeft) / totalSpots) * 100);
+  
   useEffect(() => {
-    // Recupera o valor atual de spots do localStorage se existir
-    const savedSpots = localStorage.getItem('remainingSpots');
+    // Verificamos se o usuário já tem um cookie que indica o número de vagas
+    // para manter consistência entre carregamentos
+    const savedSpots = localStorage.getItem('spotsLeft');
+    
     if (savedSpots) {
-      setSpots(parseInt(savedSpots));
+      setSpotsLeft(parseInt(savedSpots));
     } else {
-      // Inicializa com o valor padrão
-      localStorage.setItem('remainingSpots', spots.toString());
+      // Se não tiver, grava o valor inicial
+      localStorage.setItem('spotsLeft', spotsLeft.toString());
     }
-
-    // Recupera o timestamp da última redução
-    const lastReduction = localStorage.getItem('lastSpotReduction');
-    const now = new Date().getTime();
-
-    // Se passou mais de 5 minutos desde a última redução e ainda tem spots
-    if (lastReduction && spots > 1) {
-      const timePassed = now - parseInt(lastReduction);
-      const fiveMinutes = 5 * 60 * 1000;
-      const reductionsToApply = Math.floor(timePassed / fiveMinutes);
-      
-      if (reductionsToApply > 0) {
-        const newSpots = Math.max(1, spots - reductionsToApply);
-        setSpots(newSpots);
-        localStorage.setItem('remainingSpots', newSpots.toString());
-        localStorage.setItem('lastSpotReduction', now.toString());
-      }
-    } else if (!lastReduction) {
-      // Primeira visita, salva o timestamp atual
-      localStorage.setItem('lastSpotReduction', now.toString());
-    }
-
-    // Configura o intervalo para reduzir spots a cada 5 minutos
+    
+    // A cada 10-30 segundos, temos uma chance de reduzir o número de vagas
+    // para criar a ilusão de outras pessoas comprando
     const interval = setInterval(() => {
-      setSpots(prevSpots => {
-        if (prevSpots <= 1) return prevSpots; // Não reduz abaixo de 1
-        
-        const newSpots = prevSpots - 1;
-        localStorage.setItem('remainingSpots', newSpots.toString());
-        localStorage.setItem('lastSpotReduction', new Date().getTime().toString());
-        return newSpots;
-      });
-    }, 5 * 60 * 1000); // 300000 ms = 5 minutos
-
+      if (Math.random() < 0.3 && spotsLeft > 1) { // 30% de chance
+        const newSpotsLeft = spotsLeft - 1;
+        setSpotsLeft(newSpotsLeft);
+        localStorage.setItem('spotsLeft', newSpotsLeft.toString());
+      }
+    }, 15000 + Math.random() * 15000); // Intervalo entre 15 e 30 segundos
+    
     return () => clearInterval(interval);
-  }, []);
-
-  return spots;
+  }, [spotsLeft]);
+  
+  return (
+    <div className="urgent-badge mt-2 text-center">
+      <div className="flex items-center mb-1">
+        <span className="flex-shrink-0 w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse"></span>
+        <span>
+          <strong>{percentFilled}% PREENCHIDO</strong> - apenas <strong>{spotsLeft} vagas</strong> restantes!
+        </span>
+      </div>
+      <div className="w-full bg-red-200 rounded-full h-1.5">
+        <div 
+          className="progress-bar transition-all duration-1000" 
+          style={{ width: `${percentFilled}%` }}>
+        </div>
+      </div>
+    </div>
+  );
 }

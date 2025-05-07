@@ -1,176 +1,199 @@
-import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Check, X, Zap, Rocket, Shield } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { Check, AlertTriangle } from "lucide-react";
 import CountdownSpots from "./CountdownSpots";
 
 export default function Pricing() {
-  const remainingSpots = CountdownSpots();
-  const pricingPlans = [
-    {
-      name: "Básico",
-      price: 59,
-      tagline: "Ideal para testes e pequenos criadores",
-      description: "Ideal para iniciantes que querem criar conteúdo de qualidade",
-      features: [
-        { title: "Geração de Roteiros", value: "50 créditos/mês", highlight: true },
-        { title: "Descrições & Hashtags", value: "Simples" },
-        { title: "Vídeos Automáticos", included: false },
-        { title: "Estilo de Vídeo", value: "-" },
-        { title: "Áudio", value: "-" },
-        { title: "Prioridade", value: "-" },
-        { title: "Suporte", value: "48h" },
-      ],
-      cta: "COMEÇAR AGORA",
-      popular: false,
-      headerClass: "bg-gray-50",
-      priceClass: "text-gray-600",
-      buttonClass: "bg-gray-200 text-gray-700"
-    },
-    {
-      name: "Premium",
-      price: 89,
-      tagline: "🚀 Melhor custo-benefício",
-      icon: <Rocket className="h-5 w-5" />,
-      description: "De roteiro a Reel em 1 clique! Nossa IA edita vídeos com cortes automáticos, legendas sincronizadas e áudios virais.",
-      features: [
-        { title: "Geração de Roteiros", value: "150 créditos/mês", highlight: true },
-        { title: "Descrições & Hashtags", value: "Otimizadas por IA", highlight: true },
-        { title: "Vídeos Automáticos", value: "Auto-montagem (IA)", highlight: true },
-        { title: "Estilo de Vídeo", value: "5 templates básicos" },
-        { title: "Áudio", value: "Banco de áudios virais", highlight: true },
-        { title: "Prioridade", value: "Geração 2x mais rápida" },
-        { title: "Suporte", value: "24h" },
-      ],
-      cta: "🚀 QUERO VÍDEOS AUTOMÁTICOS",
-      popular: true,
-      headerClass: "bg-gradient-to-r from-green-50 to-green-100",
-      priceClass: "text-green-600",
-      buttonClass: "bg-gradient-to-r from-green-500 to-green-600",
-      borderClass: "border-green-500 border-2"
-    },
-    {
-      name: "Ultimate",
-      price: 149,
-      tagline: "Para profissionais e agências",
-      icon: <Zap className="h-5 w-5" />,
-      description: "Vídeos com qualidade de agência (sem pagar R$ 500/edição)! Templates exclusivos e voz idêntica à humana.",
-      features: [
-        { title: "Geração de Roteiros", value: "Créditos ilimitados", highlight: true },
-        { title: "Descrições & Hashtags", value: "Premium + estratégias", highlight: true },
-        { title: "Vídeos Automáticos", value: "Edição Avançada (IA)", highlight: true },
-        { title: "Estilo de Vídeo", value: "+20 templates profissionais", highlight: true },
-        { title: "Áudio", value: "Voz humana artificial (ElevenLabs) + trilhas exclusivas", highlight: true },
-        { title: "Prioridade", value: "Fila zero (processamento imediato)" },
-        { title: "Suporte", value: "12h + tutoriais exclusivos" },
-      ],
-      cta: "⚡ QUERO EDIÇÃO PROFISSIONAL",
-      popular: false,
-      headerClass: "bg-gradient-to-r from-purple-50 to-purple-100",
-      priceClass: "text-purple-600",
-      buttonClass: "bg-gradient-to-r from-purple-500 to-purple-600"
-    }
-  ];
-
   return (
-    <section id="precos" className="section bg-gradient-to-br from-primary/5 to-accent/5 py-20">
-      <div className="container">
+    <section id="planos" className="py-20 bg-gray-50">
+      <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">Planos ContentPro</h2>
-          <p className="text-gray-700 max-w-2xl mx-auto text-lg">100% Automatizados por IA - Escolha o plano ideal para suas necessidades</p>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Planos que se adaptam às suas necessidades
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Escolha o plano ideal para o seu negócio e comece a crescer suas redes sociais hoje mesmo
+          </p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {pricingPlans.map((plan, index) => (
-            <div 
-              key={index} 
-              className={cn(
-                "bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 relative h-full flex flex-col transition-transform hover:scale-[1.02] duration-300",
-                plan.borderClass
-              )}
-            >
-              {plan.popular && (
-                <>
-                  {/* Badge "MAIS VENDIDO" girado */}
-                  <div className="absolute -right-12 top-7 rotate-45 z-10">
-                    <div className="bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-bold py-1 px-12 shadow-lg w-40 text-center">
-                      🔥 MAIS VENDIDO
-                    </div>
-                  </div>
-                  
-                  {/* Selo de "Recomendado" com ícone animado */}
-                  <div className="recommended-tag">
-                    ⚡ MAIS VENDIDO 
-                    <div className="pulse"></div>
-                  </div>
-                </>
-              )}
-              
-              <div className={cn("p-6 text-center", plan.headerClass)}>
-                <h3 className="font-poppins font-bold text-xl mb-1 flex items-center justify-center gap-2">
-                  {plan.icon && plan.icon}
-                  {plan.name}
-                  {plan.icon && plan.name === "Premium" && <span className="text-green-500">🚀</span>}
-                  {plan.icon && plan.name === "Ultimate" && <span>⚡</span>}
-                </h3>
-                <p className="text-sm text-gray-600 mb-3">{plan.tagline}</p>
-                <div className="flex items-center justify-center mb-4">
-                  <span className={cn("text-4xl font-bold", plan.priceClass)}>R$ {plan.price}</span>
-                  <span className="text-gray-600 ml-2">/mês</span>
-                </div>
-                <p className="text-gray-600 text-sm">{plan.description}</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          {/* Plano Basic */}
+          <div className="plano-card bg-white rounded-xl shadow-md p-6 border border-gray-200 flex flex-col">
+            <div className="mb-8">
+              <h3 className="text-2xl font-bold mb-2">Básico</h3>
+              <div className="flex items-start mb-4">
+                <span className="text-3xl font-bold">R$</span>
+                <span className="text-5xl font-bold">59</span>
+                <span className="text-lg text-gray-500 mt-1">/mês</span>
               </div>
+              <p className="text-gray-600 mb-6">Ideal para criadores de conteúdo iniciantes.</p>
               
-              <div className="p-6 flex-grow">
-                <ul className="space-y-4">
-                  {plan.features.map((feature, fIndex) => (
-                    <li key={fIndex} className="flex items-start text-sm">
-                      {'included' in feature && feature.included === false ? (
-                        <X className="text-gray-400 mr-3 min-w-[20px] mt-0.5" size={18} />
-                      ) : (
-                        <Check className="text-green-500 mr-3 min-w-[20px] mt-0.5" size={18} />
-                      )}
-                      <div>
-                        <span className="font-medium">{feature.title}:</span>{" "}
-                        <span className={feature.highlight ? "font-semibold text-gray-800" : "text-gray-600"}>
-                          {feature.value || ''}
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+              <Button 
+                className="btn-basic w-full py-6 text-lg font-semibold" 
+                variant="outline"
+              >
+                Selecionar plano
+              </Button>
+            </div>
+            
+            <div className="space-y-4 flex-grow">
+              <div className="flex items-start">
+                <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-700">
+                  <strong>50</strong> gerações de conteúdo por mês
+                </span>
               </div>
-              
-              <div className="p-6">
-                <Link href="/dashboard">
-                  <div className={cn(
-                    "w-full hover:opacity-90 text-white font-medium py-3 rounded-lg text-center cursor-pointer transition shadow-md",
-                    plan.buttonClass
-                  )}>
-                    {plan.cta}
-                  </div>
-                </Link>
-                {plan.popular && (
-                  <>
-                    <div className="mt-4 bg-green-50 rounded-lg p-3 text-center border border-green-100">
-                      <p className="text-sm font-medium text-green-600">Teste Grátis: 3 vídeos automáticos (7 dias)</p>
-                    </div>
-                    
-                    {/* Gatilho de urgência com contador e barra de progresso */}
-                    <div className="urgent-badge mt-4">
-                      🔥 <span id="remaining-spots">{remainingSpots}</span> vagas com 20% OFF! 
-                      <div className="progress-bar" style={{ width: `${remainingSpots * 4}%` }}></div>
-                    </div>
-                  </>
-                )}
-                <p className="text-center text-sm text-gray-500 mt-4 flex items-center justify-center gap-1">
-                  <Shield className="h-4 w-4 text-gray-400" />
-                  7 dias de garantia de devolução do dinheiro
-                </p>
+              <div className="flex items-start">
+                <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-700">
+                  Scripts para Stories e Reels
+                </span>
+              </div>
+              <div className="flex items-start">
+                <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-700">
+                  Legendas otimizadas para engajamento
+                </span>
+              </div>
+              <div className="flex items-start opacity-50">
+                <AlertTriangle className="text-gray-400 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-400">
+                  Montagem automática de vídeos
+                </span>
+              </div>
+              <div className="flex items-start opacity-50">
+                <AlertTriangle className="text-gray-400 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-400">
+                  Biblioteca de templates premium
+                </span>
               </div>
             </div>
-          ))}
+          </div>
+          
+          {/* Plano Premium (Mais vendido) */}
+          <div className="plano-card bg-white rounded-xl shadow-xl p-6 border-2 border-primary relative flex flex-col transform scale-105">
+            <div className="recommended-tag">
+              <span className="pulse mr-1"></span>
+              MAIS VENDIDO
+            </div>
+            
+            <div className="mb-8">
+              <h3 className="text-2xl font-bold mb-2">Premium</h3>
+              <div className="flex items-start mb-4">
+                <span className="text-3xl font-bold">R$</span>
+                <span className="text-5xl font-bold">89</span>
+                <span className="text-lg text-gray-500 mt-1">/mês</span>
+              </div>
+              <p className="text-gray-600 mb-4">Ideal para criadores que desejam automação.</p>
+              
+              <CountdownSpots />
+              
+              <Button 
+                className="btn-premium w-full py-6 text-lg font-semibold mt-5" 
+              >
+                Obter Premium agora
+              </Button>
+            </div>
+            
+            <div className="space-y-4 flex-grow">
+              <div className="flex items-start">
+                <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-700">
+                  <strong>150</strong> gerações de conteúdo por mês
+                </span>
+              </div>
+              <div className="flex items-start">
+                <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-700">
+                  Scripts, legendas e hashtags otimizadas
+                </span>
+              </div>
+              <div className="flex items-start">
+                <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-700">
+                  <strong>Montagem automática</strong> de vídeos
+                </span>
+              </div>
+              <div className="flex items-start">
+                <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-700">
+                  Edição com 1-clique (Beta)
+                </span>
+              </div>
+              <div className="flex items-start opacity-50">
+                <AlertTriangle className="text-gray-400 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-400">
+                  Efeitos e transitions profissionais
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Plano Ultimate */}
+          <div className="plano-card bg-white rounded-xl shadow-md p-6 border border-gray-200 flex flex-col">
+            <div className="mb-8">
+              <h3 className="text-2xl font-bold mb-2">Ultimate</h3>
+              <div className="flex items-start mb-4">
+                <span className="text-3xl font-bold">R$</span>
+                <span className="text-5xl font-bold">149</span>
+                <span className="text-lg text-gray-500 mt-1">/mês</span>
+              </div>
+              <p className="text-gray-600 mb-6">Para profissionais e agências de marketing.</p>
+              
+              <Button 
+                className="btn-ultimate w-full py-6 text-lg font-semibold" 
+              >
+                Selecionar plano
+              </Button>
+            </div>
+            
+            <div className="space-y-4 flex-grow">
+              <div className="flex items-start">
+                <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-700">
+                  <strong>500</strong> gerações de conteúdo por mês
+                </span>
+              </div>
+              <div className="flex items-start">
+                <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-700">
+                  Tudo do plano Premium
+                </span>
+              </div>
+              <div className="flex items-start">
+                <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-700">
+                  <strong>Edição profissional</strong> com IA
+                </span>
+              </div>
+              <div className="flex items-start">
+                <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-700">
+                  Efeitos e transitions cinemáticas
+                </span>
+              </div>
+              <div className="flex items-start">
+                <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-700">
+                  Vozes realistas com IA
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Garantia e segurança */}
+        <div className="mt-16 text-center">
+          <div className="inline-flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full text-green-700 mb-4">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            <span className="font-medium">Garantia de 7 dias ou seu dinheiro de volta</span>
+          </div>
+          
+          <p className="text-sm text-gray-500 max-w-xl mx-auto">
+            Todos os planos são cobrados mensalmente. Você pode cancelar a qualquer momento.
+            Os preços não incluem impostos que podem ser aplicáveis.
+          </p>
         </div>
       </div>
     </section>

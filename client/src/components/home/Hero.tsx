@@ -1,55 +1,78 @@
-import { Link } from "wouter";
-import { Sparkles, Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import VideoMockup from "./VideoMockup";
+import { ArrowRight, Sparkles } from "lucide-react";
 
 export default function Hero() {
   return (
-    <section className="hero-section bg-gradient-to-br from-primary/5 to-accent/5 pt-16 pb-24 px-4">
-      <div className="container mx-auto">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="md:w-1/2 max-w-lg">
-            <h1 className="font-poppins font-bold text-5xl md:text-7xl leading-tight mb-4">
-              Crie Vídeos Virais <span className="text-purple-600 font-black">com IA</span>
-            </h1>
-            <h2 className="text-xl md:text-2xl font-bold mb-6">
-              Do roteiro à edição final <span className="bg-gradient-to-r from-primary to-accent text-transparent bg-clip-text">em 1 minuto</span> – sem habilidades técnicas!
-            </h2>
-            <p className="text-gray-800 text-lg mb-8">
-              Gere roteiros profissionais, vídeos editados automaticamente e descrições otimizadas sem precisar de editor ou conhecimentos técnicos.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <Link href="/dashboard">
-                <div className="btn-premium w-full sm:w-auto text-center flex items-center justify-center gap-2 cursor-pointer">
-                  <Sparkles className="h-5 w-5" />
-                  <span className="whitespace-nowrap">🚀 QUERO COMEÇAR</span>
-                </div>
-              </Link>
-              <a href="#como-funciona" className="w-full sm:w-auto flex items-center justify-center gap-2 font-medium text-gray-900 hover:text-purple-600 transition text-center">
-                <Play className="h-5 w-5 fill-gray-700" />
-                Ver demonstração
-              </a>
+    <section className="hero-section bg-gradient-to-b from-gray-50 to-white py-16 md:py-20">
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Texto do Hero */}
+          <div className="max-w-xl">
+            <div className="inline-flex items-center px-3 py-1 text-sm rounded-full bg-primary/10 text-primary mb-5">
+              <Sparkles size={16} className="mr-2" />
+              <span>Novo: Geração de Reels em 1-clique</span>
             </div>
             
-            {/* Social Proof */}
-            <div className="flex items-center mt-8 px-5 py-4 bg-white/80 backdrop-blur-sm rounded-lg shadow-md border border-gray-100">
-              <div className="flex -space-x-3 mr-4">
-                <img className="w-10 h-10 rounded-full border-2 border-purple-100" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100" alt="Avatar de usuário" />
-                <img className="w-10 h-10 rounded-full border-2 border-purple-100" src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100" alt="Avatar de usuário" />
-                <img className="w-10 h-10 rounded-full border-2 border-purple-100" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100" alt="Avatar de usuário" />
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+              Crie conteúdo viral com IA
+            </h1>
+            
+            <p className="text-lg md:text-xl text-gray-700 mb-6">
+              Deixe a inteligência artificial gerar seus scripts, legendas e ideias para vídeos. Cresça no Instagram e TikTok sem esforço.
+            </p>
+            
+            <div className="flex flex-wrap items-center gap-4 mb-8">
+              <Button 
+                className="btn-premium text-lg px-6 py-6 flex items-center"
+                onClick={() => window.location.href = '#planos'}
+              >
+                Começar agora
+                <ArrowRight size={20} className="ml-2" />
+              </Button>
+              
+              <div className="text-sm text-gray-500 flex items-center">
+                <svg 
+                  viewBox="0 0 24 24" 
+                  className="w-5 h-5 text-yellow-400 mr-1"
+                  fill="currentColor"
+                >
+                  <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                </svg>
+                <span>Avaliado por <strong>2.783</strong> clientes</span>
               </div>
-              <p className="text-sm text-gray-700">
-                <span className="font-bold text-purple-600 bg-purple-50 px-3 py-1 rounded-full">+12.500 criadores</span>{" "}
-                <span className="hidden sm:inline">já estão economizando tempo com o ContentPro</span>
+            </div>
+            
+            <div className="flex flex-wrap gap-6">
+              <div className="flex -space-x-2">
+                <img 
+                  src="https://i.pravatar.cc/100?img=1" 
+                  className="w-8 h-8 rounded-full border-2 border-white" 
+                  alt="Usuário" 
+                />
+                <img 
+                  src="https://i.pravatar.cc/100?img=2" 
+                  className="w-8 h-8 rounded-full border-2 border-white" 
+                  alt="Usuário" 
+                />
+                <img 
+                  src="https://i.pravatar.cc/100?img=3" 
+                  className="w-8 h-8 rounded-full border-2 border-white" 
+                  alt="Usuário" 
+                />
+                <div className="w-8 h-8 rounded-full border-2 border-white bg-primary flex items-center justify-center text-xs text-white font-bold">
+                  +82
+                </div>
+              </div>
+              
+              <p className="text-sm text-gray-600">
+                <span className="font-semibold">85 pessoas</span> assinaram nos últimos 30 minutos
               </p>
             </div>
           </div>
           
           {/* Mockup de vídeo interativo */}
-          <div className="md:w-1/2 relative">
-            <div className="absolute -top-10 -left-10 w-40 h-40 bg-purple-400/10 rounded-full blur-2xl"></div>
-            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/10 rounded-full blur-2xl"></div>
-            
-            {/* Vídeo mockup interativo com botão de play */}
+          <div className="lg:ml-auto">
             <VideoMockup />
           </div>
         </div>
