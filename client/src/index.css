@@ -132,6 +132,24 @@
   @apply pt-12 md:pt-16;
 }
 
+/* Animação sutil nos depoimentos */
+.bg-gradient-to-br {
+  @apply transition-all duration-300;
+}
+
+.bg-gradient-to-br:hover {
+  @apply transform -translate-y-2 shadow-xl;
+}
+
+/* Efeito de hover nos cartões dos planos */
+.plano-card {
+  @apply transition-all duration-300;
+}
+
+.plano-card:hover {
+  @apply transform -translate-y-2 shadow-xl border-accent/30;
+}
+
 @media (max-width: 640px) {
   .hero-section h1 {
     @apply text-3xl;
