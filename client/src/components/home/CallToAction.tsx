@@ -12,10 +12,10 @@ export default function CallToAction() {
         <h2 className="text-3xl md:text-5xl text-white font-bold mb-6">Pronto para revolucionar seu conteúdo?</h2>
         <p className="text-white/90 max-w-2xl mx-auto mb-10 text-lg">Junte-se a milhares de criadores que economizam tempo e aumentam seu engajamento com o ContentPro.</p>
         <Link href="/dashboard">
-          <a className="inline-flex items-center justify-center gap-2 bg-white text-primary font-medium px-8 py-4 rounded-xl hover:bg-gray-100 transition shadow-xl">
+          <div className="inline-flex items-center justify-center gap-2 bg-white text-primary font-medium px-8 py-4 rounded-xl hover:bg-gray-100 transition shadow-xl cursor-pointer">
             <Zap className="h-5 w-5 text-primary" />
             <span>Começar Grátis por 7 Dias</span>
-          </a>
+          </div>
         </Link>
         <p className="text-white/80 mt-6 font-medium">Sem necessidade de cartão de crédito • Apenas R$59/mês após o período de teste</p>
       </div>
