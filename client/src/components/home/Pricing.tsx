@@ -1,8 +1,32 @@
 import { Button } from "@/components/ui/button";
-import { Check, AlertTriangle } from "lucide-react";
+import { Check, AlertTriangle, Calculator, DollarSign } from "lucide-react";
 import CountdownSpots from "./CountdownSpots";
+import { useState, useEffect } from "react";
 
 export default function Pricing() {
+  const [videoCount, setVideoCount] = useState(15);
+  const [savings, setSavings] = useState("1.275");
+  const [hoursPerMonth, setHoursPerMonth] = useState(30);
+  
+  // Calcula economia
+  useEffect(() => {
+    // Custo médio por vídeo editado R$85
+    const costPerVideo = 85;
+    // Calcula economia total (formatado como BR currency)
+    const totalSavings = (videoCount * costPerVideo).toLocaleString('pt-BR');
+    setSavings(totalSavings);
+    
+    // Calcula horas economizadas (2h por vídeo em média)
+    const hoursPerVideo = 2;
+    const totalHours = videoCount * hoursPerVideo;
+    setHoursPerMonth(totalHours);
+  }, [videoCount]);
+  
+  // Manipula mudança no controle deslizante de vídeos
+  const handleVideoCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setVideoCount(parseInt(e.target.value));
+  };
+  
   return (
     <section id="planos" className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -15,7 +39,7 @@ export default function Pricing() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
           {/* Plano Basic */}
           <div className="plano-card bg-white rounded-xl shadow-md p-6 border border-gray-200 flex flex-col">
             <div className="mb-8">
@@ -88,7 +112,8 @@ export default function Pricing() {
               <CountdownSpots />
               
               <Button 
-                className="btn-premium w-full py-6 text-lg font-semibold mt-5" 
+                className="btn-premium w-full py-6 text-lg font-semibold mt-5 pricing-btn"
+                data-plan="premium" 
               >
                 Obter Premium agora
               </Button>
@@ -128,6 +153,59 @@ export default function Pricing() {
             </div>
           </div>
           
+          {/* Plano Pro (Decoy/Isca) */}
+          <div className="plano-card decoy bg-white rounded-xl shadow-md p-6 border border-gray-200 flex flex-col opacity-90">
+            <div className="mb-8">
+              <h3 className="text-2xl font-bold mb-2">Pro</h3>
+              <div className="flex items-start mb-4">
+                <span className="text-3xl font-bold">R$</span>
+                <span className="text-5xl font-bold">119</span>
+                <span className="text-lg text-gray-500 mt-1">/mês</span>
+              </div>
+              <p className="text-gray-600 mb-6">Para produtores de conteúdo profissionais.</p>
+              
+              <Button 
+                className="btn-pro w-full py-6 text-lg font-semibold pricing-btn"
+                data-plan="pro"
+              >
+                Selecionar plano
+              </Button>
+            </div>
+            
+            <div className="space-y-4 flex-grow">
+              <div className="flex items-start">
+                <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-700">
+                  <strong>200</strong> gerações de conteúdo por mês
+                </span>
+              </div>
+              <div className="flex items-start">
+                <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-700">
+                  Scripts, legendas e hashtags otimizadas
+                </span>
+              </div>
+              <div className="flex items-start">
+                <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-700">
+                  <strong>Montagem automática</strong> de vídeos
+                </span>
+              </div>
+              <div className="flex items-start">
+                <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-gray-700">
+                  Edição avançada com IA
+                </span>
+              </div>
+              <div className="flex items-start text-red-500">
+                <AlertTriangle className="text-red-500 mt-1 flex-shrink-0" size={18} />
+                <span className="ml-3 text-red-500">
+                  <strong>Não inclui</strong> templates premium
+                </span>
+              </div>
+            </div>
+          </div>
+          
           {/* Plano Ultimate */}
           <div className="plano-card bg-white rounded-xl shadow-md p-6 border border-gray-200 flex flex-col">
             <div className="mb-8">
@@ -140,7 +218,8 @@ export default function Pricing() {
               <p className="text-gray-600 mb-6">Para profissionais e agências de marketing.</p>
               
               <Button 
-                className="btn-ultimate w-full py-6 text-lg font-semibold" 
+                className="btn-ultimate w-full py-6 text-lg font-semibold pricing-btn" 
+                data-plan="ultimate"
               >
                 Selecionar plano
               </Button>
@@ -176,6 +255,66 @@ export default function Pricing() {
                 <span className="ml-3 text-gray-700">
                   Vozes realistas com IA
                 </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Calculadora de ROI */}
+        <div className="max-w-2xl mx-auto mt-20 bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="p-6 bg-gradient-to-r from-primary/10 to-purple-500/10">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-primary/20 rounded-full p-2">
+                <Calculator className="text-primary h-6 w-6" />
+              </div>
+              <h3 className="text-2xl font-bold">Calculadora de Economia</h3>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="roi-calculator">
+                <p className="text-lg font-medium mb-2">Se eu criar <span id="count" className="text-primary font-bold">{videoCount}</span> vídeos por mês:</p>
+                
+                <input
+                  type="range"
+                  id="videoCount"
+                  min="5"
+                  max="50"
+                  value={videoCount}
+                  onChange={handleVideoCountChange}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                />
+                
+                <div className="flex justify-between text-sm text-gray-500 mt-1">
+                  <span>5 vídeos</span>
+                  <span>50 vídeos</span>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <div className="resultado p-4 bg-white rounded-lg border-2 border-primary/20 flex items-center">
+                  <div className="bg-primary/10 rounded-full p-2 mr-3">
+                    <DollarSign className="text-primary h-5 w-5" />
+                  </div>
+                  <div>
+                    <span className="block text-sm font-medium text-gray-500">Economizo:</span>
+                    <span className="block text-2xl font-bold text-primary">R$ <span id="economia">{savings}</span></span>
+                    <span className="text-xs text-gray-500">em custos de edição</span>
+                  </div>
+                </div>
+                
+                <div className="resultado p-4 bg-white rounded-lg border-2 border-purple-500/20 flex items-center">
+                  <div className="bg-purple-500/10 rounded-full p-2 mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="block text-sm font-medium text-gray-500">Economizo:</span>
+                    <span className="block text-2xl font-bold text-purple-600">{hoursPerMonth} horas</span>
+                    <span className="text-xs text-gray-500">de trabalho por mês</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
