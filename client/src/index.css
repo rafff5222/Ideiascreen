@@ -239,3 +239,41 @@
 .floating-bar.visible {
   transform: translateY(0);
 }
+
+/* Estilos para o chatbot de IA */
+.chatbot-bubble {
+  @apply inline-block bg-gray-100 rounded-lg p-3 max-w-[80%];
+}
+
+.chatbot-bubble.user {
+  @apply bg-primary/10 text-primary ml-auto;
+}
+
+.chatbot-message {
+  @apply mb-3;
+}
+
+.chatbot-message.user {
+  @apply flex justify-end;
+}
+
+/* Indicador de digitação */
+.typing-indicator {
+  @apply flex items-center;
+}
+
+.typing-indicator span {
+  @apply h-2 w-2 bg-gray-400 rounded-full mx-0.5 animate-pulse;
+}
+
+.typing-indicator span:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 200ms;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 400ms;
+}
