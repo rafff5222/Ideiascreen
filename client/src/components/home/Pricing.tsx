@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Check, X, Zap, Rocket } from "lucide-react";
+import { Check, X, Zap, Rocket, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function Pricing() {
@@ -8,9 +8,10 @@ export default function Pricing() {
     {
       name: "Básico",
       price: 59,
+      tagline: "Ideal para testes e pequenos criadores",
       description: "Ideal para iniciantes que querem criar conteúdo de qualidade",
       features: [
-        { title: "Geração de Roteiros", value: "50 créditos/mês" },
+        { title: "Geração de Roteiros", value: "50 créditos/mês", highlight: true },
         { title: "Descrições & Hashtags", value: "Simples" },
         { title: "Vídeos Automáticos", included: false },
         { title: "Estilo de Vídeo", value: "-" },
@@ -20,50 +21,52 @@ export default function Pricing() {
       ],
       cta: "COMEÇAR AGORA",
       popular: false,
-      headerClass: "bg-primary/10",
-      priceClass: "text-primary",
-      buttonClass: "bg-primary"
+      headerClass: "bg-gray-50",
+      priceClass: "text-gray-600",
+      buttonClass: "bg-gray-200 text-gray-700"
     },
     {
       name: "Premium",
       price: 89,
+      tagline: "🚀 Melhor custo-benefício",
       icon: <Rocket className="h-5 w-5" />,
       description: "De roteiro a Reel em 1 clique! Nossa IA edita vídeos com cortes automáticos, legendas sincronizadas e áudios virais.",
       features: [
-        { title: "Geração de Roteiros", value: "150 créditos/mês" },
-        { title: "Descrições & Hashtags", value: "Otimizadas por IA" },
-        { title: "Vídeos Automáticos", value: "Auto-montagem (IA)" },
+        { title: "Geração de Roteiros", value: "150 créditos/mês", highlight: true },
+        { title: "Descrições & Hashtags", value: "Otimizadas por IA", highlight: true },
+        { title: "Vídeos Automáticos", value: "Auto-montagem (IA)", highlight: true },
         { title: "Estilo de Vídeo", value: "5 templates básicos" },
-        { title: "Áudio", value: "Banco de áudios virais" },
+        { title: "Áudio", value: "Banco de áudios virais", highlight: true },
         { title: "Prioridade", value: "Geração 2x mais rápida" },
         { title: "Suporte", value: "24h" },
       ],
       cta: "🚀 QUERO VÍDEOS AUTOMÁTICOS",
       popular: true,
-      headerClass: "bg-accent/10",
-      priceClass: "text-accent",
-      buttonClass: "bg-gradient-to-r from-accent to-primary",
-      borderClass: "border-accent border-2"
+      headerClass: "bg-gradient-to-r from-green-50 to-green-100",
+      priceClass: "text-green-600",
+      buttonClass: "bg-gradient-to-r from-green-500 to-green-600",
+      borderClass: "border-green-500 border-2"
     },
     {
       name: "Ultimate",
       price: 149,
+      tagline: "Para profissionais e agências",
       icon: <Zap className="h-5 w-5" />,
-      description: "Vídeos que parecem feitos por um editor humano! Efeitos cinematográficos, voz realista e templates exclusivos.",
+      description: "Vídeos com qualidade de agência (sem pagar R$ 500/edição)! Templates exclusivos e voz idêntica à humana.",
       features: [
-        { title: "Geração de Roteiros", value: "Créditos ilimitados" },
-        { title: "Descrições & Hashtags", value: "Premium + estratégias" },
-        { title: "Vídeos Automáticos", value: "Edição Avançada (IA)" },
-        { title: "Estilo de Vídeo", value: "+20 templates profissionais" },
-        { title: "Áudio", value: "Voz humana artificial (ElevenLabs) + trilhas exclusivas" },
+        { title: "Geração de Roteiros", value: "Créditos ilimitados", highlight: true },
+        { title: "Descrições & Hashtags", value: "Premium + estratégias", highlight: true },
+        { title: "Vídeos Automáticos", value: "Edição Avançada (IA)", highlight: true },
+        { title: "Estilo de Vídeo", value: "+20 templates profissionais", highlight: true },
+        { title: "Áudio", value: "Voz humana artificial (ElevenLabs) + trilhas exclusivas", highlight: true },
         { title: "Prioridade", value: "Fila zero (processamento imediato)" },
         { title: "Suporte", value: "12h + tutoriais exclusivos" },
       ],
       cta: "⚡ QUERO EDIÇÃO PROFISSIONAL",
       popular: false,
-      headerClass: "bg-secondary/10",
-      priceClass: "text-secondary",
-      buttonClass: "bg-secondary"
+      headerClass: "bg-gradient-to-r from-purple-50 to-purple-100",
+      priceClass: "text-purple-600",
+      buttonClass: "bg-gradient-to-r from-purple-500 to-purple-600"
     }
   ];
 
@@ -85,20 +88,21 @@ export default function Pricing() {
               )}
             >
               {plan.popular && (
-                <div className="absolute top-0 right-0">
-                  <div className="bg-accent text-white text-xs font-bold px-4 py-1 rounded-bl-lg shadow-lg">
-                    RECOMENDADO
+                <div className="absolute -right-12 top-7 rotate-45 z-10">
+                  <div className="bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-bold py-1 px-12 shadow-lg w-40 text-center">
+                    🔥 MAIS VENDIDO
                   </div>
                 </div>
               )}
               
               <div className={cn("p-6 text-center", plan.headerClass)}>
-                <h3 className="font-poppins font-bold text-xl mb-2 flex items-center justify-center gap-2">
+                <h3 className="font-poppins font-bold text-xl mb-1 flex items-center justify-center gap-2">
                   {plan.icon && plan.icon}
                   {plan.name}
-                  {plan.icon && plan.name === "Premium" && <span className="text-accent">🚀</span>}
+                  {plan.icon && plan.name === "Premium" && <span className="text-green-500">🚀</span>}
                   {plan.icon && plan.name === "Ultimate" && <span>⚡</span>}
                 </h3>
+                <p className="text-sm text-gray-600 mb-3">{plan.tagline}</p>
                 <div className="flex items-center justify-center mb-4">
                   <span className={cn("text-4xl font-bold", plan.priceClass)}>R$ {plan.price}</span>
                   <span className="text-gray-600 ml-2">/mês</span>
@@ -111,13 +115,15 @@ export default function Pricing() {
                   {plan.features.map((feature, fIndex) => (
                     <li key={fIndex} className="flex items-start text-sm">
                       {'included' in feature && feature.included === false ? (
-                        <X className="text-gray-400 mr-3 min-w-[20px]" size={20} />
+                        <X className="text-gray-400 mr-3 min-w-[20px] mt-0.5" size={18} />
                       ) : (
-                        <Check className="text-green-500 mr-3 min-w-[20px]" size={20} />
+                        <Check className="text-green-500 mr-3 min-w-[20px] mt-0.5" size={18} />
                       )}
                       <div>
-                        <span className="font-medium">{feature.title}: </span>
-                        <span className="text-gray-600">{feature.value || ''}</span>
+                        <span className="font-medium">{feature.title}:</span>{" "}
+                        <span className={feature.highlight ? "font-semibold text-gray-800" : "text-gray-600"}>
+                          {feature.value || ''}
+                        </span>
                       </div>
                     </li>
                   ))}
@@ -134,11 +140,14 @@ export default function Pricing() {
                   </div>
                 </Link>
                 {plan.popular && (
-                  <div className="mt-4 bg-accent/10 rounded-lg p-3 text-center">
-                    <p className="text-sm font-medium text-accent">Teste Grátis: 3 vídeos automáticos (7 dias)</p>
+                  <div className="mt-4 bg-green-50 rounded-lg p-3 text-center border border-green-100">
+                    <p className="text-sm font-medium text-green-600">Teste Grátis: 3 vídeos automáticos (7 dias)</p>
                   </div>
                 )}
-                <p className="text-center text-sm text-gray-500 mt-4">7 dias de garantia de devolução do dinheiro</p>
+                <p className="text-center text-sm text-gray-500 mt-4 flex items-center justify-center gap-1">
+                  <Shield className="h-4 w-4 text-gray-400" />
+                  7 dias de garantia de devolução do dinheiro
+                </p>
               </div>
             </div>
           ))}

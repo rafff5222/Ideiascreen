@@ -79,7 +79,7 @@ export default function Dashboard() {
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             ) : (
-              <ContentHistory content={contentHistory || []} />
+              <ContentHistory content={Array.isArray(contentHistory) ? contentHistory : []} />
             )}
           </TabsContent>
         </Tabs>
