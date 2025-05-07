@@ -12,6 +12,7 @@ import OfferProgressBar from "@/components/conversion/OfferProgressBar";
 import OneClickCheckout from "@/components/conversion/OneClickCheckout";
 import TechnicalOptimizations from "@/components/conversion/TechnicalOptimizations";
 import SalesAiChatbot from "@/components/conversion/SalesAiChatbot";
+import MetricsPanel from "@/components/admin/MetricsPanel";
 
 export default function Home() {
   // Scroll to top when navigating to home page
@@ -84,6 +85,7 @@ export default function Home() {
       {/* Componentes de Conversão */}
       <OneClickCheckout />
       <SalesAiChatbot />
+      <MetricsPanel />
       <TechnicalOptimizations />
     </>
   );

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Clock, AlertTriangle } from "lucide-react";
+import { ArrowRight, Timer, Sparkles } from "lucide-react";
 
 /**
  * Componente inteligente que adapta o CTA (Call to Action) baseado no comportamento do usuário
@@ -9,59 +9,81 @@ import { ArrowRight, Clock, AlertTriangle } from "lucide-react";
  * - Animações para aumentar o destaque
  */
 export default function DynamicCta() {
-  const [ctaText, setCtaText] = useState("Começar agora");
-  const [ctaIcon, setCtaIcon] = useState(<ArrowRight size={20} className="ml-2" />);
-  const [hasSpecialOffer, setHasSpecialOffer] = useState(false);
-  const [isUrgent, setIsUrgent] = useState(false);
-
+  const [ctaState, setCtaState] = useState<'default' | 'engaged' | 'urgent'>('default');
+  const [animate, setAnimate] = useState(false);
+  
   useEffect(() => {
-    // Detecta a profundidade de rolagem
+    // 1. Tempo na página: após 30 segundos, muda para estado "engaged"
+    const timer = setTimeout(() => {
+      setCtaState(prev => prev === 'default' ? 'engaged' : prev);
+      pulseAnimation();
+    }, 30000);
+    
+    // 2. Profundidade de rolagem: após rolar 70% da página, fica "urgent"
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
-      const documentHeight = document.body.scrollHeight - window.innerHeight;
-      const scrollDepth = (scrollPosition / documentHeight) * 100;
+      const totalHeight = document.body.scrollHeight - window.innerHeight;
+      const scrollPercentage = (scrollPosition / totalHeight) * 100;
       
-      // Se o usuário rolou mais de 60% da página, mostra um CTA de urgência
-      if (scrollDepth > 60 && !isUrgent) {
-        setCtaText("⚠️ ÚLTIMAS VAGAS! Quero meu desconto");
-        setIsUrgent(true);
+      if (scrollPercentage > 70) {
+        if (ctaState !== 'urgent') {
+          setCtaState('urgent');
+          pulseAnimation();
+        }
       }
     };
     
-    // Após 30 segundos, mostra uma oferta relâmpago
-    const timer = setTimeout(() => {
-      setCtaText("🔥 OFERTA RELÂMPAGO: 60% OFF nas próximas 2h!");
-      setCtaIcon(<Clock size={20} className="ml-2 animate-pulse" />);
-      setHasSpecialOffer(true);
-    }, 30000);
-    
-    // Registra o listener de scroll
     window.addEventListener('scroll', handleScroll);
     
+    // Aplica animação para chamar atenção
+    function pulseAnimation() {
+      setAnimate(true);
+      setTimeout(() => setAnimate(false), 1200);
+    }
+    
+    // Inicia a animação quando o componente for montado (após um pequeno atraso)
+    const initialAnimationTimer = setTimeout(() => {
+      pulseAnimation();
+    }, 2000);
+    
+    // Limpa event listeners e timers
     return () => {
-      window.removeEventListener('scroll', handleScroll);
       clearTimeout(timer);
+      clearTimeout(initialAnimationTimer);
+      window.removeEventListener('scroll', handleScroll);
     };
-  }, [isUrgent]);
-
-  // Classe CSS dinâmica baseada no estado do CTA
-  const ctaClass = `
-    btn-premium text-lg px-6 py-6 flex items-center transition-all
-    ${hasSpecialOffer ? 'animate-pulse scale-105' : ''}
-    ${isUrgent ? 'bg-red-600 hover:bg-red-700' : ''}
-  `;
-
+  }, [ctaState]);
+  
+  // Define os textos e estilos com base no estado
+  const ctaContent = {
+    default: {
+      text: 'Começar agora',
+      icon: <ArrowRight size={20} className="ml-2" />,
+      classes: 'bg-gradient-to-r from-primary to-purple-600 hover:brightness-110'
+    },
+    engaged: {
+      text: 'Criar primeiro conteúdo',
+      icon: <Sparkles size={20} className="ml-2" />,
+      classes: 'bg-gradient-to-r from-primary to-purple-600 hover:brightness-110'
+    },
+    urgent: {
+      text: '92% das vagas preenchidas',
+      icon: <Timer size={20} className="ml-2" />,
+      classes: 'bg-gradient-to-r from-amber-500 to-red-600 hover:brightness-110'
+    }
+  };
+  
+  const currentCta = ctaContent[ctaState];
+  
   return (
     <Button 
-      id="main-cta"
-      className={ctaClass}
+      className={`btn-premium text-lg px-6 py-6 flex items-center transition-all 
+        ${currentCta.classes} 
+        ${animate ? 'animate-text-blink scale-105' : ''}`}
       onClick={() => window.location.href = '#planos'}
     >
-      <span 
-        className={hasSpecialOffer ? 'animate-text-blink' : ''}
-        dangerouslySetInnerHTML={{ __html: ctaText }}
-      />
-      {ctaIcon}
+      {currentCta.text}
+      {currentCta.icon}
     </Button>
   );
 }

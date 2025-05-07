@@ -6,79 +6,88 @@ import { Clock, AlertTriangle } from "lucide-react";
  * Cria um gatilho FOMO (Fear of Missing Out) para incentivar ação imediata
  */
 export default function OfferProgressBar() {
-  const [progress, setProgress] = useState(65);
-  const [timeLeft, setTimeLeft] = useState(4 * 60 + 32); // 4min e 32s
-  const [showAlert, setShowAlert] = useState(false);
-  
-  // Formata o tempo no formato MM:SS
-  const formatTime = (timeInSeconds: number) => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = timeInSeconds % 60;
-    return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-  };
+  const [progress, setProgress] = useState(82);
+  const [timeLeft, setTimeLeft] = useState(3600); // 1 hora em segundos
+  const [isVisible, setIsVisible] = useState(false);
+  const [isFloating, setIsFloating] = useState(false);
   
   useEffect(() => {
-    // Inicia o contador regressivo
-    const timer = setInterval(() => {
-      setTimeLeft(prevTime => {
-        if (prevTime <= 1) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prevTime - 1;
-      });
-      
-      // Aumenta progressivamente a porcentagem preenchida
-      setProgress(prevProgress => {
-        // Calcula uma nova porcentagem que aumenta mais rápido
-        // quanto menor o tempo restante
-        const increment = (100 - prevProgress) / 200;
-        
-        // Garante que não ultrapasse 95% (para manter sensação de urgência)
-        return Math.min(95, prevProgress + increment);
-      });
-      
-      // Quando o tempo estiver acabando, mostra um alerta especial
-      if (timeLeft < 60 && !showAlert) {
-        setShowAlert(true);
+    // Mostra a barra após um breve atraso
+    const showTimer = setTimeout(() => {
+      setIsVisible(true);
+    }, 3000);
+    
+    // Faz a barra começar a flutuar após scroll
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setIsFloating(true);
+      } else {
+        setIsFloating(false);
       }
-      
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    
+    // Incrementa o progresso gradualmente para simular outras pessoas comprando
+    const progressInterval = setInterval(() => {
+      setProgress(prev => {
+        // Aumenta o progresso até 94% (mantém uma sensação de urgência, mas ainda com vagas)
+        if (prev < 94) {
+          return prev + Math.random();
+        }
+        return prev;
+      });
+    }, 45000); // A cada 45 segundos
+    
+    // Contador regressivo
+    const countdownInterval = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 0) return 0;
+        return prev - 1;
+      });
     }, 1000);
     
-    return () => clearInterval(timer);
-  }, [timeLeft, showAlert]);
+    return () => {
+      clearTimeout(showTimer);
+      clearInterval(progressInterval);
+      clearInterval(countdownInterval);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+  
+  // Formata o tempo restante em HH:MM:SS
+  const formatTime = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+  
+  if (!isVisible) return null;
   
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-purple-900 to-purple-700 text-white py-2 px-4 shadow-lg">
-      <div className="container mx-auto">
-        <div className="flex flex-col sm:flex-row items-center justify-between">
-          <div className="flex items-center mb-2 sm:mb-0">
-            <Clock className="h-4 w-4 mr-2 animate-pulse" />
-            <span className="text-sm font-medium">
-              Oferta especial termina em: <span className="font-bold">{formatTime(timeLeft)}</span>
-            </span>
+    <div className={`${isFloating ? 'floating-bar visible shadow-md' : 'relative'} bg-gradient-to-r from-yellow-50 to-amber-50 border-b border-amber-100 py-3 transition-all duration-300`}>
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={18} className="text-amber-500" />
+            <p className="text-sm font-medium text-amber-900">
+              Promoção de lançamento: <span className="font-semibold text-red-600">{Math.floor(progress)}%</span> das vagas preenchidas
+            </p>
           </div>
           
-          <div className="flex items-center">
-            <span className="text-sm mr-2 whitespace-nowrap">
-              <span className="font-bold">{Math.round(progress)}%</span> das vagas já preenchidas
-            </span>
-            <div className="w-32 sm:w-48 bg-white/20 rounded-full h-2">
-              <div 
-                className="bg-white rounded-full h-2 transition-all duration-1000 ease-in-out"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
+          <div className="flex items-center gap-2">
+            <Clock size={16} className="text-amber-500" />
+            <p className="text-sm font-medium text-amber-900">
+              Oferta expira em: <span className="font-semibold">{formatTime(timeLeft)}</span>
+            </p>
           </div>
         </div>
         
-        {/* Alerta para quando o tempo estiver acabando */}
-        {showAlert && (
-          <div className="mt-1 flex items-center justify-center text-yellow-300 animate-pulse">
-            <AlertTriangle className="h-4 w-4 mr-1" />
-            <span className="text-xs font-bold">Estamos quase no limite! Aproveite enquanto há vagas!</span>
-          </div>
-        )}
+        <div className="offer-bar mt-2">
+          <div className="progress" style={{ width: `${progress}%` }}></div>
+        </div>
       </div>
     </div>
   );
