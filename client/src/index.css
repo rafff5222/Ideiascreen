@@ -109,9 +109,11 @@
   }
 }
 
-/* Cores vibrantes para botões */
+/* Cores vibrantes para botões - Psicologia militar de cores para urgência e ação */
 .btn-premium {
-  @apply bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold px-6 py-3 rounded-lg shadow-lg hover:brightness-110 hover:scale-105 transition duration-300;
+  @apply text-white font-bold px-6 py-3 rounded-lg shadow-lg hover:brightness-110 hover:scale-105 transition duration-300;
+  background: linear-gradient(135deg, #FF4D4D 0%, #F9CB28 100%);
+  /* Vermelho (urgência) + Amarelo (alerta) para criar senso de ação imediata */
 }
 
 .btn-basic {
@@ -119,7 +121,9 @@
 }
 
 .btn-ultimate {
-  @apply bg-purple-600 text-white hover:bg-purple-700;
+  @apply text-white hover:brightness-110;
+  background: linear-gradient(135deg, #6B21A8 0%, #9333EA 100%);
+  /* Tons de roxo mais intensos para plano premium */
 }
 
 /* Ajustes para o mockup de vídeo */

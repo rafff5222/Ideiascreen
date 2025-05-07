@@ -10,6 +10,11 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ExitPopup from "@/components/ui/exit-popup";
 
+// Componentes de analytics e conversão
+import ClickTracker from "@/components/analytics/ClickTracker";
+import RetentionPixel from "@/components/analytics/RetentionPixel";
+import UpsellModal from "@/components/upsell/UpsellModal";
+
 function Router() {
   return (
     <Switch>
@@ -31,6 +36,12 @@ function App() {
             <Router />
           </main>
           <Footer />
+          
+          {/* Analytics e Componentes de Conversão */}
+          <ClickTracker />
+          <RetentionPixel />
+          <UpsellModal />
+          
           {/* Exibe o popup de saída apenas na página inicial */}
           <Route path="/">
             <ExitPopup />

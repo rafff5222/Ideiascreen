@@ -1,0 +1,67 @@
+🚀 1. "Hotjar do Pobre" - Gravação de Cliques (Sem Plugins)
+Problema: Você não sabe onde os usuários clicam/hesitam.
+Solução: Mapeamento térmico caseiro:
+
+javascript
+document.addEventListener('click', function(e) {
+  const dot = document.createElement('div');
+  dot.style.position = 'fixed';
+  dot.style.left = `${e.clientX - 5}px`;
+  dot.style.top = `${e.clientY - 5}px`;
+  dot.style.width = '10px';
+  dot.style.height = '10px';
+  dot.style.backgroundColor = 'rgba(255,0,0,0.5)';
+  dot.style.borderRadius = '50%';
+  dot.style.zIndex = '9999';
+  document.body.appendChild(dot);
+  setTimeout(() => dot.remove(), 1000);
+});
+Como usar:
+
+Adicione este código temporariamente
+
+Grave sua tela por 2 dias
+
+Analise onde surgem mais pontos vermelhos (áreas quentes)
+
+💎 2. Upsell Pós-Pagamento (Ouro Escondido)
+Momento mágico: Após confirmação de pagamento.
+Adicione este modal:
+
+html
+<div id="upsell-modal" style="display:none;">
+  <h3>🎁 Presente especial para você!</h3>
+  <p>Adquira o <strong>Pacote Hashtag Viral</strong> por R$ 19 (90% OFF) e aumente seu alcance em 3x!</p>
+  <button id="accept-upsell">SIM, QUERO BOMBAR!</button>
+  <button id="reject-upsell">Não, obrigado</button>
+</div>
+Script de exibição:
+
+javascript
+if (window.location.href.includes('obrigado')) {
+  setTimeout(() => {
+    document.getElementById('upsell-modal').style.display = 'block';
+  }, 3000);
+}
+📈 3. Pixel de Retenção (Luta Contra Cancelamentos)
+Técnica: Detecta intenção de cancelar antes que aconteça.
+Código na página de configurações:
+
+javascript
+document.querySelectorAll('a[href*="cancelar"]').forEach(link => {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    // Exibe oferta de retenção
+    alert("Antes de ir... Que tal 15 dias GRÁTIS para testar nosso novo recurso de edição automática?");
+    window.location.href = "/retention-offer";
+  });
+});
+🎨 4. Psicologia das Cores Avançada
+Problema: Seu roxo (#8B5CF6) atrai criatividade, mas não urgência.
+Solução gradiente militar:
+
+css
+.btn-premium {
+  background: linear-gradient(135deg, #FF4D4D 0%, #F9CB28 100%);
+  /* Vermelho (urgência) + Amarelo (alerta) */
+}
