@@ -8,6 +8,7 @@ import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import ExitPopup from "@/components/ui/exit-popup";
 
 function Router() {
   return (
@@ -30,6 +31,10 @@ function App() {
             <Router />
           </main>
           <Footer />
+          {/* Exibe o popup de saída apenas na página inicial */}
+          <Route path="/">
+            <ExitPopup />
+          </Route>
         </div>
       </TooltipProvider>
     </QueryClientProvider>
