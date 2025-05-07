@@ -2,8 +2,11 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Check, X, Zap, Rocket, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
+import CountdownSpots from "./CountdownSpots";
 
 export default function Pricing() {
+  const remainingSpots = CountdownSpots();
   const pricingPlans = [
     {
       name: "Básico",
@@ -88,11 +91,20 @@ export default function Pricing() {
               )}
             >
               {plan.popular && (
-                <div className="absolute -right-12 top-7 rotate-45 z-10">
-                  <div className="bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-bold py-1 px-12 shadow-lg w-40 text-center">
-                    🔥 MAIS VENDIDO
+                <>
+                  {/* Badge "MAIS VENDIDO" girado */}
+                  <div className="absolute -right-12 top-7 rotate-45 z-10">
+                    <div className="bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-bold py-1 px-12 shadow-lg w-40 text-center">
+                      🔥 MAIS VENDIDO
+                    </div>
                   </div>
-                </div>
+                  
+                  {/* Selo de "Recomendado" com ícone animado */}
+                  <div className="recommended-tag">
+                    ⚡ MAIS VENDIDO 
+                    <div className="pulse"></div>
+                  </div>
+                </>
               )}
               
               <div className={cn("p-6 text-center", plan.headerClass)}>
@@ -140,9 +152,17 @@ export default function Pricing() {
                   </div>
                 </Link>
                 {plan.popular && (
-                  <div className="mt-4 bg-green-50 rounded-lg p-3 text-center border border-green-100">
-                    <p className="text-sm font-medium text-green-600">Teste Grátis: 3 vídeos automáticos (7 dias)</p>
-                  </div>
+                  <>
+                    <div className="mt-4 bg-green-50 rounded-lg p-3 text-center border border-green-100">
+                      <p className="text-sm font-medium text-green-600">Teste Grátis: 3 vídeos automáticos (7 dias)</p>
+                    </div>
+                    
+                    {/* Gatilho de urgência com contador e barra de progresso */}
+                    <div className="urgent-badge mt-4">
+                      🔥 <span id="remaining-spots">{remainingSpots}</span> vagas com 20% OFF! 
+                      <div className="progress-bar" style={{ width: `${remainingSpots * 4}%` }}></div>
+                    </div>
+                  </>
                 )}
                 <p className="text-center text-sm text-gray-500 mt-4 flex items-center justify-center gap-1">
                   <Shield className="h-4 w-4 text-gray-400" />
