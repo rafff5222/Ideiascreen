@@ -17,10 +17,10 @@ export default function Hero() {
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <Link href="/dashboard">
-                <a className="w-full sm:w-auto bg-gradient-to-r from-accent via-primary to-accent hover:opacity-90 text-white font-medium px-6 py-3 rounded-lg transition text-center flex items-center justify-center gap-2 shadow-lg">
+                <div className="w-full sm:w-auto bg-gradient-to-r from-accent via-primary to-accent hover:opacity-90 text-white font-medium px-6 py-3 rounded-lg transition text-center flex items-center justify-center gap-2 shadow-lg cursor-pointer">
                   <Sparkles className="h-5 w-5" />
                   Experimentar Agora
-                </a>
+                </div>
               </Link>
               <a href="#como-funciona" className="w-full sm:w-auto flex items-center justify-center gap-2 font-medium text-gray-900 hover:text-primary transition text-center">
                 <i className="ri-play-circle-line text-xl"></i>

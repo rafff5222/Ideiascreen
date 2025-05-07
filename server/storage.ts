@@ -52,6 +52,7 @@ export class MemStorage implements IStorage {
     const contentItem: ContentItem = {
       ...insertContent,
       id,
+      userId: insertContent.userId ?? null,
       createdAt: now,
     };
     this.contentItems.set(id, contentItem);
