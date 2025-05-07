@@ -24,8 +24,8 @@ export default function Footer() {
             <ul className="space-y-2">
               <li><a href="#recursos" className="hover:text-primary transition">Recursos</a></li>
               <li><a href="#precos" className="hover:text-primary transition">Preços</a></li>
-              <li><a href="#" className="hover:text-primary transition">Exemplos</a></li>
-              <li><a href="#" className="hover:text-primary transition">Tutoriais</a></li>
+              <li><a href="#depoimentos" className="hover:text-primary transition">Depoimentos</a></li>
+              <li><Link href="/dashboard" className="hover:text-primary transition">Começar Grátis</Link></li>
             </ul>
           </div>
 

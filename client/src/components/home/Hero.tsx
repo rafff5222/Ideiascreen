@@ -7,13 +7,14 @@ export default function Hero() {
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="md:w-1/2 max-w-lg">
-            <h1 className="font-poppins font-bold text-5xl md:text-6xl leading-tight mb-6">
+            <h1 className="font-poppins font-bold text-5xl md:text-7xl leading-tight mb-4">
               <span className="text-primary font-black"># ContentPro</span>
-              <br />
-              Crie conteúdo <span className="gradient-text">viral</span> com IA para Instagram e TikTok
             </h1>
+            <h2 className="text-2xl md:text-3xl font-bold mb-6 bg-gradient-to-r from-primary to-accent text-transparent bg-clip-text">
+              Crie vídeos virais com IA em 1 minuto – do roteiro à edição final!
+            </h2>
             <p className="text-gray-800 text-lg mb-8">
-              Gere roteiros, descrições e ideias de conteúdo em segundos. Economize tempo e aumente seu engajamento nas redes sociais.
+              Gere roteiros profissionais, descrições otimizadas e ideias de conteúdo em segundos. Economize tempo e aumente seu engajamento nas redes sociais.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <Link href="/dashboard">

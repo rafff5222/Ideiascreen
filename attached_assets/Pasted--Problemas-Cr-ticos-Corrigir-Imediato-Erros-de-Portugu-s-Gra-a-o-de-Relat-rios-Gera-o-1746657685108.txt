@@ -1,0 +1,88 @@
+🔴 Problemas Críticos (Corrigir Imediato)
+Erros de Português
+
+"Graçação de Relatórios" → "Geração de Roteiros"
+
+"Vázeos Automáticos" → "Vídeos Automáticos"
+
+Impacto: Passa impressão de amadorismo e reduz confiança.
+
+Links Quebrados
+
+Botão "Estrar" (menu superior) → Link corrigir para "Entrar".
+
+"Começar órfãs" (rodapé) → Remover ou corrigir.
+
+🟡 Melhorias de Design & UX
+Hierarquia Visual
+
+Título principal (#ContenitPro) está pequeno. Aumente o tamanho e adicione uma frase impactante:
+
+"Crie vídeos virais com IA em 1 minuto – do roteiro à edição final!"
+
+Cores e Botões
+
+Botões de CTA (como "QUERO VÍDEOS AUTOMÁTICOS") precisam de cores vibrantes (ex.: verde #22C55E ou roxo #8B5CF6).
+
+Exemplo de código CSS:
+
+css
+.btn-premium {
+  background: #22C55E;
+  color: white;
+  font-weight: bold;
+  padding: 12px 24px;
+  border-radius: 8px;
+}
+Mobile Responsivo
+
+Os planos estão "esmagados" em celulares. Use flexbox para organizar em coluna:
+
+css
+@media (max-width: 768px) {
+  .planos-container {
+    flex-direction: column;
+  }
+}
+🟢 Copywriting (Venda Mais!)
+Destaque Benefícios, Não Funcionalidades
+
+Antes: "150 creditavírmis"
+
+Depois: *"150 roteiros prontos por mês – suficiente para postar 5 vídeos/dia!"*
+
+Prova Social
+
+Adicione depoimentos reais com foto/nome:
+
+"✨ 'Gerou meu primeiro vídeo viral em 2 minutos!' – @Maria, criadora de conteúdo"
+
+Garantia com Destaque
+
+Substitua o texto pequeno por um banner:
+
+"🛡️ 7 dias de garantia – Sem risco! Se não gostar, devolvemos seu dinheiro."
+
+🔵 Tecnologia (Otimização Técnica)
+Carregamento Rápido
+
+Comprima imagens com TinyPNG.
+
+Remova scripts não utilizados.
+
+Integrações Futuras
+
+API de Vídeos: Use Runway ML ou HeyGen para edição automática.
+
+Áudio: Integre ElevenLabs para vozes realistas.
+
+🎁 Bônus (Aumente Conversão!)
+Teste A/B:
+
+Versão 1: Botão "Experimente grátis por 7 dias"
+
+Versão 2: "Quero viralizar – Começar agora"
+
+Upsell Pós-Cadastro:
+
+No painel do usuário, ofereça: *"Atualize para Premium e ganhe +50 créditos agora!"*
