@@ -6,7 +6,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { MenuIcon } from "lucide-react";
+import { MenuIcon, Sparkles } from "lucide-react";
 
 export default function Navbar() {
   const [location] = useLocation();
@@ -21,14 +21,15 @@ export default function Navbar() {
     { name: "Depoimentos", href: "/#depoimentos" },
   ];
 
+  // Fixed DOM nesting by using div instead of a when using Link component
   return (
-    <nav className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+    <nav className="bg-white shadow-md sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link href="/">
-          <a className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 cursor-pointer">
             <i className="ri-quill-pen-line text-primary text-2xl"></i>
-            <span className="font-poppins font-bold text-xl text-gray-900">ContentPro</span>
-          </a>
+            <span className="font-poppins font-bold text-xl text-gray-900 gradient-text">ContentPro</span>
+          </div>
         </Link>
         
         <div className="hidden md:flex items-center space-x-8">
@@ -44,7 +45,7 @@ export default function Navbar() {
           
           {!isHomePage && (
             <Link href="/">
-              <a className="font-medium hover:text-primary transition">Início</a>
+              <div className="font-medium hover:text-primary transition cursor-pointer">Início</div>
             </Link>
           )}
         </div>
@@ -53,20 +54,21 @@ export default function Navbar() {
           {location === "/" ? (
             <>
               <Link href="/dashboard">
-                <a className="hidden md:block font-medium hover:text-primary transition">Entrar</a>
+                <div className="hidden md:block font-medium hover:text-primary transition cursor-pointer">Entrar</div>
               </Link>
-              <Button asChild className="bg-primary hover:bg-primary/90">
-                <Link href="/dashboard">
-                  <a>Começar Grátis</a>
-                </Link>
-              </Button>
+              <Link href="/dashboard">
+                <div className="bg-gradient-to-r from-accent to-primary text-white font-medium px-5 py-2 rounded-lg shadow-md hover:opacity-90 transition flex items-center gap-2 cursor-pointer">
+                  <Sparkles className="h-4 w-4" />
+                  <span>Começar Grátis</span>
+                </div>
+              </Link>
             </>
           ) : (
-            <Button asChild variant="outline">
-              <Link href="/">
-                <a>Voltar ao site</a>
-              </Link>
-            </Button>
+            <Link href="/">
+              <div className="border border-gray-200 text-gray-800 font-medium px-4 py-2 rounded-lg hover:bg-gray-50 transition cursor-pointer">
+                Voltar ao site
+              </div>
+            </Link>
           )}
           
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -91,32 +93,32 @@ export default function Navbar() {
                 
                 {!isHomePage && (
                   <Link href="/">
-                    <a 
-                      className="py-2 text-lg font-medium hover:text-primary transition"
+                    <div 
+                      className="py-2 text-lg font-medium hover:text-primary transition cursor-pointer"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Início
-                    </a>
+                    </div>
                   </Link>
                 )}
                 
                 {location === "/" ? (
                   <Link href="/dashboard">
-                    <a 
-                      className="py-2 text-lg font-medium text-primary hover:text-primary/90 transition"
+                    <div 
+                      className="py-2 text-lg font-medium text-primary hover:text-primary/90 transition cursor-pointer"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Começar Grátis
-                    </a>
+                    </div>
                   </Link>
                 ) : (
                   <Link href="/">
-                    <a 
-                      className="py-2 text-lg font-medium hover:text-primary transition"
+                    <div 
+                      className="py-2 text-lg font-medium hover:text-primary transition cursor-pointer"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Voltar ao site
-                    </a>
+                    </div>
                   </Link>
                 )}
               </div>

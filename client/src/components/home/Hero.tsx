@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { Sparkles } from "lucide-react";
 
 export default function Hero() {
   return (
@@ -6,15 +7,18 @@ export default function Hero() {
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="md:w-1/2 max-w-lg">
-            <h1 className="font-poppins font-bold text-4xl md:text-5xl leading-tight mb-4">
-              Crie conteúdo <span className="text-primary">viral</span> com IA para Instagram e TikTok
+            <h1 className="font-poppins font-bold text-5xl md:text-6xl leading-tight mb-6">
+              <span className="text-primary font-black"># ContentPro</span>
+              <br />
+              Crie conteúdo <span className="gradient-text">viral</span> com IA para Instagram e TikTok
             </h1>
-            <p className="text-gray-600 text-lg mb-8">
+            <p className="text-gray-800 text-lg mb-8">
               Gere roteiros, descrições e ideias de conteúdo em segundos. Economize tempo e aumente seu engajamento nas redes sociais.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <Link href="/dashboard">
-                <a className="w-full sm:w-auto bg-primary hover:bg-opacity-90 text-white font-medium px-6 py-3 rounded-lg transition text-center">
+                <a className="w-full sm:w-auto bg-gradient-to-r from-accent via-primary to-accent hover:opacity-90 text-white font-medium px-6 py-3 rounded-lg transition text-center flex items-center justify-center gap-2 shadow-lg">
+                  <Sparkles className="h-5 w-5" />
                   Experimentar Agora
                 </a>
               </Link>
@@ -23,14 +27,14 @@ export default function Hero() {
                 Ver como funciona
               </a>
             </div>
-            <div className="flex items-center mt-8 px-4 py-3 bg-white rounded-lg shadow-sm">
-              <div className="flex -space-x-2 mr-3">
+            <div className="flex items-center mt-8 px-5 py-4 bg-white rounded-lg shadow-md border border-gray-100">
+              <div className="flex -space-x-2 mr-4">
                 <img className="w-8 h-8 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100" alt="Avatar de usuário" />
                 <img className="w-8 h-8 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100" alt="Avatar de usuário" />
                 <img className="w-8 h-8 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100" alt="Avatar de usuário" />
               </div>
-              <p className="text-sm text-gray-600">
-                <span className="font-semibold">+2.500 criadores</span> já estão economizando tempo com o ContentPro
+              <p className="text-sm text-gray-700">
+                <span className="font-bold text-accent bg-accent/10 px-3 py-1 rounded-full">+12.500 criadores</span> já estão economizando tempo com o ContentPro
               </p>
             </div>
           </div>
