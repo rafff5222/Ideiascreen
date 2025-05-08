@@ -28,8 +28,12 @@ import MagicButton from "@/components/conversion/MagicButton";
 import DynamicSocialProof from "@/components/conversion/DynamicSocialProof";
 import CompetitorComparison from "@/components/conversion/CompetitorComparison";
 import SmartHelpButton from "@/components/conversion/SmartHelpButton";
+import PurchaseCounter from "@/components/conversion/PurchaseCounter";
+import ABTestCTA from "@/components/conversion/ABTestCTA";
+import SmartFormOptimizer from "@/components/conversion/SmartFormOptimizer";
 import StagedLoading from "@/components/optimization/StagedLoading";
 import TurboLinks from "@/components/optimization/TurboLinks";
+import MiniMetricsWidget from "@/components/admin/MiniMetricsWidget";
 import ClickHeatmap from "@/components/analytics/ClickHeatmap";
 import PrivateAnalytics from "@/components/analytics/PrivateAnalytics";
 import MicroConversionTracker from "@/components/analytics/MicroConversionTracker";
@@ -127,6 +131,10 @@ export default function Home() {
       <DynamicSocialProof />
       <CompetitorComparison />
       <SmartHelpButton />
+      <PurchaseCounter />
+      <ABTestCTA />
+      <SmartFormOptimizer />
+      <MiniMetricsWidget />
       <StagedLoading />
       <TurboLinks />
     </>

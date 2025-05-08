@@ -1,0 +1,93 @@
+:
+
+🎯 1. Contador de Compra Social em Tempo Real
+Adicione este código antes do </body>:
+
+javascript
+// Simula compras (substitua por API real depois)
+setInterval(() => {
+  const cities = ['São Paulo', 'Rio', 'Belo Horizonte'];
+  const randomCity = cities[Math.floor(Math.random() * cities.length)];
+  const counter = document.getElementById('purchase-counter');
+  
+  counter.innerHTML = `✨ ${randomCity} - ${Math.floor(Math.random() * 5) + 1} compras nos últimos 10 minutos`;
+}, 300000); // Atualiza a cada 5 minutos
+HTML para exibição:
+
+html
+<div id="purchase-counter" class="pulse-alert">
+  ✨ Carregando atividade recente...
+</div>
+CSS para destaque:
+
+css
+.pulse-alert {
+  animation: pulse 2s infinite;
+  background: rgba(139, 92, 246, 0.1);
+  padding: 8px;
+  border-radius: 8px;
+}
+@keyframes pulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+💎 2. Teste A/B Automatizado (Sem Plugins)
+Código para variar CTAs:
+
+javascript
+// Randomiza o texto do botão principal
+const ctaVariations = [
+  "Quero meus vídeos automáticos!",
+  "Gerar vídeos com IA agora",
+  "Experimente grátis por 7 dias"
+];
+
+document.getElementById('main-cta').textContent = 
+  ctaVariations[Math.floor(Math.random() * ctaVariations.length)];
+Para rastrear resultados:
+
+javascript
+document.getElementById('main-cta').addEventListener('click', function() {
+  localStorage.setItem('cta-version', this.textContent);
+});
+🚀 3. Otimização de Formulário com Auto-preenchimento
+Melhore a experiência de cadastro:
+
+javascript
+// Detecta provedores de email
+document.getElementById('email').addEventListener('blur', function() {
+  const email = this.value;
+  if (email.includes('@gmail')) {
+    document.getElementById('name').value = email.split('@')[0];
+  }
+  if (email.includes('@empresa')) {
+    document.getElementById('business').checked = true;
+  }
+});
+📊 4. Painel de Métricas Miniatura (Para Você)
+Adicione discretamente (visível apenas no seu IP):
+
+html
+<div class="admin-widget">
+  <div class="metric">
+    <small>Conversão</small>
+    <div>4.2%</div>
+  </div>
+  <div class="metric">
+    <small>Ticket Médio</small>
+    <div>R$ 87</div>
+  </div>
+</div>
+CSS Discreto:
+
+css
+.admin-widget {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  padding: 5px;
+  font-size: 12px;
+}
