@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
+import Generator from "@/pages/generator";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ExitPopup from "@/components/ui/exit-popup";
@@ -15,12 +16,14 @@ import ClickTracker from "@/components/analytics/ClickTracker";
 import RetentionPixel from "@/components/analytics/RetentionPixel";
 import UpsellModal from "@/components/upsell/UpsellModal";
 import SocialProof from "@/components/conversion/SocialProof";
+import OneClickCheckout from "@/components/conversion/OneClickCheckout";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/generator" component={Generator} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -43,6 +46,7 @@ function App() {
           <RetentionPixel />
           <UpsellModal />
           <SocialProof />
+          <OneClickCheckout />
           
           {/* Exibe o popup de saída apenas na página inicial */}
           <Route path="/">

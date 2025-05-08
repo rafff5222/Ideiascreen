@@ -1,191 +1,143 @@
 import { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Check, CreditCard, Zap } from "lucide-react";
 
 /**
- * Componente de Checkout Invisível para usuários recorrentes
- * Permite a compra em um clique sem precisar preencher informações novamente
+ * Componente de Checkout Rápido/One-Click para aumentar conversão
+ * Implementa botões para Apple Pay, Google Pay e PIX para reduzir fricção
  */
 export default function OneClickCheckout() {
-  const [open, setOpen] = useState(false);
-  const [hasSeenBefore, setHasSeenBefore] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [processing, setProcessing] = useState(false);
   const { toast } = useToast();
-  
-  // Verifica se o usuário é recorrente (normalmente seria feito via API)
+
   useEffect(() => {
-    // Simula um cliente retornando ao site
-    const checkReturningUser = () => {
-      const returningUserInfo = localStorage.getItem('returningUser');
-      
-      if (returningUserInfo) {
-        setHasSeenBefore(true);
-      } else {
-        // Para simular um usuário de primeira vez agora tornando-se recorrente
-        // salvamos a informação para futuras visitas
-        localStorage.setItem('returningUser', JSON.stringify({
-          lastVisit: new Date().toISOString(),
-          hasCompletedPurchase: false
-        }));
-      }
-    };
-    
-    checkReturningUser();
-  }, []);
-  
-  // Detecta cliques em botões de compra e oferece checkout rápido para usuários recorrentes
-  useEffect(() => {
-    if (!hasSeenBefore) return;
-    
+    // Monitora cliques em botões de compra
     const handlePricingClick = (e: MouseEvent) => {
-      // Busca pelo elemento mais próximo que seja um botão de plano
-      const targetElement = e.target as HTMLElement;
-      const button = targetElement.closest('.pricing-btn');
+      const target = e.target as HTMLElement;
+      const pricingBtn = target.closest('.pricing-btn');
       
-      if (button) {
-        // Previne o comportamento padrão
+      if (pricingBtn) {
         e.preventDefault();
         
-        // Identifica o plano selecionado
-        const plan = button.getAttribute('data-plan');
-        if (plan) {
-          setSelectedPlan(plan);
-          setOpen(true);
+        // Pega o plano selecionado através do atributo data-plan
+        const planType = pricingBtn.getAttribute('data-plan');
+        if (planType) {
+          setSelectedPlan(planType);
+          setIsVisible(true);
         }
       }
     };
-    
-    // Adiciona o listener a toda a seção de preços
-    const pricingSection = document.getElementById('planos');
-    if (pricingSection) {
-      pricingSection.addEventListener('click', handlePricingClick, true);
-    }
-    
+
+    // Adiciona listener para os botões de preço
+    document.addEventListener('click', handlePricingClick);
+
     return () => {
-      if (pricingSection) {
-        pricingSection.removeEventListener('click', handlePricingClick, true);
-      }
+      document.removeEventListener('click', handlePricingClick);
     };
-  }, [hasSeenBefore]);
-  
-  const handleOneClickPurchase = () => {
-    setProcessing(true);
+  }, []);
+
+  const handleClose = () => {
+    setIsVisible(false);
+  };
+
+  const handlePaymentMethod = (method: string) => {
+    // Simula processamento de pagamento
+    toast({
+      title: `Processando pagamento via ${method}...`,
+      description: "Estamos preparando sua conta...",
+    });
     
-    // Simula o processamento do pagamento
+    // Fecha modal após seleção
     setTimeout(() => {
-      setProcessing(false);
-      setOpen(false);
+      setIsVisible(false);
       
+      // Simula pagamento bem sucedido
       toast({
-        title: "Compra concluída com sucesso!",
-        description: `Seu plano ${selectedPlan} foi ativado instantaneamente.`,
+        title: "Pagamento processado com sucesso!",
+        description: "Bem-vindo! Seu acesso já está disponível.",
         variant: "default",
       });
-      
-      // Redireciona para a página de agradecimento
-      window.location.href = '/obrigado';
-    }, 1500);
+    }, 2000);
   };
-  
-  if (!hasSeenBefore) return null;
-  
-  const planInfo = {
-    basico: {
-      nome: "Básico",
-      preco: "R$ 59/mês",
-      descricao: "Até 30 gerações por mês"
-    },
-    premium: {
-      nome: "Premium",
-      preco: "R$ 89/mês",
-      descricao: "Até 100 gerações + montagem automática"
-    },
-    ultimate: {
-      nome: "Ultimate",
-      preco: "R$ 149/mês",
-      descricao: "Recursos profissionais + efeitos cinemáticos"
+
+  if (!isVisible) return null;
+
+  const getPlanName = () => {
+    switch (selectedPlan) {
+      case 'premium': return 'Premium';
+      case 'pro': return 'Pro';
+      case 'ultimate': return 'Ultimate';
+      default: return 'Básico';
     }
   };
-  
-  const plano = selectedPlan ? planInfo[selectedPlan as keyof typeof planInfo] : null;
-  
+
+  const getPlanPrice = () => {
+    switch (selectedPlan) {
+      case 'premium': return 'R$ 89';
+      case 'pro': return 'R$ 119';
+      case 'ultimate': return 'R$ 149';
+      default: return 'R$ 59';
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-md mx-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold flex items-center gap-2">
-            <Zap className="text-yellow-500" size={24} />
-            Checkout Express
-          </DialogTitle>
-          <DialogDescription>
-            Concluir compra usando os dados salvos
-          </DialogDescription>
-        </DialogHeader>
+    <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
+      <div className="bg-white rounded-xl p-6 shadow-2xl w-full max-w-md">
+        <h3 className="text-2xl font-bold mb-4">Checkout Rápido</h3>
+        <p className="text-gray-600 mb-6">
+          Finalizar compra do plano <span className="font-bold">{getPlanName()}</span> por <span className="text-primary font-bold">{getPlanPrice()}</span> mensal
+        </p>
         
-        <div className="py-4">
-          {plano && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <h3 className="font-bold text-lg">{plano.nome}</h3>
-              <p className="text-xl font-bold text-primary mb-1">{plano.preco}</p>
-              <p className="text-gray-600 text-sm">{plano.descricao}</p>
-            </div>
-          )}
+        <div className="space-y-3">
+          <button
+            onClick={() => handlePaymentMethod('Apple Pay')}
+            className="w-full py-3 px-4 bg-black text-white rounded-lg font-medium flex items-center justify-center"
+          >
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.07 13.54C17.93 14.49 17.67 15.43 16.89 16.2C16.28 16.86 15.83 17.14 15.13 17.14C14.43 17.14 14.03 16.8 13.24 16.8C12.47 16.8 11.77 17.14 11.33 17.14C10.38 17.18 9.9 16.8 9.24 16.11C7.99 14.82 7.45 12.3 8.3 10.53C8.79 9.36 9.79 8.61 10.82 8.61C11.65 8.61 12.32 9.06 13.11 9.06C13.9 9.06 14.5 8.61 15.4 8.61C16.21 8.61 17.06 9.19 17.53 10.08C16.14 10.9 16.37 12.87 18.07 13.54M13.69 7.11C13.43 6.17 14.08 5.25 14.5 4.7C15.07 4.05 15.92 3.67 16.56 3.67C16.65 4.67 16.31 5.58 15.81 6.23C15.33 6.87 14.5 7.3 13.69 7.11Z" />
+            </svg>
+            Pagar com Apple Pay
+          </button>
           
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Check size={18} className="text-green-500" />
-              <span className="text-sm">Cartão terminado em 4582</span>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Check size={18} className="text-green-500" />
-              <span className="text-sm">Acesso instantâneo, sem formulários</span>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Check size={18} className="text-green-500" />
-              <span className="text-sm">Cancele quando quiser, sem burocracia</span>
-            </div>
-          </div>
+          <button
+            onClick={() => handlePaymentMethod('Google Pay')}
+            className="w-full py-3 px-4 bg-white border border-gray-300 rounded-lg font-medium flex items-center justify-center"
+          >
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="#4285F4">
+              <path d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27 3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10 5.35 0 9.25-3.67 9.25-9.09 0-1.15-.15-1.81-.15-1.81z" />
+            </svg>
+            Pagar com Google Pay
+          </button>
+          
+          <button
+            onClick={() => handlePaymentMethod('PIX')}
+            className="w-full py-3 px-4 bg-[#32BCAD] text-white rounded-lg font-medium flex items-center justify-center"
+          >
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9.5 1.5C7.8 2.7 7 4.2 7 6V6.4L5.9 7.5C4.1 9.1 4 9.3 4 12C4 14.7 4.1 14.9 5.9 16.5L7 17.6V18C7 19.9 7.8 21.3 9.5 22.5L10.4 23H13.6L14.5 22.5C16.2 21.3 17 19.9 17 18V17.6L18.1 16.5C19.9 14.9 20 14.7 20 12C20 9.3 19.9 9.1 18.1 7.5L17 6.4V6C17 4.1 16.2 2.7 14.5 1.5L13.6 1H10.4L9.5 1.5M10.7 3.5H13.3C14.9 4.3 15.5 5.1 15.5 6.5V7H13V6C13 5.2 12.8 4.6 12.5 4C12.2 3.4 11.7 3 10.7 3.5M7.2 9H8.5L10.6 11.1L12.7 9H14L11.2 11.9L14 15H12.7L10.6 12.7L8.5 15H7.2L10 11.9L7.2 9Z" />
+            </svg>
+            Pagar com PIX
+          </button>
         </div>
         
-        <DialogFooter className="flex gap-3">
-          <Button 
-            variant="outline" 
-            onClick={() => setOpen(false)}
+        <div className="text-center mt-6">
+          <button 
+            onClick={handleClose}
+            className="text-gray-500 text-sm hover:text-gray-700"
           >
-            Checkout padrão
-          </Button>
-          
-          <Button 
-            onClick={handleOneClickPurchase}
-            className="bg-gradient-to-r from-primary to-purple-600 hover:brightness-110"
-            disabled={processing}
-          >
-            {processing ? (
-              <span className="flex items-center gap-2">
-                <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                Processando...
-              </span>
-            ) : (
-              <span className="flex items-center gap-2">
-                <CreditCard size={18} />
-                Comprar em 1-clique
-              </span>
-            )}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            Voltar
+          </button>
+        </div>
+        
+        <div className="mt-6 pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-center text-xs text-gray-500">
+            <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            <span>Pagamento 100% seguro via SSL</span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

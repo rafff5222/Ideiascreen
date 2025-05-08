@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Check, AlertTriangle, Calculator, DollarSign } from "lucide-react";
 import CountdownSpots from "./CountdownSpots";
 import PriceAnchoring from "@/components/conversion/PriceAnchoring";
+import DynamicPricing from "@/components/conversion/DynamicPricing";
 import { useState, useEffect } from "react";
 
 export default function Pricing() {
@@ -108,6 +109,13 @@ export default function Pricing() {
               <h3 className="text-2xl font-bold mb-2">Premium</h3>
               <div className="flex flex-col mb-4">
                 <PriceAnchoring originalPrice={197} currentPrice={89} className="mb-2" />
+                <DynamicPricing 
+                  originalPrice={89} 
+                  discountedPrice={79} 
+                  pageViewThreshold={2}
+                  timeout={15000}
+                  className="mb-1"
+                />
                 <div className="flex items-start">
                   <span className="text-3xl font-bold">R$</span>
                   <span className="text-5xl font-bold">89</span>
