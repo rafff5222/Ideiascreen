@@ -1,0 +1,69 @@
+1. Hierarquia Visual
+O título “Planos e Preços” está um pouco desalinhado e muito próximo do topo. Use margin-top e aumente o font-weight para criar destaque limpo.
+
+Padronize o tamanho dos blocos dos planos. Hoje, a altura de cada card varia dependendo do texto (isso quebra o layout visualmente).
+
+2. Botões com feedback
+Os botões “Selecionar plano” deveriam ter hover animado (cor de fundo mudando suavemente) e talvez até um ícone (como 🛒 ou ➡️) para reforçar a ação.
+
+css
+Copiar
+Editar
+.botao-selecionar:hover {
+  background-color: #5b21b6;
+  transform: scale(1.03);
+  transition: all 0.3s ease;
+}
+⚙️ FUNCIONALIDADE
+3. Links reais nos botões
+Atualmente os botões não têm ação real. Mesmo que seja algo simples, coloque um link ou onClick com redirecionamento:
+
+html
+Copiar
+Editar
+<button onclick="window.location.href='/checkout?plano=basico'">Selecionar plano</button>
+4. Responsividade ainda tem falhas
+No mobile:
+
+Os textos dos planos e os botões ainda se sobrepõem.
+
+Alguns elementos não estão com width: 100%.
+
+Solução: Adicione um @media que reorganize tudo verticalmente e centralize o conteúdo.
+
+💼 CONVERSÃO E CREDIBILIDADE
+5. Mais provas sociais
+Hoje há apenas uma caixinha com nomes aparecendo. Adicione:
+
+Foto + nome + depoimento (mesmo fictício) de alguém usando o serviço.
+
+Um selo de “+100 usuários ativos” ou similar.
+
+6. Garantia mais visível
+O texto “Garantia de 7 dias…” está ótimo, mas está pequeno e meio apagado.
+
+Coloque ele abaixo do botão “Selecionar plano” com ícone de escudo 🛡️ para passar mais confiança.
+
+🔧 OUTROS DETALHES
+7. Tag de destaque (badge)
+Use cores mais suaves e fontes menores para os selos "ECONOMIZE", "MELHOR CUSTO-BENEFÍCIO", etc. Hoje estão muito agressivos.
+
+css
+Copiar
+Editar
+.badge {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border-radius: 12px;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+8. SEO básico
+O título da aba (<title>) está genérico. Troque para algo como:
+
+html
+Copiar
+Editar
+<title>ContentCrafterAI - Crie Conteúdo Viral com IA</title>
+Use <meta name="description" content="Ferramenta de criação de conteúdo automatizada com IA. Escolha seu plano e comece agora!">
+

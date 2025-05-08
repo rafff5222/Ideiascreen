@@ -109,21 +109,21 @@ export default function PricingTable() {
             <button
               onClick={() => window.location.href = '/checkout?plan=basic'}
               className="select-button basic-button">
-              Selecionar Básico
+              <span>Selecionar Básico</span> <span className="ml-1">→</span>
             </button>
           </div>
           <div className="grid-cell">
             <button
               onClick={() => window.location.href = '/checkout?plan=premium'}
               className="select-button premium-button">
-              Selecionar Premium
+              <span>Selecionar Premium</span> <span className="ml-1">→</span>
             </button>
           </div>
           <div className="grid-cell">
             <button
               onClick={() => window.location.href = '/checkout?plan=ultimate'}
               className="select-button ultimate-button">
-              Selecionar Ultimate
+              <span>Selecionar Ultimate</span> <span className="ml-1">→</span>
             </button>
           </div>
         </div>
