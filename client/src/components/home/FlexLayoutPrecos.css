@@ -194,4 +194,9 @@
     max-width: 100%;
     margin-bottom: 20px;
   }
+  
+  .plan-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
 }

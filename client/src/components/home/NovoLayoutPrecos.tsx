@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { apiRequest } from '@/lib/queryClient';
 import PlanTooltip from './PlanTooltip';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { FaCheck, FaTimes, FaCrown, FaStar } from 'react-icons/fa';
 
 /**
  * Componente com novo layout para planos de preços conforme especificado
@@ -69,7 +70,7 @@ export default function NovoLayoutPrecos() {
             <p>Ideal para criadores iniciantes.</p>
             <ul className="my-4 space-y-2">
               <li className="flex items-start">
-                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
                 <span>
                   <PlanTooltip 
                     title="Gerações de Conteúdo" 
@@ -79,11 +80,11 @@ export default function NovoLayoutPrecos() {
                 </span>
               </li>
               <li className="flex items-start">
-                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
                 <span>Legendas otimizadas para engajamento</span>
               </li>
               <li className="flex items-start">
-                <span className="text-red-500 mr-2 flex-shrink-0 x-icon">✗</span>
+                <FaTimes className="text-red-500 mr-2 flex-shrink-0" size={16} />
                 <span className="text-gray-500">Montagem automática de vídeos</span>
               </li>
             </ul>
@@ -95,7 +96,7 @@ export default function NovoLayoutPrecos() {
           {/* Plano Premium */}
           <div className="plano-card plan-box" data-plano="premium">
             <span className="badge-economize mais-vendido">MAIS VENDIDO</span>
-            <h3>Premium</h3>
+            <h3><FaStar className="inline-block text-yellow-500 mr-1" size={18} /> Premium</h3>
             <div className="preco-container">
               <p>
                 <span className="preco-antigo">R$117,00</span>
@@ -106,15 +107,15 @@ export default function NovoLayoutPrecos() {
             <p>Perfeito para criadores em crescimento.</p>
             <ul className="my-4 space-y-2">
               <li className="flex items-start">
-                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
                 <span>150 gerações de conteúdo/mês</span>
               </li>
               <li className="flex items-start">
-                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
                 <span>Legendas otimizadas para engajamento</span>
               </li>
               <li className="flex items-start">
-                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
                 <span>Montagem automática de vídeos</span>
               </li>
             </ul>
@@ -126,7 +127,7 @@ export default function NovoLayoutPrecos() {
           {/* Plano Ultimate */}
           <div className="plano-card plan-box" data-plano="ultimate">
             <span className="badge-economize">ECONOMIZE 13%</span>
-            <h3>Ultimate</h3>
+            <h3><FaCrown className="inline-block text-yellow-600 mr-1" size={18} /> Ultimate</h3>
             <div className="preco-container">
               <p>
                 <span className="preco-antigo">R$149,00</span>
@@ -137,19 +138,19 @@ export default function NovoLayoutPrecos() {
             <p>Para criadores profissionais e empresas.</p>
             <ul className="my-4 space-y-2">
               <li className="flex items-start">
-                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
                 <span>Gerações ilimitadas de conteúdo</span>
               </li>
               <li className="flex items-start">
-                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
                 <span>Legendas otimizadas para engajamento</span>
               </li>
               <li className="flex items-start">
-                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
                 <span>Montagem automática de vídeos</span>
               </li>
               <li className="flex items-start">
-                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
                 <span>Edição com IA avançada e efeitos</span>
               </li>
             </ul>
