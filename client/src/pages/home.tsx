@@ -59,14 +59,14 @@ export default function Home() {
   return (
     <>
       <Helmet>
-        <title>ContentAI - Crie conteúdo viral para Instagram e TikTok com IA</title>
+        <title>ContentPro - Crie Vídeos Virais para Instagram e TikTok com IA</title>
         <meta 
           name="description" 
           content="Crie scripts, legendas e ideias virais para Instagram e TikTok usando IA. Economize tempo e aumente seu engajamento com conteúdo otimizado."
         />
         <meta 
           property="og:title" 
-          content="ContentAI - Crie conteúdo viral para redes sociais com IA" 
+          content="ContentPro - Crie conteúdo viral para redes sociais com IA" 
         />
         <meta 
           property="og:description" 
@@ -74,7 +74,7 @@ export default function Home() {
         />
         <meta 
           property="og:image" 
-          content="https://contentai.com.br/social-preview.jpg" 
+          content="https://contentpro.com.br/social-preview.jpg" 
         />
         <meta name="twitter:card" content="summary_large_image" />
         
@@ -83,7 +83,7 @@ export default function Home() {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            "name": "ContentAI",
+            "name": "ContentPro",
             "applicationCategory": "SocialMediaApplication",
             "operatingSystem": "Web",
             "offers": {

@@ -19,6 +19,7 @@ export default function Navbar() {
     { name: "Como Funciona", href: "/#como-funciona" },
     { name: "Preços", href: "/#precos" },
     { name: "Depoimentos", href: "/#depoimentos" },
+    { name: "Demo", href: "/demo", highlight: true },
   ];
 
   // Fixed DOM nesting by using div instead of a when using Link component
@@ -37,7 +38,7 @@ export default function Navbar() {
             <a 
               key={link.name}
               href={link.href}
-              className="font-medium hover:text-primary transition"
+              className={`font-medium hover:text-primary transition ${link.highlight ? 'text-purple-600 font-semibold' : ''}`}
             >
               {link.name}
             </a>
@@ -84,7 +85,7 @@ export default function Navbar() {
                   <a
                     key={link.name}
                     href={link.href}
-                    className="py-2 text-lg font-medium hover:text-primary transition"
+                    className={`py-2 text-lg font-medium hover:text-primary transition ${link.highlight ? 'text-purple-600 font-semibold' : ''}`}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {link.name}
