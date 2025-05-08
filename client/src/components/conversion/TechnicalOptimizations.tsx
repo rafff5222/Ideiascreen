@@ -14,6 +14,9 @@ export default function TechnicalOptimizations() {
   const [optimizationResults, setOptimizationResults] = useState<any>(null);
   
   useEffect(() => {
+    // Executa apenas uma vez na montagem do componente
+    console.log('Inicializando otimizações técnicas...');
+    
     // 1. Configuração de resource hints avançados
     const addResourceHints = () => {
       // Assets críticos para pré-carregar
@@ -290,7 +293,7 @@ export default function TechnicalOptimizations() {
       if (cleanupWorker) cleanupWorker();
       if (worker) worker.terminate();
     };
-  }, [worker]);
+  }, []); // Removendo worker das dependências para evitar o loop de renderização
   
   // Este componente não renderiza nada visualmente
   return null;
