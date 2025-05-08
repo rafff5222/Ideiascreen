@@ -166,10 +166,11 @@
   display: inline-block;
   background-color: #fee2e2;
   color: #b91c1c;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 /* Estilos para destacar valor específico */
@@ -279,16 +280,19 @@
   align-items: center;
   background-color: #ecfdf5;
   color: #065f46;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.25rem;
   border-radius: 9999px;
-  font-weight: 500;
+  font-weight: 600;
   margin-top: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #d1fae5;
 }
 
 .guarantee-icon {
   margin-right: 0.5rem;
-  color: #4f46e5;
+  color: #10b981;
   font-weight: 700;
+  font-size: 1.1rem;
 }
 
 /* Estilos para os badges exibidos na versão mobile */
@@ -300,9 +304,10 @@
   background-color: #fee2e2;
   color: #b91c1c;
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  border-radius: 12px;
   font-size: 0.7rem;
   font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .badge-economize.mais-vendido {
@@ -313,10 +318,11 @@
 .badge {
   display: inline-block;
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  border-radius: 12px;
   font-size: 0.7rem;
   font-weight: 600;
   margin-left: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .badge.red {
@@ -325,8 +331,8 @@
 }
 
 .badge.blue {
-  background-color: #dbeafe;
-  color: #1e40af;
+  background-color: #e0f2fe;
+  color: #0369a1;
 }
 
 /* Estilos para os planos na versão mobile */
@@ -389,6 +395,9 @@
     overflow: hidden;
     width: 100%;
     max-width: 100%;
+    min-height: 450px;
+    display: flex;
+    flex-direction: column;
   }
   
   .preco-container {

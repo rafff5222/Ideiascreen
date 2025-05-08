@@ -159,7 +159,7 @@ export default function PricingTable() {
           <button 
             onClick={() => window.location.href = '/checkout?plan=basic'}
             className="w-full py-3 px-4 rounded-lg bg-gray-700 text-white font-medium hover:bg-gray-800 transition-colors flex items-center justify-center">
-            <span>Selecionar plano</span>
+            <span>Selecionar plano</span><span className="ml-1">→</span>
           </button>
         </div>
 
@@ -238,9 +238,9 @@ export default function PricingTable() {
 
       {/* Garantia de satisfação - com ícone de escudo */}
       <div className="mt-10 text-center">
-        <div className="inline-flex items-center bg-green-50 px-6 py-3 rounded-full text-green-700 shadow-sm">
-          <FaShieldAlt className="h-5 w-5 mr-2 text-green-600" />
-          <span className="text-sm md:text-base font-medium">Garantia de 7 dias sem risco, devolução 100% do valor.</span>
+        <div className="guarantee-badge">
+          <FaShieldAlt className="guarantee-icon" />
+          <span>Garantia de 7 dias sem risco, devolução 100% do valor.</span>
         </div>
       </div>
     </div>
