@@ -59,7 +59,7 @@ export default function NovoLayoutPrecos() {
         <div className="planos-container plan-wrapper">
           {/* Plano Básico */}
           <div className="plano-card plan-box" data-plano="basico">
-            <h3>Básico</h3>
+            <h3><span className="text-gray-600 mr-1">•</span> Básico</h3>
             <div className="preco-container">
               <p>
                 <span className="preco-antigo">R$89,00</span>
@@ -88,8 +88,8 @@ export default function NovoLayoutPrecos() {
                 <span className="text-gray-500">Montagem automática de vídeos</span>
               </li>
             </ul>
-            <button className="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-800 font-medium hover:bg-gray-300 transition-colors">
-              Selecionar plano
+            <button className="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-800 font-medium hover:bg-gray-300 transition-colors flex items-center justify-center">
+              <span>Selecionar plano</span>
             </button>
           </div>
 
@@ -119,8 +119,9 @@ export default function NovoLayoutPrecos() {
                 <span>Montagem automática de vídeos</span>
               </li>
             </ul>
-            <button className="w-full py-3 px-4 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 transition-colors pulse">
-              Selecionar plano
+            <button className="w-full py-3 px-4 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 transition-colors pulse flex items-center justify-center">
+              <span>Selecionar plano</span>
+              <span className="ml-1 bg-yellow-400 text-xs px-1 rounded text-purple-900 font-bold">POPULAR</span>
             </button>
           </div>
 
@@ -154,8 +155,9 @@ export default function NovoLayoutPrecos() {
                 <span>Edição com IA avançada e efeitos</span>
               </li>
             </ul>
-            <button className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium hover:from-indigo-700 hover:to-purple-700 transition-colors">
-              Selecionar plano
+            <button className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium hover:from-indigo-700 hover:to-purple-700 transition-colors flex items-center justify-center">
+              <span>Selecionar plano</span>
+              <span className="ml-1 bg-blue-300 text-xs px-1 rounded text-blue-900 font-bold">MELHOR VALOR</span>
             </button>
           </div>
         </div>
@@ -164,9 +166,7 @@ export default function NovoLayoutPrecos() {
       {/* Garantia de satisfação */}
       <div className="mt-16 text-center">
         <div className="inline-flex items-center bg-green-50 px-6 py-3 rounded-full text-green-700">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-          </svg>
+          <FaCheck className="h-5 w-5 mr-2 text-green-600" />
           <span>Garantia de 7 dias sem risco, devolução 100% do valor.</span>
         </div>
       </div>

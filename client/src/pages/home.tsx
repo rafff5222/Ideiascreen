@@ -4,6 +4,7 @@ import HowItWorks from "@/components/home/HowItWorks";
 import Pricing from "@/components/home/Pricing";
 import NovoLayoutPrecos from "@/components/home/NovoLayoutPrecos";
 import Testimonials from "@/components/home/Testimonials";
+import FAQ from "@/components/home/FAQ";
 import CallToAction from "@/components/home/CallToAction";
 import { useEffect } from "react";
 import { Helmet } from 'react-helmet';
@@ -114,6 +115,7 @@ export default function Home() {
       <HowItWorks />
       <NovoLayoutPrecos />
       <Testimonials />
+      <FAQ />
       <CallToAction />
       
       {/* Componentes de Conversão */}

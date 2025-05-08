@@ -1,127 +1,86 @@
-import { FaStar, FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa";
+import React from 'react';
+import { FaStar, FaQuoteLeft } from 'react-icons/fa';
+
+interface TestimonialProps {
+  name: string;
+  profession: string;
+  text: string;
+  image: string;
+  rating: number;
+}
+
+const Testimonial: React.FC<TestimonialProps> = ({ name, profession, text, image, rating }) => {
+  return (
+    <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-100 flex flex-col h-full">
+      <div className="flex items-center mb-4">
+        <div className="w-12 h-12 rounded-full overflow-hidden mr-4 border-2 border-purple-100">
+          <img src={image} alt={`Foto de ${name}`} className="w-full h-full object-cover" />
+        </div>
+        <div>
+          <h3 className="font-bold text-gray-800">{name}</h3>
+          <p className="text-gray-600 text-sm">{profession}</p>
+        </div>
+      </div>
+      
+      <div className="flex mb-4">
+        {[...Array(5)].map((_, i) => (
+          <FaStar 
+            key={i} 
+            className={`${i < rating ? 'text-yellow-400' : 'text-gray-300'} mr-1`} 
+            size={16} 
+          />
+        ))}
+      </div>
+      
+      <div className="flex-grow">
+        <FaQuoteLeft className="text-purple-200 mb-2" size={24} />
+        <p className="text-gray-700 italic">{text}</p>
+      </div>
+    </div>
+  );
+};
 
 export default function Testimonials() {
-  const testimonials = [
+  const testimonials: TestimonialProps[] = [
     {
-      name: "Camila Moreira",
-      role: "Creator & Influencer",
-      image: "https://i.pravatar.cc/150?img=5",
-      content: "Desde que comecei a usar o ContentAI, tenho consistentemente 40% mais engajamento nos meus Reels. Os roteiros são incríveis e a função de edição automática economiza horas do meu dia!",
-      rating: 5,
-      platform: "instagram",
-      result: "+19.000 seguidores em 3 meses"
+      name: "Mariana Silva",
+      profession: "Influenciadora de moda",
+      text: "O ContentPro revolucionou a forma como produzo conteúdo. Economizo pelo menos 5 horas por semana e minhas taxas de engajamento aumentaram 32% no primeiro mês!",
+      image: "https://randomuser.me/api/portraits/women/12.jpg",
+      rating: 5
     },
     {
-      name: "Rafael Costa",
-      role: "Social Media Manager",
-      image: "https://i.pravatar.cc/150?img=12",
-      content: "Como gerencio 4 contas diferentes, preciso de eficiência. O ContentAI me permite criar conteúdo de qualidade em minutos para cada marca que represento, mantendo suas vozes autênticas.",
-      rating: 5,
-      platform: "tiktok",
-      result: "Taxa de conversão aumentou 27%"
+      name: "Pedro Almeida",
+      profession: "Criador de conteúdo fitness",
+      text: "Minha produtividade dobrou desde que comecei a usar a plataforma. Os roteiros gerados são incrivelmente bons e parecem escritos por alguém que entende do meu nicho.",
+      image: "https://randomuser.me/api/portraits/men/32.jpg",
+      rating: 4
     },
     {
-      name: "Júlia Santos",
-      role: "Empreendedora Digital",
-      image: "https://i.pravatar.cc/150?img=9",
-      content: "Minha pequena loja online cresceu exponencialmente depois que comecei a usar a plataforma. As ideias de conteúdo são relevantes e os scripts vendem de forma natural, sem parecer forçado.",
-      rating: 4,
-      platform: "youtube",
-      result: "Vendas aumentaram 58% no trimestre"
+      name: "Carla Mendes",
+      profession: "Agência de marketing digital",
+      text: "Gerenciamos contas de 15 clientes e o ContentPro é essencial para nossa operação. A ferramenta se paga em poucos dias e os resultados são consistentes.",
+      image: "https://randomuser.me/api/portraits/women/65.jpg",
+      rating: 5
     }
   ];
 
-  const renderPlatformIcon = (platform: string) => {
-    switch (platform) {
-      case 'instagram':
-        return <FaInstagram size={20} className="text-pink-500" />;
-      case 'tiktok':
-        return <FaTiktok size={20} className="text-black" />;
-      case 'youtube':
-        return <FaYoutube size={20} className="text-red-600" />;
-      default:
-        return null;
-    }
-  };
-
-  const renderStars = (rating: number) => {
-    return Array(5).fill(0).map((_, index) => (
-      <FaStar 
-        key={index} 
-        className={`${index < rating ? 'text-yellow-400' : 'text-gray-300'}`} 
-      />
-    ));
-  };
-
   return (
-    <section className="py-20 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            O que nossos clientes estão dizendo
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Milhares de criadores de conteúdo já transformaram sua presença online com nossa plataforma
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <div 
-              key={index} 
-              className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 shadow-lg relative"
-            >
-              <div className="flex items-center mb-4">
-                <img 
-                  src={testimonial.image} 
-                  alt={testimonial.name} 
-                  className="w-14 h-14 rounded-full object-cover mr-4 border-2 border-white shadow-md"
-                />
-                <div>
-                  <h3 className="font-bold text-lg">{testimonial.name}</h3>
-                  <div className="flex items-center">
-                    <span className="text-gray-600 text-sm mr-2">{testimonial.role}</span>
-                    {renderPlatformIcon(testimonial.platform)}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex mb-4">
-                {renderStars(testimonial.rating)}
-              </div>
-              
-              <p className="text-gray-700 mb-4 italic">
-                "{testimonial.content}"
-              </p>
-              
-              <div className="bg-green-50 border border-green-100 rounded-lg p-2 flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium text-green-700">
-                  Resultado: {testimonial.result}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        <div className="mt-16 text-center">
-          <p className="text-gray-600 mb-4">Junte-se a milhares de criadores satisfeitos</p>
-          <div className="flex justify-center space-x-8">
-            <div className="flex flex-col items-center">
-              <span className="text-3xl font-bold text-primary">2.783</span>
-              <span className="text-sm text-gray-500">Usuários ativos</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-3xl font-bold text-primary">4.9/5</span>
-              <span className="text-sm text-gray-500">Média de avaliações</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-3xl font-bold text-primary">93%</span>
-              <span className="text-sm text-gray-500">Taxa de renovação</span>
-            </div>
-          </div>
-        </div>
+    <div className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <div className="text-center mb-12">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-6">
+          O que nossos clientes dizem
+        </h2>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          Criadores de conteúdo como você estão transformando seus resultados
+        </p>
       </div>
-    </section>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        {testimonials.map((testimonial, index) => (
+          <Testimonial key={index} {...testimonial} />
+        ))}
+      </div>
+    </div>
   );
 }
