@@ -80,10 +80,28 @@ export default function DemoPage() {
                 <div className="bg-gray-100 h-64 rounded-md flex items-center justify-center relative">
                   {videoGenerated ? (
                     <>
-                      <div className="absolute inset-0 rounded-md bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-                        <div className="p-4 text-center">
-                          <FaPlayCircle className="text-6xl text-white opacity-80 hover:opacity-100 hover:text-indigo-400 transition-all cursor-pointer mx-auto" />
-                          <p className="text-white mt-4">Vídeo pronto para download</p>
+                      <div className="absolute inset-0 rounded-md bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center overflow-hidden">
+                        {/* Vídeo simulado - usando um vídeo real para demonstração */}
+                        <video 
+                          id="demo-video" 
+                          className="w-full h-full object-cover opacity-80"
+                          controls
+                          poster="https://images.unsplash.com/photo-1517404215738-15263e9f9178?w=500"
+                        >
+                          <source src="https://samplelib.com/lib/preview/mp4/sample-5s.mp4" type="video/mp4" />
+                          Seu navegador não suporta o elemento de vídeo.
+                        </video>
+                        
+                        {/* Ícone de play que desaparece ao clicar */}
+                        <div id="play-overlay" className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 cursor-pointer" onClick={() => {
+                          const video = document.getElementById('demo-video') as HTMLVideoElement;
+                          const overlay = document.getElementById('play-overlay');
+                          if (video && overlay) {
+                            video.play();
+                            overlay.style.display = 'none';
+                          }
+                        }}>
+                          <FaPlayCircle className="text-6xl text-white opacity-90 hover:opacity-100 hover:text-indigo-400 transition-all" />
                         </div>
                       </div>
                     </>
@@ -98,9 +116,13 @@ export default function DemoPage() {
                 
                 {videoGenerated && (
                   <div className="mt-4">
-                    <button className="bg-green-600 text-white py-2.5 px-4 rounded-md font-medium hover:bg-green-700 transition-all shadow-md w-full flex items-center justify-center">
+                    <a 
+                      href="https://samplelib.com/lib/download/mp4/sample-5s.mp4" 
+                      download="video-gerado.mp4"
+                      className="bg-green-600 text-white py-2.5 px-4 rounded-md font-medium hover:bg-green-700 transition-all shadow-md w-full flex items-center justify-center"
+                    >
                       <FaCheck className="mr-2" /> Baixar Vídeo
-                    </button>
+                    </a>
                   </div>
                 )}
               </div>
