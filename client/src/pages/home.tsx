@@ -35,6 +35,7 @@ import StagedLoading from "@/components/optimization/StagedLoading";
 import TurboLinks from "@/components/optimization/TurboLinks";
 import MiniMetricsWidget from "@/components/admin/MiniMetricsWidget";
 import ClickHeatmap from "@/components/analytics/ClickHeatmap";
+import Heatmap3D from "@/components/analytics/Heatmap3D";
 import PrivateAnalytics from "@/components/analytics/PrivateAnalytics";
 import MicroConversionTracker from "@/components/analytics/MicroConversionTracker";
 import MetricsPanel from "@/components/admin/MetricsPanel-new";
@@ -113,6 +114,7 @@ export default function Home() {
       <SalesChatbot />
       <SocialProof />
       <ClickHeatmap />
+      <Heatmap3D />
       <MetricsPanel />
       <TechnicalOptimizations />
       <MicroInteractions />

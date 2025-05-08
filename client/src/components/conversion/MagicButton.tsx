@@ -14,6 +14,11 @@ export default function MagicButton() {
     if (initialized) return;
     setInitialized(true);
     
+    // Detecta tipo de dispositivo do usuário
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isTablet = /iPad|Android(?!.*Mobile)/i.test(navigator.userAgent);
+    const deviceType = isTablet ? 'tablet' : (isMobileDevice ? 'mobile' : 'desktop');
+    
     // Detecta o nicho do usuário com base no comportamento
     const detectUserNiche = () => {
       // Possíveis nichos de usuários
@@ -173,18 +178,50 @@ export default function MagicButton() {
       // Registra o nicho detectado
       console.log('Nicho detectado:', detectedNiche || 'geral');
       
-      // Mensagens personalizadas por nicho
-      const nicheMessages: Record<string, string> = {
-        'criadores-video': 'Crie vídeos profissionais em minutos',
-        'influenciadores': 'Aumente seu engajamento em 3x',
-        'marcas': 'Multiplique resultados da sua marca',
-        'empreendedores': 'Atraia mais clientes para seu negócio',
-        'agencias': 'Escale conteúdo para todos seus clientes',
-        'iniciantes': 'Comece a criar conteúdo de qualidade',
-        'tiktok': 'Crie trends virais para TikTok',
-        'instagram': 'Gere Reels que convertem seguidores',
-        'marketing': 'Maximize conversões com conteúdo estratégico',
-        'default': 'Experimente grátis por 7 dias'
+      // Mensagens personalizadas por nicho e dispositivo
+      const deviceMessages: Record<string, Record<string, string>> = {
+        'mobile': {
+          'criadores-video': '📱 Crie vídeos no seu celular',
+          'influenciadores': '📱 Aumente engajamento onde estiver',
+          'marcas': '📱 Gerencie sua marca pelo celular',
+          'empreendedores': '📱 Cresça seu negócio pelo celular',
+          'agencias': '📱 Conteúdo para clientes em tempo real',
+          'iniciantes': '📱 Crie do zero direto do celular',
+          'tiktok': '📱 Gerar TikToks direto no celular',
+          'instagram': '📱 Crie Reels direto do celular',
+          'marketing': '📱 Marketing no seu bolso',
+          'default': '📱 Gerar Vídeos Direto do Celular'
+        },
+        'tablet': {
+          'criadores-video': '✨ Crie vídeos no seu tablet',
+          'influenciadores': '✨ Produza conteúdo em qualquer lugar',
+          'marcas': '✨ Gerencie sua marca em dispositivos móveis',
+          'empreendedores': '✨ Cresça seu negócio em movimento',
+          'agencias': '✨ Atenda seus clientes em qualquer lugar',
+          'iniciantes': '✨ Comece a criar onde estiver',
+          'tiktok': '✨ Gere TikToks em qualquer lugar',
+          'instagram': '✨ Produza Reels em qualquer lugar',
+          'marketing': '✨ Marketing em qualquer dispositivo',
+          'default': '✨ Crie Vídeos em Qualquer Lugar'
+        },
+        'desktop': {
+          'criadores-video': '💻 Crie vídeos profissionais em minutos',
+          'influenciadores': '💻 Aumente seu engajamento em 3x',
+          'marcas': '💻 Multiplique resultados da sua marca',
+          'empreendedores': '💻 Atraia mais clientes para seu negócio',
+          'agencias': '💻 Escale conteúdo para todos seus clientes',
+          'iniciantes': '💻 Comece a criar conteúdo de qualidade',
+          'tiktok': '💻 Crie trends virais para TikTok',
+          'instagram': '💻 Gere Reels que convertem seguidores',
+          'marketing': '💻 Maximize conversões com conteúdo estratégico',
+          'default': '💻 Criar Conteúdo Profissional Agora'
+        }
+      };
+      
+      // Seleciona a mensagem baseada no nicho e dispositivo
+      const getMessage = (niche: string | null) => {
+        const nicheKey = niche || 'default';
+        return deviceMessages[deviceType][nicheKey] || deviceMessages[deviceType]['default'];
       };
       
       // Seleciona todos os botões CTA principais na página
@@ -196,10 +233,8 @@ export default function MagicButton() {
         if (button.getAttribute('data-magic-processed') === 'true') return;
         button.setAttribute('data-magic-processed', 'true');
         
-        // Escolhe a mensagem baseada no nicho
-        const message = detectedNiche ? 
-          nicheMessages[detectedNiche] || nicheMessages['default'] : 
-          nicheMessages['default'];
+        // Escolhe a mensagem baseada no nicho e dispositivo
+        const message = getMessage(detectedNiche);
         
         // Aplica a nova mensagem ao botão
         if (button.tagName.toLowerCase() === 'a' || button.tagName.toLowerCase() === 'button') {
