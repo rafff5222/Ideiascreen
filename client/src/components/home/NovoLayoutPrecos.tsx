@@ -45,7 +45,7 @@ export default function NovoLayoutPrecos() {
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
       <div className="text-center mb-16">
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-6">
           Planos e Preços
         </h2>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -55,15 +55,17 @@ export default function NovoLayoutPrecos() {
 
       {/* Nova implementação com flex conforme especificado */}
       <TooltipProvider>
-        <div className="planos-container">
+        <div className="planos-container plan-wrapper">
           {/* Plano Básico */}
-          <div className="plano-card plano-container" data-plano="basico">
+          <div className="plano-card plan-box" data-plano="basico">
             <h3>Básico</h3>
-            <p>
-              <span className="preco-antigo">R$89,00</span>
-              <span className="preco-novo">R$59,00</span> /mês
-            </p>
-            <span className="badge red">ECONOMIZE 34%</span>
+            <div className="preco-container">
+              <p>
+                <span className="preco-antigo">R$89,00</span>
+                <span className="preco-novo">R$59,00</span> /mês
+              </p>
+              <span className="badge red">ECONOMIZE 34%</span>
+            </div>
             <p>Ideal para criadores iniciantes.</p>
             <ul className="my-4 space-y-2">
               <li className="flex items-start">
@@ -91,14 +93,16 @@ export default function NovoLayoutPrecos() {
           </div>
 
           {/* Plano Premium */}
-          <div className="plano-card plano-container" data-plano="premium">
+          <div className="plano-card plan-box" data-plano="premium">
             <span className="badge-economize mais-vendido">MAIS VENDIDO</span>
             <h3>Premium</h3>
-            <p>
-              <span className="preco-antigo">R$117,00</span>
-              <span className="preco-novo">R$89,00</span> /mês
-            </p>
-            <span className="badge red">ECONOMIZE 24%</span>
+            <div className="preco-container">
+              <p>
+                <span className="preco-antigo">R$117,00</span>
+                <span className="preco-novo">R$89,00</span> /mês
+              </p>
+              <span className="badge red">ECONOMIZE 24%</span>
+            </div>
             <p>Perfeito para criadores em crescimento.</p>
             <ul className="my-4 space-y-2">
               <li className="flex items-start">
@@ -120,14 +124,16 @@ export default function NovoLayoutPrecos() {
           </div>
 
           {/* Plano Ultimate */}
-          <div className="plano-card plano-container" data-plano="ultimate">
+          <div className="plano-card plan-box" data-plano="ultimate">
             <span className="badge-economize">ECONOMIZE 13%</span>
             <h3>Ultimate</h3>
-            <p>
-              <span className="preco-antigo">R$149,00</span>
-              <span className="preco-novo">R$129,90</span> /mês
-            </p>
-            <span className="badge blue">MELHOR CUSTO-BENEFÍCIO</span>
+            <div className="preco-container">
+              <p>
+                <span className="preco-antigo">R$149,00</span>
+                <span className="preco-novo">R$129,90</span> /mês
+              </p>
+              <span className="badge blue">MELHOR CUSTO-BENEFÍCIO</span>
+            </div>
             <p>Para criadores profissionais e empresas.</p>
             <ul className="my-4 space-y-2">
               <li className="flex items-start">

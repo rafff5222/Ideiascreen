@@ -6,6 +6,12 @@
 @tailwind components;
 @tailwind utilities;
 
+h2 {
+  font-size: 32px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
 /* SCRIPT FINAL DE CORREÇÃO - Unificação dos preços e formatação na tabela */
 .preco {
   font-size: 1.8rem;
