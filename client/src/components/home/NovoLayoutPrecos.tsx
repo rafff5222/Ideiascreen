@@ -88,7 +88,9 @@ export default function NovoLayoutPrecos() {
                 <span className="text-gray-500">Montagem automática de vídeos</span>
               </li>
             </ul>
-            <button className="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-800 font-medium hover:bg-gray-300 transition-colors flex items-center justify-center">
+            <button 
+              onClick={() => window.location.href = '/checkout?plan=basic'}
+              className="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-800 font-medium hover:bg-gray-300 transition-colors flex items-center justify-center">
               <span>Selecionar plano</span>
             </button>
           </div>
@@ -119,7 +121,9 @@ export default function NovoLayoutPrecos() {
                 <span>Montagem automática de vídeos</span>
               </li>
             </ul>
-            <button className="w-full py-3 px-4 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 transition-colors pulse flex items-center justify-center">
+            <button 
+              onClick={() => window.location.href = '/checkout?plan=premium'}
+              className="w-full py-3 px-4 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 transition-colors pulse flex items-center justify-center">
               <span>Selecionar plano</span>
               <span className="ml-1 bg-yellow-400 text-xs px-1 rounded text-purple-900 font-bold">POPULAR</span>
             </button>
@@ -155,7 +159,9 @@ export default function NovoLayoutPrecos() {
                 <span>Edição com IA avançada e efeitos</span>
               </li>
             </ul>
-            <button className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium hover:from-indigo-700 hover:to-purple-700 transition-colors flex items-center justify-center">
+            <button 
+              onClick={() => window.location.href = '/checkout?plan=ultimate'}
+              className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium hover:from-indigo-700 hover:to-purple-700 transition-colors flex items-center justify-center">
               <span>Selecionar plano</span>
               <span className="ml-1 bg-blue-300 text-xs px-1 rounded text-blue-900 font-bold">MELHOR VALOR</span>
             </button>

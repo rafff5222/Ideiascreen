@@ -238,4 +238,27 @@
   .plano-card[data-plano="premium"] {
     transform: scale(1);
   }
+  
+  /* Ajuste de espaçamento para mobile */
+  .plano-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+  }
+  
+  .plano-card p {
+    margin-bottom: 15px;
+  }
+  
+  .plano-card button {
+    margin-top: 10px;
+  }
+  
+  .preco-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .badge {
+    margin-top: 5px;
+  }
 }
