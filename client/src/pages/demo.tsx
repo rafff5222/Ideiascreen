@@ -1,5 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { FaCheck, FaRocket, FaVideo, FaMagic, FaArrowRight, FaPlayCircle, FaCog, FaVolumeUp } from 'react-icons/fa';
+import { FaCheck, FaRocket, FaVideo, FaMagic, FaArrowRight, FaPlayCircle, FaCog, FaVolumeUp, FaUsers, FaUserAlt } from 'react-icons/fa';
+
+// Adiciona CSS específico para animações e otimização mobile
+const styles = `
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.cta-pulse {
+  animation: pulse 2s infinite;
+}
+
+@media (max-width: 768px) {
+  .demo-container {
+    padding: 15px !important;
+  }
+  .cta-mobile {
+    position: fixed;
+    bottom: 20px;
+    width: 90%;
+    left: 5%;
+    z-index: 100;
+  }
+}
+`;
 
 export default function DemoPage() {
   const [scriptText, setScriptText] = useState<string>('');
@@ -113,8 +139,23 @@ export default function DemoPage() {
     return num.toString().padStart(length, '0');
   };
 
+  // Função para pré-visualização de roteiro em tempo real
+  const handleScriptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const texto = e.target.value;
+    setScriptText(texto);
+    
+    // Atualizamos a pré-visualização
+    const previewElement = document.getElementById('preview-video');
+    if (previewElement) {
+      previewElement.innerHTML = texto.length > 0 
+        ? `Pré-visualização: ${texto.substring(0, 50)}${texto.length > 50 ? '...' : ''}`
+        : 'Digite um roteiro para ver a pré-visualização';
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16 demo-container">
+      <style dangerouslySetInnerHTML={{ __html: styles }} />
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
@@ -134,11 +175,22 @@ export default function DemoPage() {
                   Seu Roteiro
                 </h2>
                 <textarea
+                  id="editor-roteiro"
                   value={scriptText}
-                  onChange={(e) => setScriptText(e.target.value)}
+                  onChange={handleScriptChange}
                   placeholder="Cole ou escreva seu roteiro aqui com timings específicos (0:00 - [HOOK] texto...)"
                   className="w-full h-64 p-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none resize-none font-medium"
                 ></textarea>
+                
+                {/* Pré-visualização interativa */}
+                <div className="mt-2 bg-gray-100 p-3 rounded-md border border-gray-200 text-sm">
+                  <p className="text-gray-500 font-medium mb-1">Pré-visualização em tempo real:</p>
+                  <div id="preview-video" className="text-gray-800 font-medium">
+                    {scriptText.length > 0 
+                      ? `Pré-visualização: ${scriptText.substring(0, 50)}${scriptText.length > 50 ? '...' : ''}`
+                      : 'Digite um roteiro para ver a pré-visualização'}
+                  </div>
+                </div>
                 
                 {/* Opções de configuração */}
                 <div className="mt-4 mb-4 bg-gray-50 rounded-md p-4 border border-gray-200">
@@ -238,17 +290,18 @@ export default function DemoPage() {
                 <button
                   onClick={generateVideo}
                   disabled={isLoading}
-                  className="mt-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-6 rounded-md font-bold hover:from-pink-600 hover:to-purple-700 transition-all shadow-md w-full flex items-center justify-center animate-pulse"
+                  className="cta-pulse mt-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white py-4 px-6 rounded-md font-bold hover:from-pink-600 hover:to-purple-700 transition-all shadow-md w-full flex flex-col items-center justify-center"
                   style={{animation: 'pulse 2s infinite'}}
                 >
                   {isLoading ? (
                     <>
-                      <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                      Processando...
+                      <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full mb-1"></div>
+                      <span>Processando...</span>
                     </>
                   ) : (
                     <>
-                      <FaMagic className="mr-2" /> Transformar em Vídeo <FaArrowRight className="ml-2" />
+                      <span className="flex items-center"><FaMagic className="mr-2" /> 🚀 Transformar em Vídeo <FaArrowRight className="ml-2" /></span>
+                      <small className="text-xs mt-1 opacity-90">Pronto em 30 segundos, sem esperas!</small>
                     </>
                   )}
                 </button>
@@ -379,6 +432,72 @@ export default function DemoPage() {
           </div>
         </div>
         
+        {/* Vídeo demonstrativo com social proof */}
+        <div className="max-w-3xl mx-auto mt-16 mb-12">
+          <h2 className="text-2xl font-bold mb-6 text-center flex items-center justify-center">
+            <FaUsers className="text-indigo-600 mr-2" />
+            Como 1.200+ criadores usam o ContentPro
+          </h2>
+          
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="relative">
+              <div className="aspect-video bg-gradient-to-br from-indigo-900 to-purple-900 flex items-center justify-center">
+                <div className="text-center p-6">
+                  <div className="inline-flex items-center mb-4 bg-black bg-opacity-50 px-4 py-2 rounded-full">
+                    <div className="w-2 h-2 rounded-full bg-red-500 mr-2"></div>
+                    <span className="text-white text-sm">Demo em tempo real</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center">
+                    <FaPlayCircle className="text-6xl text-white opacity-80 hover:opacity-100 hover:text-indigo-400 transition-all cursor-pointer" />
+                    <p className="text-white mt-2">Veja o processo completo</p>
+                    <p className="text-gray-300 text-sm">30 segundos do roteiro até o vídeo final</p>
+                  </div>
+                </div>
+                
+                {/* Depoimento em overlay */}
+                <div className="absolute bottom-4 right-4 bg-white rounded-lg shadow-lg p-3 max-w-xs">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 mr-2">
+                      <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden">
+                        <img 
+                          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120" 
+                          alt="Maria Criadora"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">@maria_criadora</p>
+                      <p className="text-xs text-gray-600">"Economizei 10h/semana na produção de conteúdo!"</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-4 bg-gray-50 border-t border-gray-200">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-medium">
+                    1
+                  </div>
+                  <div className="mx-2 text-gray-300">→</div>
+                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-medium">
+                    2
+                  </div>
+                  <div className="mx-2 text-gray-300">→</div>
+                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-medium">
+                    3
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs font-medium text-green-600">15.7K visualizações • 423 comentários</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Código para implementação */}
         <div className="max-w-3xl mx-auto mt-16 mb-12">
           <h2 className="text-2xl font-bold mb-6 text-center">Funcionalidades Técnicas Implementadas</h2>
@@ -476,10 +595,11 @@ function sincronizarAudioVideo(roteiro, config) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-xl mx-auto">
             <a 
               href="/" 
-              className="w-full sm:w-auto inline-block bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-8 rounded-md font-bold hover:from-pink-600 hover:to-purple-700 transition-all shadow-md animate-pulse"
+              className="cta-pulse w-full sm:w-auto inline-block bg-gradient-to-r from-pink-500 to-purple-600 text-white py-4 px-8 rounded-md font-bold hover:from-pink-600 hover:to-purple-700 transition-all shadow-md animate-pulse"
               style={{animation: 'pulse 2s infinite'}}
             >
-              Ver Planos e Preços
+              🚀 Experimente Grátis por 7 Dias
+              <small className="block text-xs mt-1 opacity-90">Sem necessidade de cartão</small>
             </a>
             <a 
               href="/generator" 
@@ -492,6 +612,21 @@ function sincronizarAudioVideo(roteiro, config) {
           <p className="text-sm text-gray-500 mt-4">
             Menos de R$ 0,50 por vídeo | Fácil de usar | Sem limites de criatividade
           </p>
+          
+          {/* Upsell Estratégico */}
+          <div className="max-w-2xl mx-auto mt-12 bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-lg border border-purple-200 shadow-sm">
+            <div className="flex flex-col sm:flex-row items-center">
+              <div className="sm:w-3/4 text-left mb-4 sm:mb-0">
+                <h3 className="text-lg font-bold text-purple-800">Gostou da demo? <span className="text-pink-600">Libere 50 vídeos grátis</span> ao assinar hoje!</h3>
+                <p className="text-sm text-gray-600 mt-1">Oferta por tempo limitado: dobre seu pacote mensal no primeiro mês.</p>
+              </div>
+              <div className="sm:w-1/4 text-center">
+                <button className="bg-pink-600 text-white py-2 px-4 rounded-md font-medium hover:bg-pink-700 transition-all shadow-sm">
+                  Quero Meu Bônus
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
