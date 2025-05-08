@@ -58,36 +58,96 @@ export async function generateSpeech(request: SpeechGenerationRequest): Promise<
   }
 }
 
-// Função para gerar um vídeo completo
+// Função para gerar imagens para o vídeo com base no texto
+async function generateImagesForVideo(text: string, numberOfImages: number = 4): Promise<string[]> {
+  try {
+    // Em uma implementação completa, usaríamos a API DALL-E para gerar imagens
+    // Aqui, retornamos URLs de exemplo
+    
+    // Dividir o texto em segmentos para gerar imagens diferentes
+    const segments = text.split(/[.!?]/).filter(s => s.trim().length > 0);
+    const imageUrls: string[] = [];
+    
+    // Gerar URLs de imagens de placeholder
+    for (let i = 0; i < Math.min(numberOfImages, segments.length); i++) {
+      // Usar uma imagem de placeholder
+      imageUrls.push(`https://picsum.photos/800/450?random=${i+1}`);
+    }
+    
+    return imageUrls;
+  } catch (error) {
+    console.error("Erro ao gerar imagens:", error);
+    // Retornar algumas imagens de backup
+    return [
+      "https://picsum.photos/800/450?random=1",
+      "https://picsum.photos/800/450?random=2",
+      "https://picsum.photos/800/450?random=3"
+    ];
+  }
+}
+
+// Função para processar e gerar um vídeo completo com áudio e imagens
 export async function generateVideo(request: VideoGenerationRequest): Promise<string> {
   try {
-    // Primeiro, gera a narração em áudio
+    // 1. Gerar a narração em áudio
+    console.log("Gerando narração de áudio para o roteiro...");
     const audioBuffer = await generateSpeech({
       text: request.script,
       voice: request.voice,
       speed: request.speed
     });
     
-    // Na implementação real, usaríamos o buffer de áudio e as transições para 
-    // criar o vídeo com imagens e legendas. Como prova de conceito, retornamos 
-    // apenas a URL do áudio que foi gerado.
+    // 2. Gerar imagens para ilustrar o vídeo
+    console.log("Gerando imagens baseadas no roteiro...");
+    const imageUrls = await generateImagesForVideo(request.script);
     
-    // SIMULAÇÃO: Em uma implementação real, retornaríamos a URL do vídeo processado
-    // Aqui, geramos dados de exemplo para demonstração
+    // 3. Criar subtítulos/legendas
+    console.log("Processando legendas...");
+    const subtitles = request.script
+      .split(/[.!?]/)
+      .filter(line => line.trim().length > 0)
+      .map(line => line.trim());
     
-    // Como estamos apenas simulando, retornamos um JSON com os dados
+    // 4. Calcular timings para as legendas e imagens
+    // Em uma implementação completa, precisaríamos de bibliotecas de processamento
+    // de áudio e vídeo para fazer isso com precisão
+    
+    // Em uma implementação real, usaríamos o buffer de áudio para renderizar 
+    // o vídeo completo. Como precisamos de um resultado funcional, vamos criar
+    // estruturas que permitam reproduzir o áudio com legendas
+    
+    // Gerar um ID único para este vídeo
+    const videoId = Date.now().toString();
+    
+    // Retornamos um JSON com os metadados e recursos gerados
     return JSON.stringify({
+      id: videoId,
+      success: true,
       audioGenerated: true,
       scriptProcessed: request.script,
       voiceUsed: request.voice,
       transitionsApplied: request.transitions,
       format: request.outputFormat,
-      // Em uma implementação real, retornaríamos URLs para os arquivos gerados
-      audioUrl: "https://example.com/audio.mp3",
-      videoUrl: "https://example.com/video.mp4"
+      
+      // Dados para renderização
+      metadata: {
+        duration: subtitles.length * 5, // Estimar 5 segundos por segmento
+        segments: subtitles.length,
+        imageCount: imageUrls.length,
+        generatedAt: new Date().toISOString()
+      },
+      
+      // Recursos para a renderização do vídeo
+      resources: {
+        subtitles: subtitles,
+        imageUrls: imageUrls,
+        // Essa é a URL em base64 para o áudio, que o cliente pode usar
+        // Numa implementação real, salvaríamos os arquivos e entregaríamos URLs
+        audioData: `data:audio/mpeg;base64,${audioBuffer.toString('base64')}`
+      }
     });
   } catch (error) {
-    console.error("Erro ao gerar vídeo:", error);
+    console.error("Erro ao gerar vídeo completo:", error);
     throw new Error("Falha ao processar o vídeo. Por favor, tente novamente.");
   }
 }

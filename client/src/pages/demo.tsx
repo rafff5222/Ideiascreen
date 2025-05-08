@@ -1,4 +1,15 @@
 import React, { useState, useEffect } from 'react';
+
+// Ampliar o tipo de Window para incluir nossas propriedades personalizadas
+declare global {
+  interface Window {
+    startVideoPlayback: () => void;
+    videoData: {
+      subtitles: string[];
+      images: string[];
+    };
+  }
+}
 import { FaCheck, FaRocket, FaVideo, FaMagic, FaArrowRight, FaPlayCircle, FaCog, FaVolumeUp, FaUsers, FaUserAlt } from 'react-icons/fa';
 
 // Adiciona CSS específico para animações e otimização mobile
@@ -48,6 +59,82 @@ export default function DemoPage() {
     setScriptText(exampleScript);
   }, []);
 
+  // Função para reproduzir vídeo com imagens e legendas
+  window.startVideoPlayback = function() {
+    // Obter referências aos elementos
+    const audioElement = document.getElementById('demo-audio') as HTMLAudioElement;
+    const imageElement = document.getElementById('current-image') as HTMLImageElement;
+    const captionElement = document.getElementById('current-caption') as HTMLElement;
+    
+    if (!window.videoData || !audioElement || !imageElement || !captionElement) {
+      console.error('Elementos necessários não encontrados');
+      return;
+    }
+    
+    const { images, subtitles } = window.videoData;
+    
+    if (!subtitles || subtitles.length === 0) {
+      captionElement.textContent = "Legendas não disponíveis";
+      return;
+    }
+    
+    // Configurar estado inicial
+    let currentImageIndex = 0;
+    let currentSubtitleIndex = 0;
+    
+    // Exibir primeira legenda e imagem
+    captionElement.textContent = subtitles[0];
+    if (images && images.length > 0) {
+      imageElement.src = images[0];
+    }
+    
+    // Atualizar legendas e imagens com base no tempo do áudio
+    const updateMedia = () => {
+      if (audioElement.paused || audioElement.ended) return;
+      
+      // Calcular o índice da legenda com base no tempo atual
+      const totalDuration = audioElement.duration;
+      const currentTime = audioElement.currentTime;
+      const segmentDuration = totalDuration / subtitles.length;
+      
+      // Determinar qual legenda deve ser exibida
+      const newSubtitleIndex = Math.min(
+        Math.floor(currentTime / segmentDuration),
+        subtitles.length - 1
+      );
+      
+      // Atualizar legenda se necessário
+      if (newSubtitleIndex !== currentSubtitleIndex) {
+        currentSubtitleIndex = newSubtitleIndex;
+        captionElement.textContent = subtitles[currentSubtitleIndex];
+        
+        // Trocar imagem a cada duas legendas
+        if (images && images.length > 0) {
+          const newImageIndex = Math.min(
+            Math.floor(currentSubtitleIndex / 2),
+            images.length - 1
+          );
+          
+          if (newImageIndex !== currentImageIndex) {
+            currentImageIndex = newImageIndex;
+            imageElement.src = images[currentImageIndex];
+          }
+        }
+      }
+      
+      // Continuar atualizando
+      requestAnimationFrame(updateMedia);
+    };
+    
+    // Iniciar a atualização quando o áudio começar
+    audioElement.addEventListener('play', updateMedia);
+    
+    // Se já estiver tocando, inicie a atualização
+    if (!audioElement.paused) {
+      updateMedia();
+    }
+  };
+
   const generateVideo = async () => {
     if (!scriptText.trim()) {
       alert('Por favor, adicione um roteiro de vídeo primeiro!');
@@ -61,31 +148,8 @@ export default function DemoPage() {
       const lines = scriptText.split(/[.!?]/).filter(line => line.trim().length > 0).map(line => line.trim());
       setSubtitles(lines);
       
-      // Fazer requisição para a API para gerar narração com a voz selecionada
-      console.log('Enviando requisição para gerar áudio...');
-      const speechResponse = await fetch('/api/generate-speech', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          text: scriptText,
-          voice: voiceType,
-          speed: speed
-        }),
-      });
-
-      if (!speechResponse.ok) {
-        throw new Error('Falha ao gerar áudio de narração');
-      }
-
-      const audioBlob = await speechResponse.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      
-      console.log('Áudio gerado com sucesso:', audioUrl);
-      
-      // Fazer a requisição para gerar o vídeo completo
-      console.log('Enviando requisição para gerar vídeo...');
+      // Fazer requisição única para gerar vídeo completo (que já inclui áudio)
+      console.log('Enviando requisição para gerar vídeo integrado...');
       const videoResponse = await fetch('/api/generate-video', {
         method: 'POST',
         headers: {
@@ -101,42 +165,43 @@ export default function DemoPage() {
       });
 
       if (!videoResponse.ok) {
-        throw new Error('Falha ao gerar vídeo');
+        throw new Error('Falha ao gerar vídeo integrado');
       }
 
       const videoData = await videoResponse.json();
-      console.log('Vídeo gerado com sucesso:', videoData);
+      console.log('Vídeo integrado gerado com sucesso:', videoData);
       
-      // Atualizar a interface com os resultados
+      if (!videoData.resources || !videoData.resources.audioData) {
+        throw new Error('Dados incompletos recebidos do servidor');
+      }
+      
+      // Guardar dados para reprodução sincronizada
+      window.videoData = {
+        subtitles: videoData.resources.subtitles || lines,
+        images: videoData.resources.imageUrls || [
+          "https://picsum.photos/800/450?random=1",
+          "https://picsum.photos/800/450?random=2",
+          "https://picsum.photos/800/450?random=3"
+        ]
+      };
+      
+      // Configurar o elemento de áudio
+      const audioElement = document.getElementById('demo-audio') as HTMLAudioElement;
+      if (audioElement) {
+        audioElement.src = videoData.resources.audioData;
+      }
+      
+      // Configurar o link de download
+      const downloadLink = document.getElementById('download-link') as HTMLAnchorElement;
+      if (downloadLink) {
+        downloadLink.href = videoData.resources.audioData;
+        downloadLink.download = "audio-narrado.mp3";
+      }
+      
+      // Atualizar a interface
       setIsLoading(false);
       setVideoGenerated(true);
       setShowMessage(true);
-      
-      // Configurar o elemento de vídeo com o áudio gerado
-      const videoElement = document.getElementById('demo-video') as HTMLVideoElement;
-      if (videoElement) {
-        // Substituir a fonte de áudio/vídeo pelo áudio gerado pela API
-        videoElement.src = audioUrl;
-        
-        // Adicionar legendas
-        const track = document.createElement('track');
-        track.kind = 'subtitles';
-        track.label = 'Português';
-        track.srclang = 'pt-br';
-        track.default = true;
-        
-        // Gerar VTT para legendas
-        const webvtt = generateVTT(lines);
-        const blob = new Blob([webvtt], { type: 'text/vtt' });
-        const vttUrl = URL.createObjectURL(blob);
-        track.src = vttUrl;
-        
-        // Adicionar ao vídeo
-        videoElement.appendChild(track);
-        
-        // Configurar para mostrar legendas
-        videoElement.textTracks[0].mode = 'showing';
-      }
       
       // Esconder a mensagem após 5 segundos
       setTimeout(() => {
@@ -372,24 +437,46 @@ export default function DemoPage() {
                   {videoGenerated ? (
                     <>
                       <div className="absolute inset-0 rounded-md bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center overflow-hidden">
-                        {/* Vídeo simulado - usando um vídeo real para demonstração */}
-                        <video 
-                          id="demo-video" 
-                          className="w-full h-full object-cover opacity-80"
-                          controls
-                          poster="https://images.unsplash.com/photo-1517404215738-15263e9f9178?w=500"
-                        >
-                          {/* O source será substituído pelo áudio gerado */}
-                          Seu navegador não suporta o elemento de vídeo.
-                        </video>
+                        {/* Componente de vídeo com imagens sincronizadas */}
+                        <div id="video-container" className="w-full h-full relative">
+                          {/* Elemento de áudio para a narração */}
+                          <audio 
+                            id="demo-audio" 
+                            controls
+                            className="absolute bottom-0 left-0 right-0 z-20 w-full bg-gray-900 bg-opacity-70"
+                          >
+                            {/* O source será preenchido dinamicamente */}
+                            Seu navegador não suporta o elemento de áudio.
+                          </audio>
+                          
+                          {/* Container para a imagem atual */}
+                          <div id="current-image-container" className="absolute inset-0 flex items-center justify-center">
+                            <img 
+                              id="current-image" 
+                              src="https://picsum.photos/800/450?random=1" 
+                              alt="Imagem do vídeo" 
+                              className="max-w-full max-h-full object-contain"
+                            />
+                          </div>
+                          
+                          {/* Legendas */}
+                          <div id="caption-container" className="absolute bottom-12 left-0 right-0 text-center p-2 z-10">
+                            <div id="current-caption" className="bg-black bg-opacity-70 text-white p-2 rounded-md inline-block text-lg font-medium">
+                              {/* Será preenchido dinamicamente */}
+                            </div>
+                          </div>
+                        </div>
                         
                         {/* Ícone de play que desaparece ao clicar */}
-                        <div id="play-overlay" className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 cursor-pointer" onClick={() => {
-                          const video = document.getElementById('demo-video') as HTMLVideoElement;
+                        <div id="play-overlay" className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 cursor-pointer z-30" onClick={() => {
+                          const audio = document.getElementById('demo-audio') as HTMLAudioElement;
                           const overlay = document.getElementById('play-overlay');
-                          if (video && overlay) {
-                            video.play();
+                          if (audio && overlay) {
+                            audio.play();
                             overlay.style.display = 'none';
+                            
+                            // Iniciar a troca de imagens e legendas sincronizadas com o áudio
+                            window.startVideoPlayback();
                           }
                         }}>
                           <FaPlayCircle className="text-6xl text-white opacity-90 hover:opacity-100 hover:text-indigo-400 transition-all" />
@@ -410,20 +497,8 @@ export default function DemoPage() {
                     <a 
                       id="download-link"
                       href="#"
-                      download="video-gerado.mp3"
+                      download="audio-narrado.mp3"
                       className="bg-green-600 text-white py-2.5 px-4 rounded-md font-medium hover:bg-green-700 transition-all shadow-md w-full flex items-center justify-center"
-                      onClick={(e) => {
-                        // Pegar a URL do áudio do elemento de vídeo
-                        const video = document.getElementById('demo-video') as HTMLVideoElement;
-                        if (video && video.src) {
-                          const downloadLink = document.getElementById('download-link') as HTMLAnchorElement;
-                          downloadLink.href = video.src;
-                          // Deixa o link funcionar normalmente
-                        } else {
-                          e.preventDefault();
-                          alert('Não foi possível preparar o download. Tente novamente.');
-                        }
-                      }}
                     >
                       <FaCheck className="mr-2" /> Baixar Áudio Narrado
                     </a>
