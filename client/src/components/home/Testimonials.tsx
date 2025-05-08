@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaStar, FaQuoteLeft } from 'react-icons/fa';
+import './TestimonialsStyle.css';
 
 interface TestimonialProps {
   name: string;
@@ -11,7 +12,7 @@ interface TestimonialProps {
 
 const Testimonial: React.FC<TestimonialProps> = ({ name, profession, text, image, rating }) => {
   return (
-    <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-100 flex flex-col h-full">
+    <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-100 flex flex-col h-full testimonial-card">
       <div className="flex items-center mb-4">
         <div className="w-12 h-12 rounded-full overflow-hidden mr-4 border-2 border-purple-100">
           <img src={image} alt={`Foto de ${name}`} className="w-full h-full object-cover" />
