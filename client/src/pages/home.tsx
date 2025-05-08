@@ -39,6 +39,8 @@ import Heatmap3D from "@/components/analytics/Heatmap3D";
 import PrivateAnalytics from "@/components/analytics/PrivateAnalytics";
 import MicroConversionTracker from "@/components/analytics/MicroConversionTracker";
 import MetricsPanel from "@/components/admin/MetricsPanel-new";
+import TimeBasedOffers from "@/components/conversion/TimeBasedOffers";
+import MemoryChatbot from "@/components/conversion/MemoryChatbot";
 
 export default function Home() {
   // Scroll to top when navigating to home page
@@ -136,6 +138,8 @@ export default function Home() {
       <PurchaseCounter />
       <ABTestCTA />
       <SmartFormOptimizer />
+      <TimeBasedOffers />
+      <MemoryChatbot />
       <MiniMetricsWidget />
       <StagedLoading />
       <TurboLinks />
