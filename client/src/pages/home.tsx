@@ -41,6 +41,11 @@ import MicroConversionTracker from "@/components/analytics/MicroConversionTracke
 import MetricsPanel from "@/components/admin/MetricsPanel-new";
 import TimeBasedOffers from "@/components/conversion/TimeBasedOffers";
 import MemoryChatbot from "@/components/conversion/MemoryChatbot";
+import SmartPricing from "@/components/conversion/SmartPricing";
+import PostInteractionUpsell from "@/components/conversion/PostInteractionUpsell";
+import PriorityLoading from "@/components/optimization/PriorityLoading";
+import VoiceCommandButton from "@/components/conversion/VoiceCommandButton";
+import MicroConversionsTracker from "@/components/analytics/MicroConversionsTracker";
 
 export default function Home() {
   // Scroll to top when navigating to home page
@@ -140,6 +145,11 @@ export default function Home() {
       <SmartFormOptimizer />
       <TimeBasedOffers />
       <MemoryChatbot />
+      <SmartPricing />
+      <PostInteractionUpsell />
+      <VoiceCommandButton />
+      <PriorityLoading />
+      <MicroConversionsTracker />
       <MiniMetricsWidget />
       <StagedLoading />
       <TurboLinks />
