@@ -1,0 +1,89 @@
+/* Estilos específicos para otimização mobile da tabela de preços */
+
+/* Layout Mobile */
+@media (max-width: 768px) {
+  .planos-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .plano-card {
+    width: 100% !important;
+    max-width: 100%;
+    margin-bottom: 25px;
+    transform: none !important;
+    scale: 1 !important;
+  }
+  
+  /* Ajuste para o plano Premium (mais vendido) */
+  .plano-card.mais-vendido {
+    transform: none !important;
+    scale: 1 !important;
+  }
+  
+  /* Ajustes de tamanho para mobile */
+  .plano-card h3 {
+    font-size: 1.5rem !important;
+  }
+  
+  .plano-card .preco {
+    font-size: 2rem !important;
+  }
+  
+  /* Melhora espaçamento em mobile */
+  .plano-card {
+    padding: 1.25rem !important;
+  }
+  
+  /* Melhora visibilidade dos benefícios */
+  .plano-card li {
+    padding: 0.5rem 0;
+  }
+  
+  /* Garante alinhamento correto dos preços */
+  .plano-card .flex.items-start {
+    align-items: center !important;
+  }
+}
+
+/* Efeito pulsante para o plano mais vendido */
+.pulse {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #6366f1;
+  box-shadow: 0 0 0 rgba(99, 102, 241, 0.4);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+}
+
+/* Tag de recomendação mais visível */
+.recommended-tag {
+  position: absolute;
+  top: -12px;
+  right: 10px;
+  background: #7c3aed;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 6px rgba(124, 58, 237, 0.3);
+  display: flex;
+  align-items: center;
+  z-index: 10;
+}

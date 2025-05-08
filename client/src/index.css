@@ -1,6 +1,13 @@
+@import './components/home/PricingMobile.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Padronização de moeda */
+.preco::before {
+  content: "R$ ";
+}
 
 :root {
   --background: 0 0% 100%;
