@@ -1,0 +1,85 @@
+🎯 1. Personalização por Intenção de Compra (IA Comportamental)
+Adicione este código antes do </body>:
+
+javascript
+// Detecta padrões de navegação
+let pricingPageViews = 0;
+let featuresTime = 0;
+
+setInterval(() => {
+  if (window.location.href.includes('#planos')) pricingPageViews++;
+}, 10000);
+
+document.addEventListener('mousemove', () => {
+  if (document.querySelector('#features:has(:hover)')) {
+    featuresTime += 0.1;
+  }
+});
+
+// Oferece desconto se usuário hesitar
+if (pricingPageViews > 2 || featuresTime > 15) {
+  document.querySelector('.plano-premium .preco').innerHTML = `
+    <span class="riscado">R$ 89</span>
+    <span class="destaque">R$ 69/mês</span>
+    <span class="badge">OFFER</span>
+  `;
+}
+💎 2. Upsell Contextual Pós-Rolagem
+Adicione após os planos:
+
+html
+<div class="upsell-contextual">
+  <p>🔍 <strong>Você estava olhando:</strong> Geração automática de vídeos</p>
+  <div class="oferta">
+    <span>Leve o <strong>Pacote Viral+</strong> por R$ 19/mês e ganhe:</span>
+    <ul>
+      <li>+100 músicas sem copyright</li>
+      <li>10 templates exclusivos</li>
+    </ul>
+    <button class="btn-upsell">QUERO POTENCIALIZAR</button>
+  </div>
+</div>
+CSS para destaque:
+
+css
+.upsell-contextual {
+  border-left: 4px solid #8B5CF6;
+  padding: 15px;
+  background: rgba(139, 92, 246, 0.05);
+  margin-top: 30px;
+}
+.btn-upsell {
+  background: linear-gradient(90deg, #EC4899, #8B5CF6);
+  color: white;
+}
+🚀 3. Carregamento Instantâneo de Páginas (Turbo Links)
+Implemente navegação AJAX:
+
+javascript
+document.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    fetch(this.href)
+      .then(response => response.text())
+      .then(html => {
+        document.body.innerHTML = html;
+        window.history.pushState({}, '', this.href);
+      });
+  });
+});
+📊 4. Analytics de Micro-conversões
+Monitore eventos-chave:
+
+javascript
+const trackMicro = (event) => {
+  navigator.sendBeacon('/analytics', JSON.stringify({
+    event,
+    timestamp: Date.now(),
+    path: window.location.pathname
+  }));
+};
+
+// Exemplos de uso
+document.querySelector('.video-demo').addEventListener('mouseenter', () => {
+  trackMicro('hover_video_demo');
+});

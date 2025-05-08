@@ -17,8 +17,12 @@ import SalesChatbot from "@/components/conversion/SalesChatbot";
 import MicroInteractions from "@/components/conversion/MicroInteractions";
 import NichePersonalization from "@/components/conversion/NichePersonalization";
 import AdvancedCheckout from "@/components/conversion/AdvancedCheckout";
+import BehavioralPricing from "@/components/conversion/BehavioralPricing";
+import ContextualUpsell from "@/components/conversion/ContextualUpsell";
+import TurboLinks from "@/components/optimization/TurboLinks";
 import ClickHeatmap from "@/components/analytics/ClickHeatmap";
 import PrivateAnalytics from "@/components/analytics/PrivateAnalytics";
+import MicroConversionTracker from "@/components/analytics/MicroConversionTracker";
 import MetricsPanel from "@/components/admin/MetricsPanel-new";
 
 export default function Home() {
@@ -99,8 +103,12 @@ export default function Home() {
       <TechnicalOptimizations />
       <MicroInteractions />
       <NichePersonalization />
+      <BehavioralPricing />
+      <ContextualUpsell />
       <AdvancedCheckout />
       <PrivateAnalytics />
+      <MicroConversionTracker />
+      <TurboLinks />
     </>
   );
 }
