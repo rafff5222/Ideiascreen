@@ -10,6 +10,7 @@ import Generator from "@/pages/generator";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ExitPopup from "@/components/ui/exit-popup";
+import UnificadorPrecos from "./components/home/UnificadorPrecos";
 
 // Componentes de analytics e conversão
 import ClickTracker from "@/components/analytics/ClickTracker";
@@ -41,6 +42,9 @@ function App() {
             <Router />
           </main>
           <Footer />
+          
+          {/* Unificador de preços em toda a aplicação */}
+          <UnificadorPrecos />
           
           {/* Analytics e Componentes de Conversão */}
           <ClickTracker />

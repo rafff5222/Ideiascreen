@@ -85,12 +85,12 @@ export default function PricingTable() {
       {/* Container com os planos */}
       <div className="max-w-7xl mx-auto planos-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
         {/* Plano Básico */}
-        <div className="plano plano-basico bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 transition-all hover:shadow-xl">
+        <div className="plano plano-basico basico bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 transition-all hover:shadow-xl" data-plano="basico">
           <div className="px-6 py-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Básico</h3>
             <div className="preco-container mb-6">
-              <div className="preco" data-valor={pricingData.prices.basic}>
-                R$ {pricingData.prices.basic}<small>/mês</small>
+              <div className="preco" data-valor="97">
+                R$ 97<small>/mês</small>
               </div>
             </div>
             <ul className="space-y-4 mb-8">
@@ -118,15 +118,15 @@ export default function PricingTable() {
         </div>
 
         {/* Plano Premium - Mais vendido */}
-        <div className="plano mais-vendido relative bg-white rounded-xl shadow-lg overflow-hidden border-2 border-purple-500 transition-all hover:shadow-xl">
+        <div className="plano premium mais-vendido relative bg-white rounded-xl shadow-lg overflow-hidden border-2 border-purple-500 transition-all hover:shadow-xl" data-plano="premium">
           <div className="absolute top-0 right-0 bg-purple-600 text-white px-4 py-1 text-sm font-bold tracking-wide">
             <span className="pulse mr-1">•</span> MAIS VENDIDO
           </div>
           <div className="px-6 py-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Premium</h3>
             <div className="preco-container mb-6">
-              <div className="preco preco-premium" data-valor={pricingData.prices.premium}>
-                R$ {pricingData.prices.premium}<small>/mês</small>
+              <div className="preco preco-premium" data-valor="197">
+                R$ 197<small>/mês</small>
               </div>
             </div>
             <ul className="space-y-4 mb-8">
@@ -154,12 +154,12 @@ export default function PricingTable() {
         </div>
 
         {/* Plano Ultimate */}
-        <div className="plano bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 transition-all hover:shadow-xl">
+        <div className="plano ultimate bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 transition-all hover:shadow-xl" data-plano="ultimate">
           <div className="px-6 py-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Ultimate</h3>
             <div className="preco-container mb-6">
-              <div className="preco preco-ultimate" data-valor={pricingData.prices.ultimate}>
-                R$ {pricingData.prices.ultimate}<small>/mês</small>
+              <div className="preco preco-ultimate" data-valor="297">
+                R$ 297<small>/mês</small>
               </div>
             </div>
             <ul className="space-y-4 mb-8">
