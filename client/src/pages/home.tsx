@@ -25,6 +25,10 @@ import VoiceAssistant from "@/components/conversion/VoiceAssistant";
 import EngagementPersonalization from "@/components/conversion/EngagementPersonalization";
 import ExpressCheckout from "@/components/conversion/ExpressCheckout";
 import MagicButton from "@/components/conversion/MagicButton";
+import DynamicSocialProof from "@/components/conversion/DynamicSocialProof";
+import CompetitorComparison from "@/components/conversion/CompetitorComparison";
+import SmartHelpButton from "@/components/conversion/SmartHelpButton";
+import StagedLoading from "@/components/optimization/StagedLoading";
 import TurboLinks from "@/components/optimization/TurboLinks";
 import ClickHeatmap from "@/components/analytics/ClickHeatmap";
 import PrivateAnalytics from "@/components/analytics/PrivateAnalytics";
@@ -120,6 +124,10 @@ export default function Home() {
       <EngagementPersonalization />
       <ExpressCheckout />
       <MagicButton />
+      <DynamicSocialProof />
+      <CompetitorComparison />
+      <SmartHelpButton />
+      <StagedLoading />
       <TurboLinks />
     </>
   );
