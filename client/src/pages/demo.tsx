@@ -48,7 +48,7 @@ export default function DemoPage() {
     setScriptText(exampleScript);
   }, []);
 
-  const generateVideo = () => {
+  const generateVideo = async () => {
     if (!scriptText.trim()) {
       alert('Por favor, adicione um roteiro de vídeo primeiro!');
       return;
@@ -56,46 +56,97 @@ export default function DemoPage() {
 
     setIsLoading(true);
     
-    // Processa o roteiro para criar legendas
-    const lines = scriptText.split(/[.!?]/).filter(line => line.trim().length > 0).map(line => line.trim());
-    setSubtitles(lines);
-    
-    // Simulação de geração de vídeo
-    setTimeout(() => {
+    try {
+      // Processa o roteiro para criar legendas
+      const lines = scriptText.split(/[.!?]/).filter(line => line.trim().length > 0).map(line => line.trim());
+      setSubtitles(lines);
+      
+      // Fazer requisição para a API para gerar narração com a voz selecionada
+      console.log('Enviando requisição para gerar áudio...');
+      const speechResponse = await fetch('/api/generate-speech', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: scriptText,
+          voice: voiceType,
+          speed: speed
+        }),
+      });
+
+      if (!speechResponse.ok) {
+        throw new Error('Falha ao gerar áudio de narração');
+      }
+
+      const audioBlob = await speechResponse.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      console.log('Áudio gerado com sucesso:', audioUrl);
+      
+      // Fazer a requisição para gerar o vídeo completo
+      console.log('Enviando requisição para gerar vídeo...');
+      const videoResponse = await fetch('/api/generate-video', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          script: scriptText,
+          voice: voiceType,
+          speed: speed,
+          transitions: transitions,
+          outputFormat: outputFormat
+        }),
+      });
+
+      if (!videoResponse.ok) {
+        throw new Error('Falha ao gerar vídeo');
+      }
+
+      const videoData = await videoResponse.json();
+      console.log('Vídeo gerado com sucesso:', videoData);
+      
+      // Atualizar a interface com os resultados
       setIsLoading(false);
       setVideoGenerated(true);
       setShowMessage(true);
       
-      // Esconde a mensagem após 5 segundos
+      // Configurar o elemento de vídeo com o áudio gerado
+      const videoElement = document.getElementById('demo-video') as HTMLVideoElement;
+      if (videoElement) {
+        // Substituir a fonte de áudio/vídeo pelo áudio gerado pela API
+        videoElement.src = audioUrl;
+        
+        // Adicionar legendas
+        const track = document.createElement('track');
+        track.kind = 'subtitles';
+        track.label = 'Português';
+        track.srclang = 'pt-br';
+        track.default = true;
+        
+        // Gerar VTT para legendas
+        const webvtt = generateVTT(lines);
+        const blob = new Blob([webvtt], { type: 'text/vtt' });
+        const vttUrl = URL.createObjectURL(blob);
+        track.src = vttUrl;
+        
+        // Adicionar ao vídeo
+        videoElement.appendChild(track);
+        
+        // Configurar para mostrar legendas
+        videoElement.textTracks[0].mode = 'showing';
+      }
+      
+      // Esconder a mensagem após 5 segundos
       setTimeout(() => {
         setShowMessage(false);
       }, 5000);
-      
-      // Configura o evento de carregamento do vídeo para adicionar legendas
-      setTimeout(() => {
-        const video = document.getElementById('demo-video') as HTMLVideoElement;
-        if (video) {
-          // Criamos um elemento de track para as legendas
-          const track = document.createElement('track');
-          track.kind = 'subtitles';
-          track.label = 'Português';
-          track.srclang = 'pt-br';
-          track.default = true;
-          
-          // Geramos um blob URL para o arquivo de legendas
-          const webvtt = generateVTT(lines);
-          const blob = new Blob([webvtt], { type: 'text/vtt' });
-          const url = URL.createObjectURL(blob);
-          track.src = url;
-          
-          // Adicionamos ao vídeo
-          video.appendChild(track);
-          
-          // Configuramos o elemento de video para mostrar legendas
-          video.textTracks[0].mode = 'showing';
-        }
-      }, 100);
-    }, 3000);
+    } catch (error: any) {
+      console.error('Erro ao gerar vídeo:', error);
+      setIsLoading(false);
+      alert(`Falha ao processar: ${error.message || 'Erro desconhecido'}. Por favor, tente novamente.`);
+    }
   };
   
   // Função para gerar um arquivo VTT de legendas a partir do roteiro
@@ -328,7 +379,7 @@ export default function DemoPage() {
                           controls
                           poster="https://images.unsplash.com/photo-1517404215738-15263e9f9178?w=500"
                         >
-                          <source src="https://samplelib.com/lib/preview/mp4/sample-5s.mp4" type="video/mp4" />
+                          {/* O source será substituído pelo áudio gerado */}
                           Seu navegador não suporta o elemento de vídeo.
                         </video>
                         
@@ -357,11 +408,24 @@ export default function DemoPage() {
                 {videoGenerated && (
                   <div className="mt-4">
                     <a 
-                      href="https://samplelib.com/lib/download/mp4/sample-5s.mp4" 
-                      download="video-gerado.mp4"
+                      id="download-link"
+                      href="#"
+                      download="video-gerado.mp3"
                       className="bg-green-600 text-white py-2.5 px-4 rounded-md font-medium hover:bg-green-700 transition-all shadow-md w-full flex items-center justify-center"
+                      onClick={(e) => {
+                        // Pegar a URL do áudio do elemento de vídeo
+                        const video = document.getElementById('demo-video') as HTMLVideoElement;
+                        if (video && video.src) {
+                          const downloadLink = document.getElementById('download-link') as HTMLAnchorElement;
+                          downloadLink.href = video.src;
+                          // Deixa o link funcionar normalmente
+                        } else {
+                          e.preventDefault();
+                          alert('Não foi possível preparar o download. Tente novamente.');
+                        }
+                      }}
                     >
-                      <FaCheck className="mr-2" /> Baixar Vídeo
+                      <FaCheck className="mr-2" /> Baixar Áudio Narrado
                     </a>
                   </div>
                 )}
