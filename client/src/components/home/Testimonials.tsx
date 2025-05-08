@@ -15,7 +15,7 @@ const Testimonial: React.FC<TestimonialProps> = ({ name, profession, text, image
     <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-100 flex flex-col h-full testimonial-card">
       <div className="flex items-center mb-4">
         <div className="w-12 h-12 rounded-full overflow-hidden mr-4 border-2 border-purple-100">
-          <img src={image} alt={`Foto de ${name}`} className="w-full h-full object-cover" />
+          <img src={image} alt={`Foto de ${name}`} className="w-full h-full object-cover testimonial-image" />
         </div>
         <div>
           <h3 className="font-bold text-gray-800">{name}</h3>
@@ -23,18 +23,18 @@ const Testimonial: React.FC<TestimonialProps> = ({ name, profession, text, image
         </div>
       </div>
       
-      <div className="flex mb-4">
+      <div className="flex mb-4 testimonial-stars">
         {[...Array(5)].map((_, i) => (
           <FaStar 
             key={i} 
-            className={`${i < rating ? 'text-yellow-400' : 'text-gray-300'} mr-1`} 
+            className={`${i < rating ? 'star' : 'star-empty'} mr-1`} 
             size={16} 
           />
         ))}
       </div>
       
       <div className="flex-grow">
-        <FaQuoteLeft className="text-purple-200 mb-2" size={24} />
+        <FaQuoteLeft className="testimonial-quote" size={24} />
         <p className="text-gray-700 italic">{text}</p>
       </div>
     </div>
