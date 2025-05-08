@@ -6,6 +6,7 @@ export default function DemoPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [videoGenerated, setVideoGenerated] = useState<boolean>(false);
   const [showMessage, setShowMessage] = useState<boolean>(false);
+  const [subtitles, setSubtitles] = useState<string[]>([]);
 
   const generateVideo = () => {
     if (!scriptText.trim()) {
@@ -14,6 +15,10 @@ export default function DemoPage() {
     }
 
     setIsLoading(true);
+    
+    // Processa o roteiro para criar legendas
+    const lines = scriptText.split(/[.!?]/).filter(line => line.trim().length > 0).map(line => line.trim());
+    setSubtitles(lines);
     
     // Simulação de geração de vídeo
     setTimeout(() => {
@@ -25,7 +30,73 @@ export default function DemoPage() {
       setTimeout(() => {
         setShowMessage(false);
       }, 5000);
+      
+      // Configura o evento de carregamento do vídeo para adicionar legendas
+      setTimeout(() => {
+        const video = document.getElementById('demo-video') as HTMLVideoElement;
+        if (video) {
+          // Criamos um elemento de track para as legendas
+          const track = document.createElement('track');
+          track.kind = 'subtitles';
+          track.label = 'Português';
+          track.srclang = 'pt-br';
+          track.default = true;
+          
+          // Geramos um blob URL para o arquivo de legendas
+          const webvtt = generateVTT(lines);
+          const blob = new Blob([webvtt], { type: 'text/vtt' });
+          const url = URL.createObjectURL(blob);
+          track.src = url;
+          
+          // Adicionamos ao vídeo
+          video.appendChild(track);
+          
+          // Configuramos o elemento de video para mostrar legendas
+          video.textTracks[0].mode = 'showing';
+        }
+      }, 100);
     }, 3000);
+  };
+  
+  // Função para gerar um arquivo VTT de legendas a partir do roteiro
+  const generateVTT = (lines: string[]): string => {
+    let vtt = 'WEBVTT\n\n';
+    let startTime = 0;
+    
+    lines.forEach((line, index) => {
+      // Calculamos tempos para cada linha do roteiro
+      const duration = Math.max(2, line.length / 15); // Duração baseada no comprimento do texto
+      const endTime = startTime + duration;
+      
+      // Formatamos os tempos no formato VTT (HH:MM:SS.mmm)
+      const startFormatted = formatTime(startTime);
+      const endFormatted = formatTime(endTime);
+      
+      // Adicionamos a legenda
+      vtt += `${index + 1}\n`;
+      vtt += `${startFormatted} --> ${endFormatted}\n`;
+      vtt += `${line}\n\n`;
+      
+      // Atualizamos o tempo de início para a próxima legenda
+      startTime = endTime + 0.2; // Pequena pausa entre as legendas
+    });
+    
+    return vtt;
+  };
+  
+  // Formata segundos para o formato VTT de tempo
+  const formatTime = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    const ms = Math.floor((seconds % 1) * 1000);
+    
+    return `${pad(hours)}:${pad(minutes)}:${pad(secs)}.${pad(ms, 3)}`;
+  };
+  
+  // Adiciona zeros à esquerda
+  const pad = (num: number, length: number = 2): string => {
+    return num.toString().padStart(length, '0');
   };
 
   return (
@@ -139,6 +210,29 @@ export default function DemoPage() {
                 <p className="text-green-700 text-sm">Esta é uma versão demo. Para acessar recursos avançados, assine um de nossos planos.</p>
               </div>
             </div>
+          </div>
+        )}
+        
+        {/* Mostrar as legendas processadas do roteiro */}
+        {videoGenerated && subtitles.length > 0 && (
+          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-12 mx-auto max-w-2xl">
+            <h3 className="text-lg font-semibold mb-3 flex items-center">
+              <span className="bg-indigo-100 text-indigo-700 p-1 rounded-full mr-2 flex items-center justify-center" style={{width: '24px', height: '24px'}}>
+                <span className="text-xs">CC</span>
+              </span>
+              Legendas geradas automaticamente do seu roteiro:
+            </h3>
+            <div className="bg-gray-50 rounded-md p-3 overflow-auto max-h-40">
+              {subtitles.map((line, index) => (
+                <div key={index} className="mb-2 last:mb-0 p-2 border-l-2 border-indigo-300">
+                  <div className="text-xs text-gray-500 mb-1">TEMPO {index + 1}</div>
+                  <div>{line}</div>
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-gray-500 mt-3">
+              Estas legendas são incorporadas automaticamente no vídeo. Cada frase do seu roteiro é sincronizada com o vídeo.
+            </p>
           </div>
         )}
 
