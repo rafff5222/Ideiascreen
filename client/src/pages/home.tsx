@@ -22,6 +22,8 @@ import ContextualUpsell from "@/components/conversion/ContextualUpsell";
 import RealTimeScarcity from "@/components/conversion/RealTimeScarcity";
 import Comparador3DPlanos from "@/components/conversion/Comparador3DPlanos";
 import VoiceAssistant from "@/components/conversion/VoiceAssistant";
+import EngagementPersonalization from "@/components/conversion/EngagementPersonalization";
+import ExpressCheckout from "@/components/conversion/ExpressCheckout";
 import TurboLinks from "@/components/optimization/TurboLinks";
 import ClickHeatmap from "@/components/analytics/ClickHeatmap";
 import PrivateAnalytics from "@/components/analytics/PrivateAnalytics";
@@ -114,6 +116,8 @@ export default function Home() {
       <RealTimeScarcity />
       <Comparador3DPlanos />
       <VoiceAssistant />
+      <EngagementPersonalization />
+      <ExpressCheckout />
       <TurboLinks />
     </>
   );

@@ -50,16 +50,33 @@ export default function ClickHeatmap() {
   // Envia dados de cliques para a API
   const sendClickData = async (clickData: ClickData) => {
     try {
-      // Em ambiente de produção, enviaríamos para uma API real
-      // Aqui apenas simulamos o envio e logamos no console
+      // Prepara dados mais completos para análise
+      const enrichedClickData = {
+        ...clickData,
+        path: window.location.pathname,
+        userAgent: navigator.userAgent,
+        screenWidth: window.innerWidth,
+        screenHeight: window.innerHeight,
+        targetElement: document.elementFromPoint(clickData.x, clickData.y)?.tagName || 'unknown',
+        targetElementId: (document.elementFromPoint(clickData.x, clickData.y) as HTMLElement)?.id || '',
+        targetElementClass: (document.elementFromPoint(clickData.x, clickData.y) as HTMLElement)?.className || ''
+      };
+      
+      // Log para debug
       console.log('Clique registrado:', clickData);
       
-      // Simulação de envio para API
-      // await fetch('/api/clicks', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(clickData)
-      // });
+      // Usa sendBeacon para envios não-bloqueantes (funciona mesmo se a página for fechada)
+      if (navigator.sendBeacon) {
+        const blob = new Blob([JSON.stringify(enrichedClickData)], { type: 'application/json' });
+        navigator.sendBeacon('/api/clicks', blob);
+      } else {
+        // Fallback para fetch se sendBeacon não estiver disponível
+        await fetch('/api/clicks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(enrichedClickData)
+        });
+      }
     } catch (error) {
       console.error('Erro ao enviar dados de clique:', error);
     }

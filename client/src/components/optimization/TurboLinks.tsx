@@ -3,9 +3,56 @@ import { useEffect } from 'react';
 /**
  * Implementa carregamento instantâneo de páginas (Turbo Links)
  * Substitui navegação padrão por AJAX para melhor experiência do usuário
+ * 
+ * Recursos adicionais:
+ * - Pré-carregamento de assets críticos
+ * - DNS prefetch para domínios externos
+ * - Preconnect para APIs de terceiros
  */
 export default function TurboLinks() {
   useEffect(() => {
+    // Implementa pré-carregamento de assets críticos
+    const preloadCriticalAssets = () => {
+      const criticalAssets = [
+        { href: '/assets/js/checkout.js', as: 'script' },
+        { href: '/assets/img/hero-bg.webp', as: 'image' },
+        { href: '/assets/fonts/inter.woff2', as: 'font', crossorigin: 'anonymous' }
+      ];
+      
+      // Domínios para preconnect
+      const preconnectDomains = [
+        'https://api.stripe.com',
+        'https://cdn.jsdelivr.net',
+        'https://fonts.googleapis.com'
+      ];
+      
+      // Adiciona os preloads
+      criticalAssets.forEach(asset => {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.href = asset.href;
+        link.as = asset.as;
+        if (asset.crossorigin) {
+          link.crossOrigin = asset.crossorigin;
+        }
+        document.head.appendChild(link);
+      });
+      
+      // Adiciona os preconnects
+      preconnectDomains.forEach(domain => {
+        const link = document.createElement('link');
+        link.rel = 'preconnect';
+        link.href = domain;
+        link.crossOrigin = 'anonymous';
+        document.head.appendChild(link);
+      });
+      
+      console.log('Assets críticos pré-carregados');
+    };
+    
+    // Executa pré-carregamento de assets
+    preloadCriticalAssets();
+    
     // Cache para páginas já carregadas
     const pageCache = new Map();
     
