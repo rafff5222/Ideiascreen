@@ -1,198 +1,233 @@
-import React, { useEffect, useState } from 'react';
-import { apiRequest } from '@/lib/queryClient';
-import PlanTooltip from './PlanTooltip';
-import { PlanFeature } from './PlanIcons';
-
-interface PricingData {
-  prices: {
-    basic: number;
-    premium: number;
-    pro: number;
-    ultimate: number;
-  };
-  basePrices: {
-    basic: number;
-    premium: number;
-    pro: number;
-    ultimate: number;
-  };
-  discount: number;
-  promoMessage: string;
-}
+import React from 'react';
+import { FaCheck, FaTimes, FaCrown, FaStar } from 'react-icons/fa';
+import './ComparisonTable.css';
 
 /**
- * Componente de Tabela de Preços Aprimorada
- * Inclui formatação adequada, destaques visuais e padronização de moeda
+ * Componente de tabela de preços bem organizada e clara
+ * Implementa um design tabular para melhor comparação entre planos
  */
 export default function PricingTable() {
-  const [pricingData, setPricingData] = useState<PricingData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Busca os dados de preços dinâmicos
-    const fetchPricingData = async () => {
-      try {
-        setLoading(true);
-        const response = await apiRequest('GET', '/api/pricing-data');
-        const data = await response.json();
-        setPricingData(data);
-      } catch (error) {
-        console.error('Erro ao carregar dados de preço:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPricingData();
-    
-    // Importa e executa a unificação de preços
-    import('./PriceUnifier').then(module => {
-      module.inicializarUnificadorPrecos();
-    });
-  }, []);
-
-  // Função para padronizar a moeda para Reais
-  const formatCurrency = (value: number) => {
-    return `R$ ${value}`;
+  // Valores fixos definitivos conforme correção solicitada
+  const precosFixos = {
+    basico: 59,
+    premium: 89,
+    ultimate: 129.90
   };
 
-  if (loading || !pricingData) {
-    return (
-      <div className="flex justify-center items-center py-10">
-        <div className="w-8 h-8 border-4 border-t-transparent border-purple-600 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="text-center mb-16">
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
-          Planos e Preços
-        </h2>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Escolha o plano ideal para suas necessidades de criação de conteúdo
-        </p>
-        
-        {/* Mensagem promocional */}
-        {pricingData.promoMessage && (
-          <div className="mt-4 bg-indigo-100 text-indigo-800 py-2 px-4 rounded-md inline-block">
-            {pricingData.promoMessage}
-          </div>
-        )}
+    <div className="comparison-container">
+      {/* Título da seção */}
+      <div className="comparison-title">
+        <h2>Escolha Seu Plano</h2>
+        <p>Compare e escolha a opção ideal para suas necessidades</p>
       </div>
 
-      {/* Container com os planos */}
-      <div className="max-w-7xl mx-auto planos-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
-        {/* Plano Básico */}
-        <div className="plano plano-basico basico bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 transition-all hover:shadow-xl" data-plano="basico">
-          <div className="px-6 py-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Básico</h3>
-            <div className="preco-container mb-6">
-              <div className="preco" data-valor="97">
-                R$ 97<small>/mês</small>
-              </div>
-            </div>
-            <ul className="space-y-4 mb-8">
-              <PlanFeature 
-                included={true} 
-                text={<>50 gerações de conteúdo/mês <PlanTooltip text="Crie até 50 ideias e roteiros para suas redes sociais todo mês" /></>}
-              />
-              <PlanFeature 
-                included={true} 
-                text={<>Legendas otimizadas para engajamento <PlanTooltip text="Textos e legendas criados para maximizar o engajamento do público" /></>}
-              />
-              <PlanFeature 
-                included={false}
-                text="Montagem automática de vídeos"
-              />
-              <PlanFeature 
-                included={false}
-                text="Edição com IA avançada"
-              />
-            </ul>
-            <button className="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-800 font-medium hover:bg-gray-300 transition-colors">
-              Selecionar Plano
-            </button>
+      {/* Grid de comparação - apenas para desktop */}
+      <div className="comparison-grid hidden md:block">
+        {/* Cabeçalho */}
+        <div className="grid-header"></div>
+        <div className="grid-header">
+          <div className="plan-name">Básico</div>
+        </div>
+        <div className="grid-header">
+          <div className="plan-name">Premium</div>
+          <span className="plan-popular">POPULAR</span>
+        </div>
+        <div className="grid-header">
+          <div className="plan-name">Ultimate</div>
+          <span className="plan-best-value">MELHOR VALOR</span>
+        </div>
+
+        {/* Preços */}
+        <div className="grid-row price-row">
+          <div className="grid-cell">Preço Mensal</div>
+          <div className="price-cell">
+            <div className="current-price">R${precosFixos.basico},00</div>
+            <div className="old-price">R$89,00</div>
+            <div className="discount-badge">Economize 34%</div>
+          </div>
+          <div className="price-cell">
+            <div className="current-price">R${precosFixos.premium},00</div>
+            <div className="old-price">R$117,00</div>
+            <div className="discount-badge">Economize 24%</div>
+          </div>
+          <div className="price-cell">
+            <div className="current-price">R${precosFixos.ultimate}</div>
+            <div className="old-price">R$149,00</div>
+            <div className="discount-badge">Economize 13%</div>
           </div>
         </div>
 
-        {/* Plano Premium - Mais vendido */}
-        <div className="plano premium mais-vendido relative bg-white rounded-xl shadow-lg overflow-hidden border-2 border-purple-500 transition-all hover:shadow-xl" data-plano="premium">
-          <div className="absolute top-0 right-0 bg-purple-600 text-white px-4 py-1 text-sm font-bold tracking-wide">
-            <span className="pulse mr-1">•</span> MAIS VENDIDO
+        {/* Gerações de conteúdo */}
+        <div className="grid-row">
+          <div className="grid-cell">Gerações de conteúdo</div>
+          <div className="grid-cell">50 / mês</div>
+          <div className="grid-cell">150 / mês</div>
+          <div className="grid-cell highlight-value">Ilimitadas</div>
+        </div>
+
+        {/* Legendas otimizadas */}
+        <div className="grid-row">
+          <div className="grid-cell">Legendas otimizadas</div>
+          <div className="grid-cell"><FaCheck className="check-icon" /></div>
+          <div className="grid-cell"><FaCheck className="check-icon" /></div>
+          <div className="grid-cell"><FaCheck className="check-icon" /></div>
+        </div>
+
+        {/* Montagem automática */}
+        <div className="grid-row">
+          <div className="grid-cell">Montagem automática</div>
+          <div className="grid-cell"><FaTimes className="x-icon" /></div>
+          <div className="grid-cell"><FaCheck className="check-icon" /></div>
+          <div className="grid-cell"><FaCheck className="check-icon" /></div>
+        </div>
+
+        {/* Edição com IA */}
+        <div className="grid-row">
+          <div className="grid-cell">Edição com IA avançada</div>
+          <div className="grid-cell"><FaTimes className="x-icon" /></div>
+          <div className="grid-cell"><FaTimes className="x-icon" /></div>
+          <div className="grid-cell"><FaCheck className="check-icon" /></div>
+        </div>
+
+        {/* Botões */}
+        <div className="grid-row button-row">
+          <div className="grid-cell"></div>
+          <div className="grid-cell">
+            <button
+              onClick={() => window.location.href = '/checkout?plan=basic'}
+              className="select-button basic-button">
+              Selecionar Básico
+            </button>
           </div>
-          <div className="px-6 py-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Premium</h3>
-            <div className="preco-container mb-6">
-              <div className="preco preco-premium" data-valor="197">
-                R$ 197<small>/mês</small>
-              </div>
-            </div>
-            <ul className="space-y-4 mb-8">
-              <PlanFeature 
-                included={true} 
-                text={<>150 gerações de conteúdo/mês <PlanTooltip text="Triplique sua produção com 150 gerações de conteúdo mensais" /></>}
-              />
-              <PlanFeature 
-                included={true} 
-                text={<>Legendas otimizadas para engajamento <PlanTooltip text="Textos e legendas criados para maximizar o engajamento do público" /></>}
-              />
-              <PlanFeature 
-                included={true}
-                text={<>Montagem automática de vídeos <PlanTooltip text="A IA cria automaticamente vídeos baseados nos seus roteiros" /></>}
-              />
-              <PlanFeature 
-                included={false}
-                text="Edição com IA avançada"
-              />
-            </ul>
-            <button className="w-full py-3 px-4 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 transition-colors pulse">
-              Selecionar Plano
+          <div className="grid-cell">
+            <button
+              onClick={() => window.location.href = '/checkout?plan=premium'}
+              className="select-button premium-button">
+              Selecionar Premium
+            </button>
+          </div>
+          <div className="grid-cell">
+            <button
+              onClick={() => window.location.href = '/checkout?plan=ultimate'}
+              className="select-button ultimate-button">
+              Selecionar Ultimate
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Plano Ultimate */}
-        <div className="plano ultimate bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 transition-all hover:shadow-xl" data-plano="ultimate">
-          <div className="px-6 py-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Ultimate</h3>
-            <div className="preco-container mb-6">
-              <div className="preco preco-ultimate" data-valor="297">
-                R$ 297<small>/mês</small>
-              </div>
-            </div>
-            <ul className="space-y-4 mb-8">
-              <PlanFeature 
-                included={true} 
-                text={<>Gerações ilimitadas de conteúdo <PlanTooltip text="Sem limites! Crie quantos conteúdos precisar todos os meses" /></>}
-              />
-              <PlanFeature 
-                included={true} 
-                text="Legendas otimizadas para engajamento"
-              />
-              <PlanFeature 
-                included={true}
-                text="Montagem automática de vídeos"
-              />
-              <PlanFeature 
-                included={true}
-                text={<>Edição com IA avançada e efeitos <PlanTooltip text="Edição profissional com efeitos cinemáticos, transições e correção de cor automática" /></>}
-              />
-            </ul>
-            <button className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium hover:from-indigo-700 hover:to-purple-700 transition-colors">
-              Selecionar Plano
-            </button>
+      {/* Cards para mobile - visíveis apenas em mobile */}
+      <div className="mobile-cards md:hidden">
+        {/* Plano Básico - Mobile */}
+        <div className="plano-card plan-box" data-plano="basico">
+          <h3><span className="text-gray-600 mr-1">•</span> Básico</h3>
+          <div className="preco-container">
+            <p>
+              <span className="preco-antigo">R$89,00</span>
+              <span className="preco-novo">R${precosFixos.basico},00</span> /mês
+            </p>
+            <span className="badge red">ECONOMIZE 34%</span>
           </div>
+          <p>Ideal para criadores iniciantes.</p>
+          <ul className="my-4 space-y-2">
+            <li className="flex items-start">
+              <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
+              <span>50 gerações de conteúdo/mês</span>
+            </li>
+            <li className="flex items-start">
+              <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
+              <span>Legendas otimizadas para engajamento</span>
+            </li>
+            <li className="flex items-start">
+              <FaTimes className="text-red-500 mr-2 flex-shrink-0" size={16} />
+              <span className="text-gray-500">Montagem automática de vídeos</span>
+            </li>
+          </ul>
+          <button 
+            onClick={() => window.location.href = '/checkout?plan=basic'}
+            className="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-800 font-medium hover:bg-gray-300 transition-colors flex items-center justify-center">
+            <span>Selecionar plano</span>
+          </button>
+        </div>
+
+        {/* Plano Premium - Mobile */}
+        <div className="plano-card plan-box" data-plano="premium">
+          <span className="badge-economize mais-vendido">MAIS VENDIDO</span>
+          <h3><FaStar className="inline-block text-yellow-500 mr-1" size={18} /> Premium</h3>
+          <div className="preco-container">
+            <p>
+              <span className="preco-antigo">R$117,00</span>
+              <span className="preco-novo">R${precosFixos.premium},00</span> /mês
+            </p>
+            <span className="badge red">ECONOMIZE 24%</span>
+          </div>
+          <p>Perfeito para criadores em crescimento.</p>
+          <ul className="my-4 space-y-2">
+            <li className="flex items-start">
+              <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
+              <span>150 gerações de conteúdo/mês</span>
+            </li>
+            <li className="flex items-start">
+              <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
+              <span>Legendas otimizadas para engajamento</span>
+            </li>
+            <li className="flex items-start">
+              <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
+              <span>Montagem automática de vídeos</span>
+            </li>
+          </ul>
+          <button 
+            onClick={() => window.location.href = '/checkout?plan=premium'}
+            className="w-full py-3 px-4 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 transition-colors pulse flex items-center justify-center">
+            <span>Selecionar plano</span>
+            <span className="ml-1 bg-yellow-400 text-xs px-1 rounded text-purple-900 font-bold">POPULAR</span>
+          </button>
+        </div>
+
+        {/* Plano Ultimate - Mobile */}
+        <div className="plano-card plan-box" data-plano="ultimate">
+          <span className="badge-economize">ECONOMIZE 13%</span>
+          <h3><FaCrown className="inline-block text-yellow-600 mr-1" size={18} /> Ultimate</h3>
+          <div className="preco-container">
+            <p>
+              <span className="preco-antigo">R$149,00</span>
+              <span className="preco-novo">R${precosFixos.ultimate}</span> /mês
+            </p>
+            <span className="badge blue">MELHOR CUSTO-BENEFÍCIO</span>
+          </div>
+          <p>Para criadores profissionais e empresas.</p>
+          <ul className="my-4 space-y-2">
+            <li className="flex items-start">
+              <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
+              <span>Gerações ilimitadas de conteúdo</span>
+            </li>
+            <li className="flex items-start">
+              <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
+              <span>Legendas otimizadas para engajamento</span>
+            </li>
+            <li className="flex items-start">
+              <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
+              <span>Montagem automática de vídeos</span>
+            </li>
+            <li className="flex items-start">
+              <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
+              <span>Edição com IA avançada e efeitos</span>
+            </li>
+          </ul>
+          <button 
+            onClick={() => window.location.href = '/checkout?plan=ultimate'}
+            className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium hover:from-indigo-700 hover:to-purple-700 transition-colors flex items-center justify-center">
+            <span>Selecionar plano</span>
+            <span className="ml-1 bg-blue-300 text-xs px-1 rounded text-blue-900 font-bold">MELHOR VALOR</span>
+          </button>
         </div>
       </div>
 
       {/* Garantia de satisfação */}
-      <div className="mt-16 text-center">
+      <div className="mt-10 text-center">
         <div className="inline-flex items-center bg-green-50 px-6 py-3 rounded-full text-green-700">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-          </svg>
+          <FaCheck className="h-5 w-5 mr-2 text-green-600" />
           <span>Garantia de 7 dias sem risco, devolução 100% do valor.</span>
         </div>
       </div>

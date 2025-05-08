@@ -3,6 +3,7 @@ import Features from "@/components/home/Features";
 import HowItWorks from "@/components/home/HowItWorks";
 import Pricing from "@/components/home/Pricing";
 import NovoLayoutPrecos from "@/components/home/NovoLayoutPrecos";
+import PricingTable from "@/components/home/PricingTable";
 import Testimonials from "@/components/home/Testimonials";
 import FAQ from "@/components/home/FAQ";
 import CallToAction from "@/components/home/CallToAction";
@@ -113,7 +114,7 @@ export default function Home() {
       <Hero />
       <Features />
       <HowItWorks />
-      <NovoLayoutPrecos />
+      <PricingTable />
       <Testimonials />
       <FAQ />
       <CallToAction />
