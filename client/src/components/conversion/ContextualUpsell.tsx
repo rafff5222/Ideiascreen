@@ -22,7 +22,16 @@ export default function ContextualUpsell() {
       ];
       
       // Rastreia hover em cada feature
-      let hoverTimes = JSON.parse(sessionStorage.getItem('featureHoverTimes') || '{}');
+      const storedHoverTimes = sessionStorage.getItem('featureHoverTimes');
+      let hoverTimes: Record<string, number> = {};
+      
+      if (storedHoverTimes) {
+        try {
+          hoverTimes = JSON.parse(storedHoverTimes);
+        } catch (e) {
+          console.error('Erro ao analisar dados de features:', e);
+        }
+      }
       
       featureMap.forEach(feature => {
         const elements = document.querySelectorAll(feature.selector);
@@ -61,8 +70,19 @@ export default function ContextualUpsell() {
     
     // Detecta feature de interesse com base nos cliques anteriores (fallback)
     if (!featureInterest) {
-      const hoverData = JSON.parse(sessionStorage.getItem('featureHoverTimes') || '{}');
-      const mostInterested = Object.entries(hoverData).sort((a, b) => b[1] - a[1])[0];
+      const storedData = sessionStorage.getItem('featureHoverTimes');
+      let hoverData: Record<string, number> = {};
+      
+      if (storedData) {
+        try {
+          hoverData = JSON.parse(storedData);
+        } catch (e) {
+          console.error('Erro ao analisar dados de hover:', e);
+        }
+      }
+      
+      const entries = Object.entries(hoverData);
+      const mostInterested = entries.length > 0 ? entries.sort((a, b) => b[1] - a[1])[0] : null;
       
       if (mostInterested) {
         const featureId = mostInterested[0];
@@ -173,7 +193,7 @@ export default function ContextualUpsell() {
         </div>
       </div>
       
-      <style jsx global>{`
+      <style>{`
         .upsell-contextual {
           animation: slide-up 0.5s ease;
           box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
