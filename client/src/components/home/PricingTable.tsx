@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { FaCheck, FaTimes, FaCrown, FaStar, FaShieldAlt } from 'react-icons/fa';
+import { FaCheck, FaTimes, FaCrown, FaStar, FaShieldAlt, FaUserCircle, FaQuoteLeft } from 'react-icons/fa';
 import './ComparisonTable.css';
 
 /**
@@ -233,6 +233,38 @@ export default function PricingTable() {
             <span>Selecionar plano</span>
             <span className="ml-1 bg-blue-300 text-xs px-1 rounded text-blue-900 font-bold">MELHOR VALOR</span>
           </button>
+        </div>
+      </div>
+
+      {/* Depoimentos - Provas sociais */}
+      <div className="mt-12 mb-10">
+        <h3 className="text-center text-xl font-semibold mb-6">O que nossos usuários dizem</h3>
+        <div className="testimonials-container">
+          <div className="testimonial-card">
+            <FaQuoteLeft className="quote-icon" />
+            <p className="testimonial-text">Gerou meu primeiro vídeo viral em 2 minutos! Economizo pelo menos 5 horas por semana e meu engajamento aumentou 40%.</p>
+            <div className="testimonial-author">
+              <img src="https://randomuser.me/api/portraits/women/42.jpg" alt="Amanda S." className="testimonial-avatar" />
+              <div>
+                <p className="testimonial-name">Amanda S.</p>
+                <p className="testimonial-title">Influencer de Moda</p>
+              </div>
+            </div>
+          </div>
+          <div className="testimonial-card">
+            <FaQuoteLeft className="quote-icon" />
+            <p className="testimonial-text">De 5 mil para 20 mil seguidores em 6 semanas! Os vídeos automáticos parecem feitos por uma agência profissional.</p>
+            <div className="testimonial-author">
+              <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Carlos M." className="testimonial-avatar" />
+              <div>
+                <p className="testimonial-name">Carlos M.</p>
+                <p className="testimonial-title">Creator de Tecnologia</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 text-center">
+          <span className="users-badge">+ 5.000 usuários ativos</span>
         </div>
       </div>
 
