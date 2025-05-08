@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Check, AlertTriangle, Calculator, DollarSign } from "lucide-react";
 import CountdownSpots from "./CountdownSpots";
+import PriceAnchoring from "@/components/conversion/PriceAnchoring";
 import { useState, useEffect } from "react";
 
 export default function Pricing() {
@@ -44,10 +45,13 @@ export default function Pricing() {
           <div className="plano-card bg-white rounded-xl shadow-md p-6 border border-gray-200 flex flex-col">
             <div className="mb-8">
               <h3 className="text-2xl font-bold mb-2">Básico</h3>
-              <div className="flex items-start mb-4">
-                <span className="text-3xl font-bold">R$</span>
-                <span className="text-5xl font-bold">59</span>
-                <span className="text-lg text-gray-500 mt-1">/mês</span>
+              <div className="flex flex-col mb-4">
+                <PriceAnchoring originalPrice={97} currentPrice={59} className="mb-2" />
+                <div className="flex items-start">
+                  <span className="text-3xl font-bold">R$</span>
+                  <span className="text-5xl font-bold">59</span>
+                  <span className="text-lg text-gray-500 mt-1">/mês</span>
+                </div>
               </div>
               <p className="text-gray-600 mb-6">Ideal para criadores de conteúdo iniciantes.</p>
               
@@ -102,10 +106,13 @@ export default function Pricing() {
             
             <div className="mb-8">
               <h3 className="text-2xl font-bold mb-2">Premium</h3>
-              <div className="flex items-start mb-4">
-                <span className="text-3xl font-bold">R$</span>
-                <span className="text-5xl font-bold">89</span>
-                <span className="text-lg text-gray-500 mt-1">/mês</span>
+              <div className="flex flex-col mb-4">
+                <PriceAnchoring originalPrice={197} currentPrice={89} className="mb-2" />
+                <div className="flex items-start">
+                  <span className="text-3xl font-bold">R$</span>
+                  <span className="text-5xl font-bold">89</span>
+                  <span className="text-lg text-gray-500 mt-1">/mês</span>
+                </div>
               </div>
               <p className="text-gray-600 mb-4">Ideal para criadores que desejam automação.</p>
               
@@ -157,10 +164,13 @@ export default function Pricing() {
           <div className="plano-card decoy bg-white rounded-xl shadow-md p-6 border border-gray-200 flex flex-col opacity-90">
             <div className="mb-8">
               <h3 className="text-2xl font-bold mb-2">Pro</h3>
-              <div className="flex items-start mb-4">
-                <span className="text-3xl font-bold">R$</span>
-                <span className="text-5xl font-bold">119</span>
-                <span className="text-lg text-gray-500 mt-1">/mês</span>
+              <div className="flex flex-col mb-4">
+                <PriceAnchoring originalPrice={197} currentPrice={119} className="mb-2" />
+                <div className="flex items-start">
+                  <span className="text-3xl font-bold">R$</span>
+                  <span className="text-5xl font-bold">119</span>
+                  <span className="text-lg text-gray-500 mt-1">/mês</span>
+                </div>
               </div>
               <p className="text-gray-600 mb-6">Para produtores de conteúdo profissionais.</p>
               
@@ -210,10 +220,13 @@ export default function Pricing() {
           <div className="plano-card bg-white rounded-xl shadow-md p-6 border border-gray-200 flex flex-col">
             <div className="mb-8">
               <h3 className="text-2xl font-bold mb-2">Ultimate</h3>
-              <div className="flex items-start mb-4">
-                <span className="text-3xl font-bold">R$</span>
-                <span className="text-5xl font-bold">149</span>
-                <span className="text-lg text-gray-500 mt-1">/mês</span>
+              <div className="flex flex-col mb-4">
+                <PriceAnchoring originalPrice={297} currentPrice={149} className="mb-2" />
+                <div className="flex items-start">
+                  <span className="text-3xl font-bold">R$</span>
+                  <span className="text-5xl font-bold">149</span>
+                  <span className="text-lg text-gray-500 mt-1">/mês</span>
+                </div>
               </div>
               <p className="text-gray-600 mb-6">Para profissionais e agências de marketing.</p>
               

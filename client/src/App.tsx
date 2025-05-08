@@ -14,6 +14,7 @@ import ExitPopup from "@/components/ui/exit-popup";
 import ClickTracker from "@/components/analytics/ClickTracker";
 import RetentionPixel from "@/components/analytics/RetentionPixel";
 import UpsellModal from "@/components/upsell/UpsellModal";
+import SocialProof from "@/components/conversion/SocialProof";
 
 function Router() {
   return (
@@ -41,6 +42,7 @@ function App() {
           <ClickTracker />
           <RetentionPixel />
           <UpsellModal />
+          <SocialProof />
           
           {/* Exibe o popup de saída apenas na página inicial */}
           <Route path="/">
