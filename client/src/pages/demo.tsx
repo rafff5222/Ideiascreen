@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FaCheck, FaRocket, FaVideo, FaMagic, FaArrowRight, FaPlayCircle } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaCheck, FaRocket, FaVideo, FaMagic, FaArrowRight, FaPlayCircle, FaCog, FaVolumeUp } from 'react-icons/fa';
 
 export default function DemoPage() {
   const [scriptText, setScriptText] = useState<string>('');
@@ -7,6 +7,20 @@ export default function DemoPage() {
   const [videoGenerated, setVideoGenerated] = useState<boolean>(false);
   const [showMessage, setShowMessage] = useState<boolean>(false);
   const [subtitles, setSubtitles] = useState<string[]>([]);
+  const [voiceType, setVoiceType] = useState<string>('feminino-profissional');
+  const [speed, setSpeed] = useState<number>(1.2);
+  const [transitions, setTransitions] = useState<string[]>(['zoom', 'dissolve', 'cut']);
+  const [outputFormat, setOutputFormat] = useState<string>('mp4_vertical');
+  
+  // Exemplo de roteiro otimizado
+  const exampleScript = `0:00 - [GANCHO] Você sabe como dobrar seus seguidores?
+0:03 - [DICA] Use 3 hashtags nichadas
+0:07 - [CTA] Comente 'QUERO' para a parte 2!`;
+
+  // Preencher com o exemplo quando a página carrega
+  useEffect(() => {
+    setScriptText(exampleScript);
+  }, []);
 
   const generateVideo = () => {
     if (!scriptText.trim()) {
@@ -122,13 +136,110 @@ export default function DemoPage() {
                 <textarea
                   value={scriptText}
                   onChange={(e) => setScriptText(e.target.value)}
-                  placeholder="Cole ou escreva seu roteiro aqui... Exemplo: Olá pessoal! Hoje vou falar sobre como a inteligência artificial está revolucionando nosso dia a dia. Vamos começar com alguns exemplos práticos..."
-                  className="w-full h-64 p-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none resize-none"
+                  placeholder="Cole ou escreva seu roteiro aqui com timings específicos (0:00 - [HOOK] texto...)"
+                  className="w-full h-64 p-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none resize-none font-medium"
                 ></textarea>
+                
+                {/* Opções de configuração */}
+                <div className="mt-4 mb-4 bg-gray-50 rounded-md p-4 border border-gray-200">
+                  <div className="mb-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                      <FaVolumeUp className="mr-1 text-indigo-500" /> Voz e Narração
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <select 
+                        className="p-2 border border-gray-300 rounded-md text-sm"
+                        value={voiceType}
+                        onChange={(e) => setVoiceType(e.target.value)}
+                      >
+                        <option value="feminino-profissional">Feminina Profissional</option>
+                        <option value="masculino-profissional">Masculina Profissional</option>
+                        <option value="feminino-jovem">Feminina Jovem</option>
+                        <option value="masculino-jovem">Masculina Jovem</option>
+                        <option value="neutro">Neutra</option>
+                      </select>
+                      <select 
+                        className="p-2 border border-gray-300 rounded-md text-sm"
+                        value={speed}
+                        onChange={(e) => setSpeed(parseFloat(e.target.value))}
+                      >
+                        <option value="0.8">Velocidade: Lenta</option>
+                        <option value="1">Velocidade: Normal</option>
+                        <option value="1.2">Velocidade: Rápida</option>
+                        <option value="1.5">Velocidade: Muito Rápida</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                      <FaCog className="mr-1 text-indigo-500" /> Estilo de Transição
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        className={`px-3 py-1 text-xs rounded-full ${transitions.includes('zoom') ? 'bg-indigo-100 text-indigo-700 border border-indigo-300' : 'bg-gray-100 text-gray-700 border border-gray-300'}`}
+                        onClick={() => setTransitions(prev => 
+                          prev.includes('zoom') 
+                            ? prev.filter(t => t !== 'zoom') 
+                            : [...prev, 'zoom']
+                        )}
+                      >
+                        Zoom
+                      </button>
+                      <button
+                        type="button"
+                        className={`px-3 py-1 text-xs rounded-full ${transitions.includes('dissolve') ? 'bg-indigo-100 text-indigo-700 border border-indigo-300' : 'bg-gray-100 text-gray-700 border border-gray-300'}`}
+                        onClick={() => setTransitions(prev => 
+                          prev.includes('dissolve') 
+                            ? prev.filter(t => t !== 'dissolve') 
+                            : [...prev, 'dissolve']
+                        )}
+                      >
+                        Dissolve
+                      </button>
+                      <button
+                        type="button"
+                        className={`px-3 py-1 text-xs rounded-full ${transitions.includes('cut') ? 'bg-indigo-100 text-indigo-700 border border-indigo-300' : 'bg-gray-100 text-gray-700 border border-gray-300'}`}
+                        onClick={() => setTransitions(prev => 
+                          prev.includes('cut') 
+                            ? prev.filter(t => t !== 'cut') 
+                            : [...prev, 'cut']
+                        )}
+                      >
+                        Corte Seco
+                      </button>
+                      <button
+                        type="button"
+                        className={`px-3 py-1 text-xs rounded-full ${transitions.includes('slide') ? 'bg-indigo-100 text-indigo-700 border border-indigo-300' : 'bg-gray-100 text-gray-700 border border-gray-300'}`}
+                        onClick={() => setTransitions(prev => 
+                          prev.includes('slide') 
+                            ? prev.filter(t => t !== 'slide') 
+                            : [...prev, 'slide']
+                        )}
+                      >
+                        Deslize
+                      </button>
+                      <button
+                        type="button"
+                        className={`px-3 py-1 text-xs rounded-full ${transitions.includes('fade') ? 'bg-indigo-100 text-indigo-700 border border-indigo-300' : 'bg-gray-100 text-gray-700 border border-gray-300'}`}
+                        onClick={() => setTransitions(prev => 
+                          prev.includes('fade') 
+                            ? prev.filter(t => t !== 'fade') 
+                            : [...prev, 'fade']
+                        )}
+                      >
+                        Fade
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
                 <button
                   onClick={generateVideo}
                   disabled={isLoading}
-                  className="mt-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-6 rounded-md font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md w-full flex items-center justify-center"
+                  className="mt-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-6 rounded-md font-bold hover:from-pink-600 hover:to-purple-700 transition-all shadow-md w-full flex items-center justify-center animate-pulse"
+                  style={{animation: 'pulse 2s infinite'}}
                 >
                   {isLoading ? (
                     <>
@@ -141,6 +252,11 @@ export default function DemoPage() {
                     </>
                   )}
                 </button>
+                
+                <div className="mt-3 text-center text-xs text-gray-500">
+                  <span className="font-medium text-green-600">💰 Custo:</span> Menos de R$ 0,50 por vídeo | 
+                  <span className="font-medium text-green-600"> ⏱️ Tempo:</span> Pronto em 30 segundos
+                </div>
               </div>
               
               <div className="w-full md:w-1/2">
@@ -239,41 +355,143 @@ export default function DemoPage() {
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl font-bold mb-6 text-center">Como funciona?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-100 text-indigo-600 mb-4 mx-auto">
+            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition-all">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-gradient-to-r from-purple-500 to-indigo-600 text-white mb-4 mx-auto">
                 <span className="font-bold">1</span>
               </div>
-              <h3 className="text-lg font-medium text-center mb-2">Escreva seu roteiro</h3>
-              <p className="text-gray-600 text-center text-sm">Você escreve ou cola um roteiro que deseja transformar em vídeo.</p>
+              <h3 className="text-lg font-medium text-center mb-2">Cole seu roteiro</h3>
+              <p className="text-gray-600 text-center text-sm">Você escreve ou cola um roteiro que deseja transformar em vídeo (ou use nosso gerador por IA).</p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-100 text-indigo-600 mb-4 mx-auto">
+            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition-all">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-gradient-to-r from-purple-500 to-indigo-600 text-white mb-4 mx-auto">
                 <span className="font-bold">2</span>
               </div>
-              <h3 className="text-lg font-medium text-center mb-2">IA processa o conteúdo</h3>
-              <p className="text-gray-600 text-center text-sm">Nossa tecnologia analisa o texto e gera automaticamente elementos visuais correspondentes.</p>
+              <h3 className="text-lg font-medium text-center mb-2">Personalize</h3>
+              <p className="text-gray-600 text-center text-sm">Escolha o estilo de transição, voz com 5 sotaques em PT-BR, e ajuste a velocidade da narração.</p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-100 text-indigo-600 mb-4 mx-auto">
+            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition-all">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-gradient-to-r from-purple-500 to-indigo-600 text-white mb-4 mx-auto">
                 <span className="font-bold">3</span>
               </div>
-              <h3 className="text-lg font-medium text-center mb-2">Vídeo pronto para uso</h3>
-              <p className="text-gray-600 text-center text-sm">Receba seu vídeo editado com transições, legendas e efeitos profissionais.</p>
+              <h3 className="text-lg font-medium text-center mb-2">Renderize</h3>
+              <p className="text-gray-600 text-center text-sm">Vídeo pronto em 30 segundos! Menos de R$ 0,50 por vídeo com qualidade profissional.</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Código para implementação */}
+        <div className="max-w-3xl mx-auto mt-16 mb-12">
+          <h2 className="text-2xl font-bold mb-6 text-center">Funcionalidades Técnicas Implementadas</h2>
+          <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden">
+            <div className="flex items-center px-4 py-2 bg-gray-800">
+              <div className="flex space-x-1 mr-4">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              </div>
+              <div className="text-gray-400 text-sm">code.js</div>
+            </div>
+            <div className="p-4 overflow-auto text-sm" style={{maxHeight: '300px'}}>
+              <pre className="text-green-400">
+                <code>{`// Função de renderização automática
+function renderizarVideo(roteiro) {
+  const config = {
+    voz: 'feminino-profissional', // Opções: masculino, feminino, jovem
+    velocidade: 1.2, // 0.8x a 1.5x
+    transicoes: ['zoom', 'dissolve', 'cut'], 
+    formatoSaida: 'mp4_vertical' // Para Reels/TikTok
+  };
+  
+  return IA.renderizar(roteiro, config);
+}
+
+// Integração automática de áudio com o vídeo
+function sincronizarAudioVideo(roteiro, config) {
+  // Dividir o roteiro em frases
+  const frases = roteiro.split(/[.!?]/).filter(f => f.trim().length > 0);
+  
+  // Gerar áudio para cada frase
+  const clipsAudio = frases.map((frase, index) => {
+    return {
+      texto: frase.trim(),
+      inicio: calcularInicio(index, frases),
+      duracao: calcularDuracao(frase),
+      voz: config.voz
+    };
+  });
+  
+  // Aplicar legendas sincronizadas
+  const legendas = gerarLegendasSincronizadas(clipsAudio);
+  
+  return {
+    clipsFrases: clipsAudio,
+    legendas: legendas,
+    duracao: clipsAudio.reduce((total, clip) => total + clip.duracao, 0)
+  };
+}`}</code>
+              </pre>
             </div>
           </div>
         </div>
 
-        <div className="mt-16 text-center">
+        {/* Seção CSS/Design Recomendado */}
+        <div className="max-w-3xl mx-auto mt-16 mb-12">
+          <h2 className="text-2xl font-bold mb-6 text-center">Design Recomendado para Botões</h2>
+          <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden">
+            <div className="flex items-center px-4 py-2 bg-gray-800">
+              <div className="flex space-x-1 mr-4">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              </div>
+              <div className="text-gray-400 text-sm">styles.css</div>
+            </div>
+            <div className="p-4 overflow-auto text-sm" style={{maxHeight: '200px'}}>
+              <pre className="text-blue-400">
+                <code>{`.botao-render {
+  background: linear-gradient(90deg, #EC4899, #8B5CF6);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}`}</code>
+              </pre>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 text-center">
           <h2 className="text-2xl font-bold mb-4">Pronto para criar vídeos profissionais?</h2>
           <p className="text-lg text-gray-700 mb-6 max-w-2xl mx-auto">
             Experimente a funcionalidade completa assinando agora mesmo!
           </p>
-          <a 
-            href="/"
-            className="inline-block bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-8 rounded-md font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md"
-          >
-            Ver Planos
-          </a>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-xl mx-auto">
+            <a 
+              href="/" 
+              className="w-full sm:w-auto inline-block bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-8 rounded-md font-bold hover:from-pink-600 hover:to-purple-700 transition-all shadow-md animate-pulse"
+              style={{animation: 'pulse 2s infinite'}}
+            >
+              Ver Planos e Preços
+            </a>
+            <a 
+              href="/generator" 
+              className="w-full sm:w-auto inline-block bg-white border-2 border-purple-500 text-purple-700 py-3 px-8 rounded-md font-medium hover:bg-purple-50 transition-all"
+            >
+              Testar Gerador de Roteiros
+            </a>
+          </div>
+          
+          <p className="text-sm text-gray-500 mt-4">
+            Menos de R$ 0,50 por vídeo | Fácil de usar | Sem limites de criatividade
+          </p>
         </div>
       </div>
     </div>
