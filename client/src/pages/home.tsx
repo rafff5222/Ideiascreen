@@ -19,6 +19,9 @@ import NichePersonalization from "@/components/conversion/NichePersonalization";
 import AdvancedCheckout from "@/components/conversion/AdvancedCheckout";
 import BehavioralPricing from "@/components/conversion/BehavioralPricing";
 import ContextualUpsell from "@/components/conversion/ContextualUpsell";
+import RealTimeScarcity from "@/components/conversion/RealTimeScarcity";
+import Comparador3DPlanos from "@/components/conversion/Comparador3DPlanos";
+import VoiceAssistant from "@/components/conversion/VoiceAssistant";
 import TurboLinks from "@/components/optimization/TurboLinks";
 import ClickHeatmap from "@/components/analytics/ClickHeatmap";
 import PrivateAnalytics from "@/components/analytics/PrivateAnalytics";
@@ -108,6 +111,9 @@ export default function Home() {
       <AdvancedCheckout />
       <PrivateAnalytics />
       <MicroConversionTracker />
+      <RealTimeScarcity />
+      <Comparador3DPlanos />
+      <VoiceAssistant />
       <TurboLinks />
     </>
   );
