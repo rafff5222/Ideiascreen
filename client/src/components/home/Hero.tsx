@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import VideoMockup from "./VideoMockup";
 import { ArrowRight, Sparkles } from "lucide-react";
 import DynamicCta from "@/components/conversion/DynamicCta";
+import MagicButton from "@/components/conversion/MagicButton";
+import SocialProof from "@/components/conversion/SocialProof";
 
 export default function Hero() {
   return (
@@ -24,8 +26,8 @@ export default function Hero() {
             </p>
             
             <div className="flex flex-wrap items-center gap-4 mb-8">
-              {/* Substituído o botão estático pelo CTA dinâmico */}
-              <DynamicCta />
+              {/* Magic Button com IA para reconhecimento de nicho */}
+              <MagicButton />
               
               <div className="text-sm text-gray-500 flex items-center">
                 <svg 

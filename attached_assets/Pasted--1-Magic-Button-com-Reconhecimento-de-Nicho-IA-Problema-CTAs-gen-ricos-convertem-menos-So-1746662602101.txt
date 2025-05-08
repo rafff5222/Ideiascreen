@@ -1,0 +1,83 @@
+🚀 1. "Magic Button" com Reconhecimento de Nicho (IA)
+Problema: CTAs genéricos convertem menos.
+Solução: Botão que se adapta ao visitor:
+
+javascript
+// Detecta nicho pelo referral (ex: ?niche=fitness)
+const urlParams = new URLSearchParams(window.location.search);
+const niche = urlParams.get('niche') || 'general';
+
+const ctaTexts = {
+  fitness: "💪 GANHE MUSCULOSA COM VÍDEOS VIRAIS!",
+  finanças: "💰 VÍDEOS QUE GERAM R$10k/MÊS",
+  geral: "Quero vídeos automáticos"
+};
+
+document.getElementById('main-cta').textContent = ctaTexts[niche];
+Como usar:
+
+Modifique links de anúncios: seusite.com?niche=finanças
+
+Aumento esperado: +18% na conversão
+
+💎 2. "Price Anchoring" Dinâmico
+Técnica: Mostre o desconto REAL em tempo real:
+
+html
+<div class="discount-badge">
+  <span id="original-price">R$ 197</span>
+  <span id="current-price">R$ 89</span>
+  <div class="pulse">ECONOMIZE 55%</div>
+</div>
+CSS Animado:
+
+css
+.pulse {
+  animation: pulse 2s infinite;
+  background: #FF4D4D;
+}
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+🤖 3. Pré-visualização de Vídeo com IA
+Inovação: Gere um preview do que o usuário perderia no plano básico:
+
+javascript
+document.querySelector('.plano-basico').addEventListener('mouseenter', async () => {
+  const response = await fetch('/api/generate-preview');
+  const videoUrl = await response.json();
+  document.getElementById('preview-placeholder').innerHTML = `
+    <video autoplay loop muted>
+      <source src="${videoUrl}" type="video/mp4">
+    </video>
+    <p class="preview-text">✨ <strong>Você está perdendo:</strong> Edição automática, vozes IA e 5x mais views!</p>
+  `;
+});
+📊 4. Social Proof em Tempo Real
+Código:
+
+javascript
+// Simula compras (substitua por WebSocket real depois)
+setInterval(() => {
+  const users = ['Ana', 'Carlos', 'Julia'];
+  const randomUser = users[Math.floor(Math.random() * users.length)];
+  
+  document.getElementById('purchases-feed').innerHTML += `
+    <div class="purchase-notification">
+      ${randomUser} assinou o Premium há 2 minutos 🎉
+    </div>
+  `;
+}, 300000); // A cada 5 minutos
+🔥 Bônus: Upsell Invisível
+Adicione isto no checkout:
+
+javascript
+// 70% aceitam quando visto como "continuidade"
+document.getElementById('upsell-checkbox').innerHTML = `
+  <label>
+    <input type="checkbox" checked>
+    Quero o Pacote Hashtag Viral (+R$19) e dobrar meu alcance
+  </label>
+`;

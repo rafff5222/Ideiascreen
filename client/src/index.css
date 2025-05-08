@@ -126,6 +126,12 @@
   /* Tons de roxo mais intensos para plano premium */
 }
 
+.btn-pro {
+  @apply text-white hover:brightness-110;
+  background: linear-gradient(135deg, #4B5563 0%, #6B7280 100%);
+  /* Tons de cinza mais neutros para plano isca */
+}
+
 /* Ajustes para o mockup de vídeo */
 .hero-mockup {
   @apply relative bg-gradient-to-br from-gray-900 to-gray-800 p-3 rounded-2xl shadow-2xl border border-gray-700;
@@ -201,6 +207,44 @@
 
 .animate-text-blink {
   animation: text-blink 1s ease-in-out infinite;
+}
+
+/* Animação para o Price Anchoring */
+.pulse-animation {
+  animation: pulse-price 2s infinite;
+}
+
+@keyframes pulse-price {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Estilos para o botão mágico */
+#magic-button {
+  transition: all 0.3s ease;
+}
+
+#magic-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para o plano isca (decoy) */
+.plano-card.decoy {
+  position: relative;
+}
+
+.plano-card.decoy::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  bottom: -3px;
+  left: -3px;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(135deg, transparent 95%, #FF4D4D 95%, #FF4D4D 100%);
 }
 
 @keyframes slide-up {
