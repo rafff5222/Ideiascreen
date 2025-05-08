@@ -59,7 +59,11 @@ export default function NovoLayoutPrecos() {
           {/* Plano Básico */}
           <div className="plano-card" data-plano="basico">
             <h3>Básico</h3>
-            <div className="plano-preco">R${precosFixos.basico}/mês</div>
+            <div className="plano-preco">
+              <span className="preco-antigo">R$149,00</span>
+              <span className="preco-novo">R${precosFixos.basico}</span><small>/mês</small>
+              <span className="badge-desconto">ECONOMIZE 34%</span>
+            </div>
             <p>Ideal para criadores iniciantes.</p>
             <ul className="my-4 space-y-2">
               <li className="flex items-start">
@@ -88,9 +92,13 @@ export default function NovoLayoutPrecos() {
 
           {/* Plano Premium */}
           <div className="plano-card" data-plano="premium">
-            <span className="badge-economize">MAIS VENDIDO</span>
+            <span className="badge-economize mais-vendido">MAIS VENDIDO</span>
             <h3>Premium</h3>
-            <div className="plano-preco">R${precosFixos.premium}/mês</div>
+            <div className="plano-preco">
+              <span className="preco-antigo">R$299,90</span>
+              <span className="preco-novo">R${precosFixos.premium}</span><small>/mês</small>
+              <span className="badge-desconto">ECONOMIZE 34%</span>
+            </div>
             <p>Perfeito para criadores em crescimento.</p>
             <ul className="my-4 space-y-2">
               <li className="flex items-start">
@@ -113,9 +121,13 @@ export default function NovoLayoutPrecos() {
 
           {/* Plano Ultimate */}
           <div className="plano-card" data-plano="ultimate">
-            <span className="badge-economize">ECONOMIZE 10%</span>
+            <span className="badge-economize">ECONOMIZE 50%</span>
             <h3>Ultimate</h3>
-            <div className="plano-preco">R${precosFixos.ultimate}/mês</div>
+            <div className="plano-preco">
+              <span className="preco-antigo">R$597,00</span>
+              <span className="preco-novo">R${precosFixos.ultimate}</span><small>/mês</small>
+              <span className="badge-desconto melhor-valor">MELHOR CUSTO-BENEFÍCIO</span>
+            </div>
             <p>Para criadores profissionais e empresas.</p>
             <ul className="my-4 space-y-2">
               <li className="flex items-start">
