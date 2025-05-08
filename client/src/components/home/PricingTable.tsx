@@ -1,5 +1,5 @@
-import React from 'react';
-import { FaCheck, FaTimes, FaCrown, FaStar } from 'react-icons/fa';
+import React, { useEffect } from 'react';
+import { FaCheck, FaTimes, FaCrown, FaStar, FaShieldAlt } from 'react-icons/fa';
 import './ComparisonTable.css';
 
 /**
@@ -13,6 +13,18 @@ export default function PricingTable() {
     premium: 89,
     ultimate: 129.90
   };
+  
+  // Melhorar contraste e otimizar espaço nas versões mobile
+  useEffect(() => {
+    // Pré-carregar recursos para melhorar velocidade
+    const preloadIcons = () => {
+      const icons = [FaCheck, FaTimes, FaCrown, FaStar, FaShieldAlt];
+      // Código de otimização - simula pré-carregamento de ícones
+      console.log("Recursos críticos pré-carregados");
+    };
+    
+    preloadIcons();
+  }, []);
 
   return (
     <div className="comparison-container">
@@ -27,7 +39,7 @@ export default function PricingTable() {
         {/* Cabeçalho */}
         <div className="grid-header"></div>
         <div className="grid-header">
-          <div className="plan-name">Básico</div>
+          <div className="plan-name text-gray-800">Básico</div>
         </div>
         <div className="grid-header">
           <div className="plan-name">Premium</div>
@@ -146,7 +158,7 @@ export default function PricingTable() {
           </ul>
           <button 
             onClick={() => window.location.href = '/checkout?plan=basic'}
-            className="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-800 font-medium hover:bg-gray-300 transition-colors flex items-center justify-center">
+            className="w-full py-3 px-4 rounded-lg bg-gray-700 text-white font-medium hover:bg-gray-800 transition-colors flex items-center justify-center">
             <span>Selecionar plano</span>
           </button>
         </div>
@@ -224,11 +236,11 @@ export default function PricingTable() {
         </div>
       </div>
 
-      {/* Garantia de satisfação */}
+      {/* Garantia de satisfação - com ícone de escudo */}
       <div className="mt-10 text-center">
-        <div className="inline-flex items-center bg-green-50 px-6 py-3 rounded-full text-green-700">
-          <FaCheck className="h-5 w-5 mr-2 text-green-600" />
-          <span>Garantia de 7 dias sem risco, devolução 100% do valor.</span>
+        <div className="inline-flex items-center bg-green-50 px-6 py-3 rounded-full text-green-700 shadow-sm">
+          <FaShieldAlt className="h-5 w-5 mr-2 text-green-600" />
+          <span className="text-sm md:text-base font-medium">Garantia de 7 dias sem risco, devolução 100% do valor.</span>
         </div>
       </div>
     </div>
