@@ -3,6 +3,7 @@ import { Check, AlertTriangle, Calculator, DollarSign } from "lucide-react";
 import CountdownSpots from "./CountdownSpots";
 import PriceAnchoring from "@/components/conversion/PriceAnchoring";
 import DynamicPricing from "@/components/conversion/DynamicPricing";
+import AnnualPriceAnchor from "@/components/conversion/AnnualPriceAnchor";
 import { useState, useEffect } from "react";
 
 export default function Pricing() {
@@ -126,6 +127,8 @@ export default function Pricing() {
               
               <CountdownSpots />
               
+              <AnnualPriceAnchor monthlyPrice={89} className="mt-2 mb-2" />
+              
               <Button 
                 className="btn-premium w-full py-6 text-lg font-semibold mt-5 pricing-btn"
                 data-plan="premium" 
@@ -237,6 +240,8 @@ export default function Pricing() {
                 </div>
               </div>
               <p className="text-gray-600 mb-6">Para profissionais e agências de marketing.</p>
+              
+              <AnnualPriceAnchor monthlyPrice={149} className="mt-2 mb-2" />
               
               <Button 
                 className="btn-ultimate w-full py-6 text-lg font-semibold pricing-btn" 
