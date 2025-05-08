@@ -15,9 +15,11 @@ import SalesAiChatbot from "@/components/conversion/SalesAiChatbot";
 import SocialProof from "@/components/conversion/SocialProof";
 import SalesChatbot from "@/components/conversion/SalesChatbot";
 import MicroInteractions from "@/components/conversion/MicroInteractions";
+import NichePersonalization from "@/components/conversion/NichePersonalization";
+import AdvancedCheckout from "@/components/conversion/AdvancedCheckout";
 import ClickHeatmap from "@/components/analytics/ClickHeatmap";
 import PrivateAnalytics from "@/components/analytics/PrivateAnalytics";
-import MetricsPanel from "@/components/admin/MetricsPanel";
+import MetricsPanel from "@/components/admin/MetricsPanel-new";
 
 export default function Home() {
   // Scroll to top when navigating to home page
@@ -96,6 +98,8 @@ export default function Home() {
       <MetricsPanel />
       <TechnicalOptimizations />
       <MicroInteractions />
+      <NichePersonalization />
+      <AdvancedCheckout />
       <PrivateAnalytics />
     </>
   );
