@@ -1,8 +1,96 @@
 import OpenAI from "openai";
 import { ContentGeneration } from "@shared/schema";
+import { ReadStream } from "fs";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "demo-key" });
+
+// Interface para o pedido de geração de narração de áudio
+export interface SpeechGenerationRequest {
+  text: string;
+  voice: string;
+  speed: number;
+}
+
+// Interface para o pedido de geração de vídeo
+export interface VideoGenerationRequest {
+  script: string;
+  voice: string;
+  speed: number;
+  transitions: string[];
+  outputFormat: string;
+}
+
+// Tipos de voz disponíveis para a API TTS da OpenAI
+type OpenAIVoice = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
+
+// Mapeamento de nossos tipos de voz para os da OpenAI
+const voiceMapping: Record<string, OpenAIVoice> = {
+  'feminino-profissional': 'nova',
+  'masculino-profissional': 'onyx',
+  'feminino-jovem': 'shimmer',
+  'masculino-jovem': 'echo',
+  'neutro': 'alloy'
+};
+
+// Função para gerar narração em áudio a partir do texto usando OpenAI TTS API
+export async function generateSpeech(request: SpeechGenerationRequest): Promise<Buffer> {
+  try {
+    const { text, voice, speed } = request;
+    
+    // Seleciona a voz correta
+    const openAIVoice: OpenAIVoice = voiceMapping[voice] || 'nova';
+    
+    // Gera áudio com Text-to-Speech API da OpenAI
+    const mp3Response = await openai.audio.speech.create({
+      model: "tts-1",
+      voice: openAIVoice,
+      input: text,
+      speed: speed // Ajuste de velocidade
+    });
+    
+    // Converte para buffer
+    const buffer = Buffer.from(await mp3Response.arrayBuffer());
+    return buffer;
+  } catch (error) {
+    console.error("Erro ao gerar narração de áudio:", error);
+    throw new Error("Falha ao gerar áudio para o roteiro. Por favor, tente novamente.");
+  }
+}
+
+// Função para gerar um vídeo completo
+export async function generateVideo(request: VideoGenerationRequest): Promise<string> {
+  try {
+    // Primeiro, gera a narração em áudio
+    const audioBuffer = await generateSpeech({
+      text: request.script,
+      voice: request.voice,
+      speed: request.speed
+    });
+    
+    // Na implementação real, usaríamos o buffer de áudio e as transições para 
+    // criar o vídeo com imagens e legendas. Como prova de conceito, retornamos 
+    // apenas a URL do áudio que foi gerado.
+    
+    // SIMULAÇÃO: Em uma implementação real, retornaríamos a URL do vídeo processado
+    // Aqui, geramos dados de exemplo para demonstração
+    
+    // Como estamos apenas simulando, retornamos um JSON com os dados
+    return JSON.stringify({
+      audioGenerated: true,
+      scriptProcessed: request.script,
+      voiceUsed: request.voice,
+      transitionsApplied: request.transitions,
+      format: request.outputFormat,
+      // Em uma implementação real, retornaríamos URLs para os arquivos gerados
+      audioUrl: "https://example.com/audio.mp3",
+      videoUrl: "https://example.com/video.mp4"
+    });
+  } catch (error) {
+    console.error("Erro ao gerar vídeo:", error);
+    throw new Error("Falha ao processar o vídeo. Por favor, tente novamente.");
+  }
+}
 
 export async function generateContent(params: ContentGeneration): Promise<string> {
   const { contentType, platform, topic, communicationStyle } = params;

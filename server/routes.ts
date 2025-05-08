@@ -2,17 +2,82 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import OpenAI from "openai";
 import { contentGenerationSchema } from "../shared/schema";
-import { generateContent } from "./openai";
+import { generateContent, generateSpeech, generateVideo, type SpeechGenerationRequest, type VideoGenerationRequest } from "./openai";
 import { storage } from "./storage";
 import fs from "fs";
 import path from "path";
+import { z } from 'zod';
 
 // Initialize OpenAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
+// Esquema Zod para validação do request de geração de narração
+const speechGenerationSchema = z.object({
+  text: z.string().min(1, "O texto não pode estar vazio"),
+  voice: z.string(),
+  speed: z.number().min(0.5).max(2.0).default(1.0)
+});
+
+// Esquema Zod para validação do request de geração de vídeo
+const videoGenerationSchema = z.object({
+  script: z.string().min(1, "O roteiro não pode estar vazio"),
+  voice: z.string(),
+  speed: z.number().min(0.5).max(2.0).default(1.0),
+  transitions: z.array(z.string()).default([]),
+  outputFormat: z.string().default("mp4")
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  /**
+   * Endpoint para gerar narração de áudio a partir de texto usando OpenAI TTS
+   */
+  app.post("/api/generate-speech", async (req: Request, res: Response) => {
+    try {
+      // Validar os dados de entrada
+      const validatedData = speechGenerationSchema.parse(req.body);
+      
+      // Gerar a narração
+      const audioBuffer = await generateSpeech(validatedData);
+      
+      // Configurar os headers para download do arquivo de áudio
+      res.setHeader('Content-Type', 'audio/mpeg');
+      res.setHeader('Content-Disposition', 'attachment; filename="narration.mp3"');
+      
+      // Enviar o buffer como resposta
+      res.send(audioBuffer);
+      
+    } catch (error: any) {
+      console.error("Erro ao gerar narração:", error);
+      res.status(400).json({ 
+        error: error.message || "Erro ao gerar narração" 
+      });
+    }
+  });
+  
+  /**
+   * Endpoint para gerar vídeo completo a partir de roteiro
+   */
+  app.post("/api/generate-video", async (req: Request, res: Response) => {
+    try {
+      // Validar os dados de entrada
+      const validatedData = videoGenerationSchema.parse(req.body);
+      
+      // Gerar o vídeo completo
+      const result = await generateVideo(validatedData);
+      
+      // Retornar os dados do vídeo
+      res.json(JSON.parse(result));
+      
+    } catch (error: any) {
+      console.error("Erro ao gerar vídeo:", error);
+      res.status(400).json({ 
+        error: error.message || "Erro ao gerar vídeo" 
+      });
+    }
+  });
+  
   /**
    * Endpoint para gerar conteúdo com OpenAI
    */
