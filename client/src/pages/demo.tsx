@@ -24,6 +24,77 @@ const styles = `
   animation: pulse 2s infinite;
 }
 
+.cta-demo {
+  background: linear-gradient(90deg, #FF4D4D, #F9CB28);
+  box-shadow: 0 4px 20px rgba(255, 77, 77, 0.4);
+  transform: scale(1.05);
+  transition: all 0.3s;
+}
+
+.cta-demo:hover {
+  transform: scale(1.1);
+}
+
+#live-demo {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+#live-demo video {
+  width: 100%;
+  aspect-ratio: 9/16;
+  background: #000;
+}
+
+#live-demo .code-preview {
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+}
+
+#live-demo .code-preview span {
+  color: #6b7280;
+  font-size: 0.75rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+#live-demo .code-preview code {
+  font-family: monospace;
+  color: #111827;
+  font-size: 0.875rem;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.result-card {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+.result-card p {
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.result-card video {
+  width: 100%;
+  aspect-ratio: 9/16;
+  background: #000;
+}
+
 @media (max-width: 768px) {
   .demo-container {
     padding: 15px !important;
