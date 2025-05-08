@@ -5,10 +5,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Padronização de moeda */
-.preco::before {
-  content: "R$ ";
+/* SCRIPT FINAL DE CORREÇÃO - Unificação dos preços e formatação na tabela */
+.preco {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #333;
+  margin: 15px 0;
+  position: relative;
+  display: flex;
+  align-items: baseline;
 }
+
+.preco small {
+  font-size: 1rem;
+  color: #666;
+  font-weight: normal;
+  margin-left: 2px;
+}
+
+/* Não acrescentar R$ automaticamente para evitar duplicação */
+/* .preco::before {
+  content: "R$ ";
+} */
 
 :root {
   --background: 0 0% 100%;
@@ -83,13 +101,32 @@
   }
 }
 
+/* Correção de Layout - Implementação definitiva */
+.planos-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  align-items: start;
+}
+
+.plano {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
 /* Correção de Layout no Mobile (Visualização de Planos) */
 @media (max-width: 768px) {
   .planos-container {
+    grid-template-columns: 1fr !important;
     gap: 20px !important;
     padding: 0 15px !important;
   }
+  
   .plano {
+    padding: 20px !important;
     margin-bottom: 25px !important;
     width: 100% !important;
   }

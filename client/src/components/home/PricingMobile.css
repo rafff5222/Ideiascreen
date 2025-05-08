@@ -26,12 +26,27 @@
   -webkit-text-fill-color: transparent;
 }
 
+/* Layout principal para planos - SOLUÇÃO DEFINITIVA */
+.planos-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  align-items: start;
+}
+
+.plano {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
 /* Layout Mobile */
 @media (max-width: 768px) {
   .planos-container {
-    display: grid;
     grid-template-columns: 1fr !important;
-    gap: 25px !important;
+    gap: 20px !important;
     margin-bottom: 30px;
     padding: 0 10px !important;
   }
@@ -42,6 +57,7 @@
     margin-bottom: 25px !important;
     transform: none !important;
     scale: 1 !important;
+    padding: 20px !important;
   }
   
   /* Ajuste para o plano Premium (mais vendido) */
@@ -57,11 +73,6 @@
   
   .preco {
     font-size: 1.5rem !important;
-  }
-  
-  /* Melhora espaçamento em mobile */
-  .plano, .plano-card {
-    padding: 1.25rem !important;
   }
   
   /* Melhora visibilidade dos benefícios */

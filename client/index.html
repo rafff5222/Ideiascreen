@@ -86,5 +86,22 @@
     <script type="module" src="/src/main.tsx"></script>
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
     <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+    
+    <!-- CORREÇÃO TOTAL - Script para unificação definitiva de preços -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const precosUnificados = {
+          basico: 97,
+          premium: 197,
+          ultimate: 297
+        };
+        
+        Object.entries(precosUnificados).forEach(([plano, valor]) => {
+          document.querySelectorAll(`.${plano} .preco`).forEach(el => {
+            el.innerHTML = `R$ ${valor}<small>/mês</small>`;
+          });
+        });
+      });
+    </script>
   </body>
 </html>
