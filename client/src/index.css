@@ -1,5 +1,6 @@
 @import './components/home/PricingMobile.css';
 @import './components/home/Tooltip.css';
+@import './components/home/FlexLayoutPrecos.css';
 
 @tailwind base;
 @tailwind components;

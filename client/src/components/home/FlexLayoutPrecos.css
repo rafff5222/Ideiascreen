@@ -1,0 +1,127 @@
+/* Layout Flex para tabela de preços - Implementação final */
+.planos-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.plano-card {
+  flex: 1 1 250px;
+  max-width: 300px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: white;
+}
+
+.plano-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.plano-card h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.plano-card p {
+  color: #666;
+  margin: 0 0 15px;
+}
+
+.plano-preco {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 15px 0;
+  color: #333;
+  display: flex;
+  align-items: baseline;
+}
+
+.plano-preco small {
+  font-size: 1rem;
+  font-weight: normal;
+  color: #666;
+  margin-left: 2px;
+}
+
+.badge-economize {
+  background: #e53e3e;
+  color: white;
+  padding: 3px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 4px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  box-shadow: 0 2px 4px rgba(229, 62, 62, 0.3);
+  text-transform: uppercase;
+}
+
+.mais-vendido {
+  background: #7c3aed;
+  color: white;
+}
+
+/* Estilo para botões por plano */
+.plano-card button {
+  width: 100%;
+  padding: 12px 0;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  margin-top: 20px;
+  cursor: pointer;
+  border: none;
+}
+
+.plano-card[data-plano="basico"] button {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.plano-card[data-plano="basico"] button:hover {
+  background-color: #e5e7eb;
+}
+
+.plano-card[data-plano="premium"] button {
+  background-color: #7c3aed;
+  color: white;
+}
+
+.plano-card[data-plano="premium"] button:hover {
+  background-color: #6d28d9;
+}
+
+.plano-card[data-plano="ultimate"] button {
+  background: linear-gradient(to right, #6366f1, #8b5cf6);
+  color: white;
+}
+
+.plano-card[data-plano="ultimate"] button:hover {
+  background: linear-gradient(to right, #4f46e5, #7c3aed);
+}
+
+/* Layout Mobile */
+@media (max-width: 768px) {
+  .planos-container {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 10px;
+  }
+  
+  .plano-card {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+}

@@ -1,21 +1,35 @@
-import React from 'react';
-import { InfoIcon } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-interface TooltipProps {
-  text: string;
-  className?: string;
+interface PlanTooltipProps {
+  title: string;
+  description: string;
+  children: React.ReactNode;
 }
 
 /**
- * Componente de tooltip para exibir informações adicionais sobre recursos dos planos
+ * Componente de tooltip para planos
+ * Exibe informações adicionais sobre recursos dos planos
  */
-export const PlanTooltip: React.FC<TooltipProps> = ({ text, className = '' }) => {
-  return (
-    <span className={`pricing-tooltip ${className}`}>
-      <InfoIcon className="tooltip-icon h-4 w-4 inline-block" />
-      <span className="tooltip-text">{text}</span>
-    </span>
-  );
-};
+export default function PlanTooltip({ title, description, children }: PlanTooltipProps) {
+  const [isOpen, setIsOpen] = useState(false);
 
-export default PlanTooltip;
+  return (
+    <Tooltip open={isOpen} onOpenChange={setIsOpen}>
+      <TooltipTrigger asChild>
+        <span className="cursor-help underline decoration-dotted underline-offset-2">
+          {children}
+        </span>
+      </TooltipTrigger>
+      <TooltipContent className="max-w-[280px] text-sm bg-white p-3 rounded-lg shadow-lg" sideOffset={5}>
+        <div className="font-medium mb-1">{title}</div>
+        <p className="text-gray-600">{description}</p>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
