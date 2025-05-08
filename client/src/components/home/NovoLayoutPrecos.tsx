@@ -56,90 +56,91 @@ export default function NovoLayoutPrecos() {
       {/* Nova implementação com flex conforme especificado */}
       <TooltipProvider>
         <div className="planos-container">
-        {/* Plano Básico */}
-        <div className="plano-card" data-plano="basico">
-          <h3>Básico</h3>
-          <div className="plano-preco">R${precosFixos.basico}/mês</div>
-          <p>Ideal para criadores iniciantes.</p>
-          <ul className="my-4 space-y-2">
-            <li className="flex items-start">
-              <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
-              <span>
-                <PlanTooltip 
-                  title="Gerações de Conteúdo" 
-                  description="Cada geração inclui roteiro, sugestões de cortes e legendas otimizadas para algoritmos.">
-                  50 gerações de conteúdo/mês
-                </PlanTooltip>
-              </span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
-              <span>Legendas otimizadas para engajamento</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-red-500 mr-2 flex-shrink-0 x-icon">✗</span>
-              <span className="text-gray-500">Montagem automática de vídeos</span>
-            </li>
-          </ul>
-          <button className="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-800 font-medium hover:bg-gray-300 transition-colors">
-            Selecionar plano
-          </button>
-        </div>
+          {/* Plano Básico */}
+          <div className="plano-card" data-plano="basico">
+            <h3>Básico</h3>
+            <div className="plano-preco">R${precosFixos.basico}/mês</div>
+            <p>Ideal para criadores iniciantes.</p>
+            <ul className="my-4 space-y-2">
+              <li className="flex items-start">
+                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <span>
+                  <PlanTooltip 
+                    title="Gerações de Conteúdo" 
+                    description="Cada geração inclui roteiro, sugestões de cortes e legendas otimizadas para algoritmos.">
+                    50 gerações de conteúdo/mês
+                  </PlanTooltip>
+                </span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <span>Legendas otimizadas para engajamento</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-red-500 mr-2 flex-shrink-0 x-icon">✗</span>
+                <span className="text-gray-500">Montagem automática de vídeos</span>
+              </li>
+            </ul>
+            <button className="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-800 font-medium hover:bg-gray-300 transition-colors">
+              Selecionar plano
+            </button>
+          </div>
 
-        {/* Plano Premium */}
-        <div className="plano-card" data-plano="premium">
-          <span className="badge-economize">MAIS VENDIDO</span>
-          <h3>Premium</h3>
-          <div className="plano-preco">R${precosFixos.premium}/mês</div>
-          <p>Perfeito para criadores em crescimento.</p>
-          <ul className="my-4 space-y-2">
-            <li className="flex items-start">
-              <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
-              <span>150 gerações de conteúdo/mês</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
-              <span>Legendas otimizadas para engajamento</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
-              <span>Montagem automática de vídeos</span>
-            </li>
-          </ul>
-          <button className="w-full py-3 px-4 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 transition-colors pulse">
-            Selecionar plano
-          </button>
-        </div>
+          {/* Plano Premium */}
+          <div className="plano-card" data-plano="premium">
+            <span className="badge-economize">MAIS VENDIDO</span>
+            <h3>Premium</h3>
+            <div className="plano-preco">R${precosFixos.premium}/mês</div>
+            <p>Perfeito para criadores em crescimento.</p>
+            <ul className="my-4 space-y-2">
+              <li className="flex items-start">
+                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <span>150 gerações de conteúdo/mês</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <span>Legendas otimizadas para engajamento</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <span>Montagem automática de vídeos</span>
+              </li>
+            </ul>
+            <button className="w-full py-3 px-4 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 transition-colors pulse">
+              Selecionar plano
+            </button>
+          </div>
 
-        {/* Plano Ultimate */}
-        <div className="plano-card" data-plano="ultimate">
-          <span className="badge-economize">ECONOMIZE 10%</span>
-          <h3>Ultimate</h3>
-          <div className="plano-preco">R${precosFixos.ultimate}/mês</div>
-          <p>Para criadores profissionais e empresas.</p>
-          <ul className="my-4 space-y-2">
-            <li className="flex items-start">
-              <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
-              <span>Gerações ilimitadas de conteúdo</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
-              <span>Legendas otimizadas para engajamento</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
-              <span>Montagem automática de vídeos</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
-              <span>Edição com IA avançada e efeitos</span>
-            </li>
-          </ul>
-          <button className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium hover:from-indigo-700 hover:to-purple-700 transition-colors">
-            Selecionar plano
-          </button>
+          {/* Plano Ultimate */}
+          <div className="plano-card" data-plano="ultimate">
+            <span className="badge-economize">ECONOMIZE 10%</span>
+            <h3>Ultimate</h3>
+            <div className="plano-preco">R${precosFixos.ultimate}/mês</div>
+            <p>Para criadores profissionais e empresas.</p>
+            <ul className="my-4 space-y-2">
+              <li className="flex items-start">
+                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <span>Gerações ilimitadas de conteúdo</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <span>Legendas otimizadas para engajamento</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <span>Montagem automática de vídeos</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
+                <span>Edição com IA avançada e efeitos</span>
+              </li>
+            </ul>
+            <button className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium hover:from-indigo-700 hover:to-purple-700 transition-colors">
+              Selecionar plano
+            </button>
+          </div>
         </div>
-      </div>
+      </TooltipProvider>
 
       {/* Garantia de satisfação */}
       <div className="mt-16 text-center">

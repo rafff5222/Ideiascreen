@@ -2,6 +2,7 @@ import Hero from "@/components/home/Hero";
 import Features from "@/components/home/Features";
 import HowItWorks from "@/components/home/HowItWorks";
 import Pricing from "@/components/home/Pricing";
+import NovoLayoutPrecos from "@/components/home/NovoLayoutPrecos";
 import Testimonials from "@/components/home/Testimonials";
 import CallToAction from "@/components/home/CallToAction";
 import { useEffect } from "react";
@@ -111,7 +112,7 @@ export default function Home() {
       <Hero />
       <Features />
       <HowItWorks />
-      <Pricing />
+      <NovoLayoutPrecos />
       <Testimonials />
       <CallToAction />
       
