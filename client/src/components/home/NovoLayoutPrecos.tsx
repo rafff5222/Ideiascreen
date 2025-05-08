@@ -10,9 +10,9 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 export default function NovoLayoutPrecos() {
   // Valores fixos definitivos conforme correção solicitada
   const precosFixos = {
-    basico: 97,
-    premium: 197,
-    ultimate: 297
+    basico: 59,
+    premium: 89,
+    ultimate: 129.90
   };
 
   const [loading, setLoading] = useState(false);
@@ -57,13 +57,13 @@ export default function NovoLayoutPrecos() {
       <TooltipProvider>
         <div className="planos-container">
           {/* Plano Básico */}
-          <div className="plano-card" data-plano="basico">
+          <div className="plano-card plano-container" data-plano="basico">
             <h3>Básico</h3>
-            <div className="plano-preco">
-              <span className="preco-antigo">R$149,00</span>
-              <span className="preco-novo">R${precosFixos.basico}</span><small>/mês</small>
-            </div>
-            <span className="badge-desconto">ECONOMIZE 34%</span>
+            <p>
+              <span className="preco-antigo">R$89,00</span>
+              <span className="preco-novo">R$59,00</span> /mês
+            </p>
+            <span className="badge red">ECONOMIZE 34%</span>
             <p>Ideal para criadores iniciantes.</p>
             <ul className="my-4 space-y-2">
               <li className="flex items-start">
@@ -91,14 +91,14 @@ export default function NovoLayoutPrecos() {
           </div>
 
           {/* Plano Premium */}
-          <div className="plano-card" data-plano="premium">
+          <div className="plano-card plano-container" data-plano="premium">
             <span className="badge-economize mais-vendido">MAIS VENDIDO</span>
             <h3>Premium</h3>
-            <div className="plano-preco">
-              <span className="preco-antigo">R$299,90</span>
-              <span className="preco-novo">R${precosFixos.premium}</span><small>/mês</small>
-            </div>
-            <span className="badge-desconto">ECONOMIZE 34%</span>
+            <p>
+              <span className="preco-antigo">R$117,00</span>
+              <span className="preco-novo">R$89,00</span> /mês
+            </p>
+            <span className="badge red">ECONOMIZE 24%</span>
             <p>Perfeito para criadores em crescimento.</p>
             <ul className="my-4 space-y-2">
               <li className="flex items-start">
@@ -120,14 +120,14 @@ export default function NovoLayoutPrecos() {
           </div>
 
           {/* Plano Ultimate */}
-          <div className="plano-card" data-plano="ultimate">
-            <span className="badge-economize">ECONOMIZE 50%</span>
+          <div className="plano-card plano-container" data-plano="ultimate">
+            <span className="badge-economize">ECONOMIZE 13%</span>
             <h3>Ultimate</h3>
-            <div className="plano-preco">
-              <span className="preco-antigo">R$597,00</span>
-              <span className="preco-novo">R${precosFixos.ultimate}</span><small>/mês</small>
-            </div>
-            <span className="badge-desconto melhor-valor">MELHOR CUSTO-BENEFÍCIO</span>
+            <p>
+              <span className="preco-antigo">R$149,00</span>
+              <span className="preco-novo">R$129,90</span> /mês
+            </p>
+            <span className="badge blue">MELHOR CUSTO-BENEFÍCIO</span>
             <p>Para criadores profissionais e empresas.</p>
             <ul className="my-4 space-y-2">
               <li className="flex items-start">

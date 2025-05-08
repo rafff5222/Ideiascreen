@@ -59,30 +59,43 @@
   text-decoration: line-through;
   color: #999;
   font-size: 14px;
-  margin-right: 5px;
+  margin-right: 8px;
   font-weight: normal;
 }
 
 .preco-novo {
   color: #000;
   font-weight: bold;
-  font-size: 22px;
+  font-size: 24px;
 }
 
-.badge-desconto {
-  background-color: #e53e3e;
+.badge.red {
+  background-color: red;
   color: white;
-  padding: 4px 8px;
   font-size: 12px;
-  border-radius: 4px;
-  margin-top: 4px;
-  display: inline-block;
   font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+/* Estilo para container dos planos */
+.plano-container {
+  text-align: center;
+  padding: 16px;
 }
 
 /* Estilo para badge de melhor custo-benefício */
-.badge-desconto.melhor-valor {
+.badge.blue {
   background-color: #2b6cb0;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 4px;
 }
 
 .badge-economize {
