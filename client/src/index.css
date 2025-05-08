@@ -4,320 +4,153 @@
 
 :root {
   --background: 0 0% 100%;
-  --foreground: 20 14.3% 4.1%;
-  --muted: 60 4.8% 95.9%;
-  --muted-foreground: 25 5.3% 44.7%;
+  --foreground: 222.2 84% 4.9%;
+
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+
   --popover: 0 0% 100%;
-  --popover-foreground: 20 14.3% 4.1%;
+  --popover-foreground: 222.2 84% 4.9%;
+
   --card: 0 0% 100%;
-  --card-foreground: 20 14.3% 4.1%;
-  --border: 20 5.9% 90%;
-  --input: 20 5.9% 90%;
-  --primary: 354 100% 67%;  /* #FF5A5F */
-  --primary-foreground: 211 100% 99%;
-  --secondary: 211 100% 62%; /* #3A86FF */
-  --secondary-foreground: 24 9.8% 10%;
-  --accent: 277 71% 53%; /* #8A2BE2 */
-  --accent-foreground: 24 9.8% 10%;
+  --card-foreground: 222.2 84% 4.9%;
+
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+
+  --primary: 222.2 47.4% 11.2%;
+  --primary-foreground: 210 40% 98%;
+
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+
   --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 60 9.1% 97.8%;
-  --ring: 211 100% 62%;
+  --destructive-foreground: 210 40% 98%;
+
+  --ring: 215 20.2% 65.1%;
+
   --radius: 0.5rem;
-  --chart-1: 354 100% 67%;
-  --chart-2: 211 100% 62%;
-  --chart-3: 277 71% 53%;
-  --chart-4: 145 63% 42%;
-  --chart-5: 31 100% 55%;
 }
 
 .dark {
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
-  --card: 240 10% 3.9%;
-  --card-foreground: 0 0% 98%;
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --primary: 354 100% 67%;
-  --primary-foreground: 211 100% 99%;
-  --secondary: 211 100% 62%;
-  --secondary-foreground: 0 0% 98%;
-  --accent: 277 71% 53%;
-  --accent-foreground: 0 0% 98%;
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+
+  --primary: 210 40% 98%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+
   --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
-  --ring: 240 4.9% 83.9%;
-  --radius: 0.5rem;
-  --chart-1: 354 100% 67%;
-  --chart-2: 211 100% 62%;
-  --chart-3: 277 71% 53%;
-  --chart-4: 145 63% 42%;
-  --chart-5: 31 100% 55%;
+  --destructive-foreground: 0 85.7% 97.3%;
+
+  --ring: 217.2 32.6% 17.5%;
 }
 
 @layer base {
   * {
     @apply border-border;
   }
-
   body {
-    @apply bg-background text-foreground font-inter;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-poppins font-bold;
+    @apply bg-background text-foreground;
   }
 }
 
-@layer utilities {
-  .font-poppins {
-    font-family: "Poppins", sans-serif;
-  }
-  
-  .font-inter {
-    font-family: "Inter", sans-serif;
-  }
-}
-
-.gradient-text {
-  @apply bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
-}
-
-.section {
-  @apply py-16 md:py-20 px-4;
-}
-
-.container {
-  @apply max-w-7xl mx-auto;
-}
-
-/* Melhor responsividade para mobile */
+/* Correção de Layout no Mobile (Visualização de Planos) */
 @media (max-width: 768px) {
   .planos-container {
-    @apply flex-col;
+    gap: 20px !important;
+    padding: 0 15px !important;
   }
-  
-  h1 {
-    @apply text-4xl !important;
-  }
-  
-  h2 {
-    @apply text-2xl !important;
+  .plano {
+    margin-bottom: 25px !important;
+    width: 100% !important;
   }
 }
 
-/* Cores vibrantes para botões - Psicologia militar de cores para urgência e ação */
-.btn-premium {
-  @apply text-white font-bold px-6 py-3 rounded-lg shadow-lg hover:brightness-110 hover:scale-105 transition duration-300;
-  background: linear-gradient(135deg, #FF4D4D 0%, #F9CB28 100%);
-  /* Vermelho (urgência) + Amarelo (alerta) para criar senso de ação imediata */
+/* Compatibilidade entre Navegadores */
+@-moz-document url-prefix() {
+  .btn-premium {
+    padding: 12px 24px !important;
+  }
 }
 
-.btn-basic {
-  @apply bg-gray-100 text-gray-700 hover:bg-gray-200;
-}
-
-.btn-ultimate {
-  @apply text-white hover:brightness-110;
-  background: linear-gradient(135deg, #6B21A8 0%, #9333EA 100%);
-  /* Tons de roxo mais intensos para plano premium */
-}
-
-.btn-pro {
-  @apply text-white hover:brightness-110;
-  background: linear-gradient(135deg, #4B5563 0%, #6B7280 100%);
-  /* Tons de cinza mais neutros para plano isca */
-}
-
-/* Ajustes para o mockup de vídeo */
-.hero-mockup {
-  @apply relative bg-gradient-to-br from-gray-900 to-gray-800 p-3 rounded-2xl shadow-2xl border border-gray-700;
-}
-
-/* Melhoria de responsividade especificamente no hero */
-.hero-section {
-  @apply pt-12 md:pt-16;
-}
-
-/* Animação sutil nos depoimentos */
-.bg-gradient-to-br {
-  @apply transition-all duration-300;
-}
-
-.bg-gradient-to-br:hover {
-  @apply transform -translate-y-2 shadow-xl;
-}
-
-/* Efeito de hover nos cartões dos planos */
-.plano-card {
-  @apply transition-all duration-300;
-}
-
-.plano-card:hover {
-  @apply transform -translate-y-2 shadow-xl border-accent/30;
-}
-
-/* Selo de "Recomendado" com ícone animado */
-.recommended-tag {
-  @apply absolute top-5 right-5 bg-gradient-to-r from-purple-600 to-pink-500 text-white py-1 px-3 rounded-full text-xs font-bold flex items-center gap-1 shadow-md z-20;
-}
-
-.pulse {
-  @apply w-2 h-2 bg-white rounded-full inline-block;
-  animation: pulse 1.5s infinite;
-}
-
+/* Prefixo para animações */
 @keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  70% { transform: scale(2); opacity: 0.7; }
-  100% { transform: scale(1); opacity: 0; }
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+@-webkit-keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
 }
 
-/* Gatilho de urgência com contador */
-.urgent-badge {
-  @apply bg-red-50 text-red-600 p-2 rounded-lg font-bold text-sm relative;
+/* Animações customizadas */
+.pulse {
+  animation: pulse 2s infinite;
+  -webkit-animation: pulse 2s infinite;
 }
 
-.progress-bar {
-  @apply h-1 bg-red-600 mt-1 rounded-full;
+.shake {
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
-@media (max-width: 640px) {
-  .hero-section h1 {
-    @apply text-3xl;
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
   }
   
-  .hero-section h2 {
-    @apply text-xl;
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+@-webkit-keyframes shake {
+  10%, 90% {
+    -webkit-transform: translate3d(-1px, 0, 0);
   }
   
-  .hero-mockup {
-    @apply mt-8;
+  20%, 80% {
+    -webkit-transform: translate3d(2px, 0, 0);
   }
-}
 
-/* Animações para os elementos de conversão */
-@keyframes text-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
-}
-
-.animate-text-blink {
-  animation: text-blink 1s ease-in-out infinite;
-}
-
-/* Animação para o Price Anchoring */
-.pulse-animation {
-  animation: pulse-price 2s infinite;
-}
-
-@keyframes pulse-price {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-/* Estilos para o botão mágico */
-#magic-button {
-  transition: all 0.3s ease;
-}
-
-#magic-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-/* Estilos para o plano isca (decoy) */
-.plano-card.decoy {
-  position: relative;
-}
-
-.plano-card.decoy::after {
-  content: "";
-  position: absolute;
-  top: -3px;
-  right: -3px;
-  bottom: -3px;
-  left: -3px;
-  z-index: -1;
-  border-radius: inherit;
-  background: linear-gradient(135deg, transparent 95%, #FF4D4D 95%, #FF4D4D 100%);
-}
-
-@keyframes slide-up {
-  0% {
-    opacity: 0;
-    transform: translateY(30px);
+  30%, 50%, 70% {
+    -webkit-transform: translate3d(-4px, 0, 0);
   }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
+
+  40%, 60% {
+    -webkit-transform: translate3d(4px, 0, 0);
   }
-}
-
-.animate-slide-up {
-  animation: slide-up 0.5s ease-out;
-}
-
-/* Estilos para a barra de oferta */
-.offer-bar {
-  @apply relative w-full h-6 bg-gray-100 rounded-full overflow-hidden;
-}
-
-.offer-bar .progress {
-  @apply absolute top-0 left-0 h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-1000 ease-out;
-}
-
-/* Barra flutuante de oferta */
-.floating-bar {
-  @apply fixed w-full z-50 top-0 left-0 right-0 transition-transform duration-300;
-}
-
-.floating-bar.hidden {
-  transform: translateY(-100%);
-}
-
-.floating-bar.visible {
-  transform: translateY(0);
-}
-
-/* Estilos para o chatbot de IA */
-.chatbot-bubble {
-  @apply inline-block bg-gray-100 rounded-lg p-3 max-w-[80%];
-}
-
-.chatbot-bubble.user {
-  @apply bg-primary/10 text-primary ml-auto;
-}
-
-.chatbot-message {
-  @apply mb-3;
-}
-
-.chatbot-message.user {
-  @apply flex justify-end;
-}
-
-/* Indicador de digitação */
-.typing-indicator {
-  @apply flex items-center;
-}
-
-.typing-indicator span {
-  @apply h-2 w-2 bg-gray-400 rounded-full mx-0.5 animate-pulse;
-}
-
-.typing-indicator span:nth-child(1) {
-  animation-delay: 0ms;
-}
-
-.typing-indicator span:nth-child(2) {
-  animation-delay: 200ms;
-}
-
-.typing-indicator span:nth-child(3) {
-  animation-delay: 400ms;
 }

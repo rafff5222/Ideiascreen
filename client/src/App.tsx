@@ -17,6 +17,7 @@ import RetentionPixel from "@/components/analytics/RetentionPixel";
 import UpsellModal from "@/components/upsell/UpsellModal";
 import SocialProof from "@/components/conversion/SocialProof";
 import OneClickCheckout from "@/components/conversion/OneClickCheckout";
+import ErrorMonitor from "@/components/ErrorMonitor";
 
 function Router() {
   return (
@@ -47,6 +48,7 @@ function App() {
           <UpsellModal />
           <SocialProof />
           <OneClickCheckout />
+          <ErrorMonitor />
           
           {/* Exibe o popup de saída apenas na página inicial */}
           <Route path="/">
