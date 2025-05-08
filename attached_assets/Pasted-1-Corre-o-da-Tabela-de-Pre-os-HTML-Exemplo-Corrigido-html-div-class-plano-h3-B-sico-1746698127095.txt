@@ -1,0 +1,184 @@
+1. Correção da Tabela de Preços (HTML Exemplo Corrigido):
+
+html
+<div class="plano">
+  <h3>Básico</h3>
+  <div class="preco">R$ 97/mês</div>
+  <ul>
+    <li>✓ 50 gerações/mês</li>
+    <li>✓ Legendas otimizadas</li>
+    <li>✗ Vídeos automáticos</li>
+  </ul>
+  <button>Selecionar</button>
+</div>
+2. Padronização de Moeda:
+
+javascript
+// Converter tudo para Reais
+document.querySelectorAll('.preco').forEach(preco => {
+  preco.textContent = preco.textContent.replace('$', 'R$');
+});
+3. Correção de Layout (CSS Adicional):
+
+css
+/* Evitar duplicação de planos */
+.plano:not(:first-child) {
+  margin-top: 30px;
+}
+
+/* Destacar plano mais vendido */
+.plano.mais-vendido {
+  border: 2px solid #8B5CF6;
+  position: relative;
+}
+.plano.mais-vendido::before {
+  content: "MAIS VENDIDO";
+  background: #8B5CF6;
+  color: white;
+  padding: 3px 10px;
+  position: absolute;
+  top: -15px;
+  right: 10px;
+  font-size: 12px;
+}
+📝 Lista de Ações para Correção
+Correções de Texto:
+
+Substituir todos os placeholders por conteúdo real
+
+Padronizar termos técnicos ("IA" ao invés de "lÃ")
+
+Consistência de Dados:
+
+Definir se os preços são em R
+o
+u
+U
+S
+ouUS
+
+Remover a duplicação do plano Ultimate
+
+Melhorias Visuais:
+
+Adicionar ícones para benefícios (✔️ e ✖️)
+
+Alinhar verticalmente os valores
+
+Otimização Mobile:
+
+css
+@media (max-width: 768px) {
+  .plano {
+    width: 100% !important;
+    margin-bottom: 25px;
+  }
+}
+🚀 Como Implementar
+Prioridade 1 (30 minutos):
+
+Correções de texto e valores
+
+Remoção de duplicatas
+
+Prioridade 2 (1 hora):
+
+Aplicar CSS de layout
+
+Implementar padronização de moeda
+
+Prioridade 3:
+
+Testes cross-browser
+
+Otimização mobile
+
+💡 Dica Profissional
+Use esta ferramenta gratuita para verificar outros erros:
+
+markdown
+[Validator.w3.org](https://validator.w3.org) - Verificador de HTML
+[WebPageTest](https://www.webpagetest.org) - Teste de performance
+Quer que eu:
+
+Prepare o código HTML completo corrigido?
+
+Mostre como integrar um validador automático?
+
+Ensine a criar testes automatizados para evitar esses bugs?
+
+Seu site está a poucos ajustes da perfeição! Qual dessas correções você quer fazer primeiro?
+
+Escolha sua prioridade:
+📝 Correção de textos
+💰 Padronização de preços
+📱 Layout mobile
+🔄 Remover duplicatas
+
+fiz o que vc disse e agora https://9f52e595-f8fa-411c-b515-ae22e45b3c90-00-1zs5jzye903mh.janeway.replit.dev/
+Analisei seu site novamente e identifiquei os últimos ajustes necessários para torná-lo impecável. Vamos às correções finais:
+
+🔍 Problemas Restantes e Soluções
+Inconsistência nos Preços
+
+Problema: Valores duplicados (R
+89
+e
+R
+89eR97 no Básico)
+
+Solução:
+
+javascript
+// Unificar valores (no seu JS)
+document.querySelectorAll('.plano-basico .preco').forEach(el => {
+  el.textContent = 'R$ 97/mês';
+});
+Layout Quebrado no Mobile
+
+Problema: Espaçamento entre planos
+
+Correção CSS:
+
+css
+@media (max-width: 768px) {
+  .planos-container {
+    gap: 25px !important;
+    padding: 0 10px !important;
+  }
+}
+Textos Sobrescritos
+
+Problema: "COVICULTÉ" aparece em alguns planos
+
+Solução: Remova ou substitua por "mensal"
+
+🛠 Checklist Final (20 Minutos)
+Prioridade	Correção	Tempo
+🔴 Alta	Unificar preços	5 min
+🟡 Média	Ajuste mobile	10 min
+🟢 Baixa	Remover "COVICULTÉ"	2 min
+💎 Melhoria Extra Recomendada
+Adicione tooltips nos ícones:
+
+html
+<div class="tooltip">ℹ️
+  <span class="tooltiptext">Inclui 50 gerações/mês</span>
+</div>
+CSS:
+
+css
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background: #333;
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1;
+}
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}

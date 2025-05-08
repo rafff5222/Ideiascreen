@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { apiRequest } from '@/lib/queryClient';
+import PlanTooltip from './PlanTooltip';
+import { PlanFeature } from './PlanIcons';
 
 interface PricingData {
   prices: {
@@ -78,30 +80,30 @@ export default function PricingTable() {
       {/* Container com os planos */}
       <div className="max-w-7xl mx-auto planos-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
         {/* Plano Básico */}
-        <div className="plano bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 transition-all hover:shadow-xl">
+        <div className="plano plano-basico bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 transition-all hover:shadow-xl">
           <div className="px-6 py-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Básico</h3>
             <div className="flex items-end mb-6">
-              <div className="text-4xl font-bold text-gray-900">{formatCurrency(pricingData.prices.basic)}</div>
+              <div className="text-4xl font-bold text-gray-900 preco">{pricingData.prices.basic}</div>
               <div className="text-gray-500 ml-2">/mês</div>
             </div>
             <ul className="space-y-4 mb-8">
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>50 gerações de conteúdo/mês</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>Legendas otimizadas para engajamento</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-red-500 mr-2">✗</span>
-                <span className="text-gray-500">Montagem automática de vídeos</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-red-500 mr-2">✗</span>
-                <span className="text-gray-500">Edição com IA avançada</span>
-              </li>
+              <PlanFeature 
+                included={true} 
+                text={<>50 gerações de conteúdo/mês <PlanTooltip text="Crie até 50 ideias e roteiros para suas redes sociais todo mês" /></>}
+              />
+              <PlanFeature 
+                included={true} 
+                text={<>Legendas otimizadas para engajamento <PlanTooltip text="Textos e legendas criados para maximizar o engajamento do público" /></>}
+              />
+              <PlanFeature 
+                included={false}
+                text="Montagem automática de vídeos"
+              />
+              <PlanFeature 
+                included={false}
+                text="Edição com IA avançada"
+              />
             </ul>
             <button className="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-800 font-medium hover:bg-gray-300 transition-colors">
               Selecionar Plano
@@ -112,31 +114,31 @@ export default function PricingTable() {
         {/* Plano Premium - Mais vendido */}
         <div className="plano mais-vendido relative bg-white rounded-xl shadow-lg overflow-hidden border-2 border-purple-500 transition-all hover:shadow-xl">
           <div className="absolute top-0 right-0 bg-purple-600 text-white px-4 py-1 text-sm font-bold tracking-wide">
-            MAIS VENDIDO
+            <span className="pulse mr-1">•</span> MAIS VENDIDO
           </div>
           <div className="px-6 py-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Premium</h3>
             <div className="flex items-end mb-6">
-              <div className="text-4xl font-bold text-purple-600">{formatCurrency(pricingData.prices.premium)}</div>
+              <div className="text-4xl font-bold text-purple-600 preco">{pricingData.prices.premium}</div>
               <div className="text-gray-500 ml-2">/mês</div>
             </div>
             <ul className="space-y-4 mb-8">
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>150 gerações de conteúdo/mês</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>Legendas otimizadas para engajamento</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>Montagem automática de vídeos</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-red-500 mr-2">✗</span>
-                <span className="text-gray-500">Edição com IA avançada</span>
-              </li>
+              <PlanFeature 
+                included={true} 
+                text={<>150 gerações de conteúdo/mês <PlanTooltip text="Triplique sua produção com 150 gerações de conteúdo mensais" /></>}
+              />
+              <PlanFeature 
+                included={true} 
+                text={<>Legendas otimizadas para engajamento <PlanTooltip text="Textos e legendas criados para maximizar o engajamento do público" /></>}
+              />
+              <PlanFeature 
+                included={true}
+                text={<>Montagem automática de vídeos <PlanTooltip text="A IA cria automaticamente vídeos baseados nos seus roteiros" /></>}
+              />
+              <PlanFeature 
+                included={false}
+                text="Edição com IA avançada"
+              />
             </ul>
             <button className="w-full py-3 px-4 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 transition-colors pulse">
               Selecionar Plano
@@ -149,26 +151,26 @@ export default function PricingTable() {
           <div className="px-6 py-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Ultimate</h3>
             <div className="flex items-end mb-6">
-              <div className="text-4xl font-bold text-gray-900">{formatCurrency(pricingData.prices.ultimate)}</div>
+              <div className="text-4xl font-bold text-gray-900 preco">{pricingData.prices.ultimate}</div>
               <div className="text-gray-500 ml-2">/mês</div>
             </div>
             <ul className="space-y-4 mb-8">
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>Gerações ilimitadas de conteúdo</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>Legendas otimizadas para engajamento</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>Montagem automática de vídeos</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>Edição com IA avançada e efeitos cinemáticos</span>
-              </li>
+              <PlanFeature 
+                included={true} 
+                text={<>Gerações ilimitadas de conteúdo <PlanTooltip text="Sem limites! Crie quantos conteúdos precisar todos os meses" /></>}
+              />
+              <PlanFeature 
+                included={true} 
+                text="Legendas otimizadas para engajamento"
+              />
+              <PlanFeature 
+                included={true}
+                text="Montagem automática de vídeos"
+              />
+              <PlanFeature 
+                included={true}
+                text={<>Edição com IA avançada e efeitos <PlanTooltip text="Edição profissional com efeitos cinemáticos, transições e correção de cor automática" /></>}
+              />
             </ul>
             <button className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium hover:from-indigo-700 hover:to-purple-700 transition-colors">
               Selecionar Plano

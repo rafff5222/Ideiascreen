@@ -1,0 +1,84 @@
+/* Estilos para tooltips nos planos de preços */
+
+.pricing-tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+  margin-left: 5px;
+}
+
+.pricing-tooltip .tooltip-icon {
+  color: #8B5CF6;
+  font-size: 14px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.pricing-tooltip:hover .tooltip-icon {
+  opacity: 1;
+}
+
+.pricing-tooltip .tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 10px;
+  position: absolute;
+  z-index: 50;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.85rem;
+  font-weight: normal;
+  line-height: 1.4;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.pricing-tooltip .tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+.pricing-tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Melhorias de layout */
+.plano {
+  position: relative;
+}
+
+/* Melhor distinção entre verificado e não verificado */
+.check-icon {
+  color: #10B981;
+  font-weight: bold;
+}
+
+.x-icon {
+  color: #EF4444;
+}
+
+/* Correção para o layout mobile */
+@media (max-width: 768px) {
+  .pricing-tooltip .tooltip-text {
+    width: 160px;
+    font-size: 0.8rem;
+  }
+  
+  .planos-container {
+    gap: 25px !important;
+    padding: 0 10px !important;
+  }
+}
