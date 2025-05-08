@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import Generator from "@/pages/generator";
+import Demo from "@/pages/demo";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ExitPopup from "@/components/ui/exit-popup";
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/generator" component={Generator} />
+      <Route path="/demo" component={Demo} />
       <Route component={NotFound} />
     </Switch>
   );
