@@ -12,6 +12,9 @@ import OfferProgressBar from "@/components/conversion/OfferProgressBar";
 import OneClickCheckout from "@/components/conversion/OneClickCheckout";
 import TechnicalOptimizations from "@/components/conversion/TechnicalOptimizations";
 import SalesAiChatbot from "@/components/conversion/SalesAiChatbot";
+import SocialProof from "@/components/conversion/SocialProof";
+import SalesChatbot from "@/components/conversion/SalesChatbot";
+import ClickHeatmap from "@/components/analytics/ClickHeatmap";
 import MetricsPanel from "@/components/admin/MetricsPanel";
 
 export default function Home() {
@@ -85,6 +88,9 @@ export default function Home() {
       {/* Componentes de Conversão */}
       <OneClickCheckout />
       <SalesAiChatbot />
+      <SalesChatbot />
+      <SocialProof />
+      <ClickHeatmap />
       <MetricsPanel />
       <TechnicalOptimizations />
     </>

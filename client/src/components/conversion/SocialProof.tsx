@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { AlertCircle, Users, ShoppingCart } from 'lucide-react';
 
 type Purchase = {
   id: number;
@@ -12,79 +13,97 @@ type Purchase = {
  * Cria prova social e urgência mostrando que outras pessoas estão comprando
  */
 export default function SocialProof() {
-  const [purchases, setPurchases] = useState<Purchase[]>([]);
-  const [visible, setVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [currentPurchase, setCurrentPurchase] = useState<Purchase | null>(null);
+  const [visitorsCount] = useState(Math.floor(Math.random() * 20) + 35); // 35-55 visitantes
   
-  // Nomes brasileiros comuns para simulação de compras
-  const names = [
-    'Ana', 'Carlos', 'Julia', 'Pedro', 'Mariana', 
-    'Lucas', 'Camila', 'Rafael', 'Fernanda', 'Bruno',
-    'Larissa', 'Guilherme', 'Beatriz', 'Thiago', 'Gabriela'
-  ];
-  
-  // Planos disponíveis
-  const plans = ['Premium', 'Ultimate'];
-  
-  // Função para gerar uma compra aleatória
+  // Gera uma compra aleatória para exibição
   const generateRandomPurchase = (): Purchase => {
-    const randomName = names[Math.floor(Math.random() * names.length)];
-    const randomPlan = plans[Math.floor(Math.random() * plans.length)];
-    const minutes = Math.floor(Math.random() * 10) + 1; // Entre 1 e 10 minutos atrás
+    const names = [
+      "André S.", "Bruno M.", "Carla L.", "Daniela R.", "Eduardo P.", 
+      "Fabiana C.", "Gabriel T.", "Helena V.", "Igor M.", "Júlia N.", 
+      "Luciana K.", "Marcelo F.", "Natália B.", "Otávio C.", "Paula R.",
+      "Ricardo L.", "Sandra M.", "Thiago N.", "Vanessa C.", "Wagner P."
+    ];
+    
+    const plans = ["Básico", "Premium", "Ultimate"];
+    const timeAgo = ["agora mesmo", "há 2 min", "há 5 min", "há 12 min", "há 30 min", "há 1 hora"];
     
     return {
-      id: Date.now(),
-      name: randomName,
-      plan: randomPlan,
-      timeAgo: `${minutes} minutos`
+      id: Math.floor(Math.random() * 1000),
+      name: names[Math.floor(Math.random() * names.length)],
+      plan: plans[Math.floor(Math.random() * plans.length)],
+      timeAgo: timeAgo[Math.floor(Math.random() * timeAgo.length)]
     };
   };
   
-  // Efeito para adicionar novas compras periodicamente
+  // Exibe notificações em intervalos aleatórios
   useEffect(() => {
-    // Inicializa com algumas compras
-    const initialPurchases = Array(3).fill(null).map(() => generateRandomPurchase());
-    setPurchases(initialPurchases);
+    // Primeira notificação após 10-20 segundos
+    const firstTimeout = setTimeout(() => {
+      const purchase = generateRandomPurchase();
+      setCurrentPurchase(purchase);
+      setIsVisible(true);
+      
+      // Esconde a notificação após 5 segundos
+      setTimeout(() => setIsVisible(false), 5000);
+    }, Math.random() * 10000 + 10000);
     
-    // Intervalo para adicionar novas compras (entre 1-3 minutos)
+    // Configura intervalo para notificações subsequentes
     const interval = setInterval(() => {
-      const randomPurchase = generateRandomPurchase();
-      
-      setPurchases(prev => {
-        // Mantém apenas as últimas 3 compras
-        const updated = [randomPurchase, ...prev.slice(0, 2)];
-        return updated;
-      });
-      
-      // Mostra a notificação
-      setVisible(true);
-      
-      // Esconde após 5 segundos
-      setTimeout(() => {
-        setVisible(false);
-      }, 5000);
-    }, Math.floor(Math.random() * 120000) + 60000); // Entre 1 e 3 minutos
+      // Mostra apenas se a anterior não estiver visível
+      if (!isVisible) {
+        const purchase = generateRandomPurchase();
+        setCurrentPurchase(purchase);
+        setIsVisible(true);
+        
+        // Esconde após 5 segundos
+        setTimeout(() => setIsVisible(false), 5000);
+      }
+    }, Math.random() * 20000 + 25000); // A cada 25-45 segundos
     
-    return () => clearInterval(interval);
-  }, []);
+    return () => {
+      clearTimeout(firstTimeout);
+      clearInterval(interval);
+    };
+  }, [isVisible]);
+  
+  // Renderiza notificação de visitantes ativos
+  const renderVisitorsNotification = () => {
+    return (
+      <div className="fixed bottom-5 left-5 bg-white shadow-lg rounded-lg p-3 max-w-xs z-30 flex items-center border border-gray-200 animate-fade-in">
+        <div className="bg-blue-100 rounded-full p-2 mr-3">
+          <Users size={16} className="text-blue-600" />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-gray-800">
+            <span className="font-bold text-blue-600">{visitorsCount}</span> pessoas estão vendo esta página
+          </p>
+          <p className="text-xs text-gray-500">Nos últimos 15 minutos</p>
+        </div>
+      </div>
+    );
+  };
+  
+  // Se não houver compra ou não estiver visível, retorna null
+  if (!isVisible || !currentPurchase) {
+    return null;
+  }
   
   return (
-    <div className={`fixed bottom-5 left-5 z-50 transition-transform duration-500 ${visible ? 'translate-x-0' : '-translate-x-full'}`}>
-      {purchases.length > 0 && (
-        <div className="purchase-notification bg-white rounded-lg shadow-lg p-4 max-w-xs">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary font-bold">
-              {purchases[0].name.charAt(0)}
-            </div>
-            <div>
-              <p className="text-sm font-medium">
-                <span className="font-bold">{purchases[0].name}</span> assinou o plano {' '}
-                <span className="text-primary font-bold">{purchases[0].plan}</span>
-              </p>
-              <p className="text-xs text-gray-500">há {purchases[0].timeAgo} 🎉</p>
-            </div>
-          </div>
-        </div>
-      )}
+    <div className="fixed bottom-5 right-5 bg-white shadow-lg rounded-lg p-3 max-w-xs z-30 flex items-center border border-gray-200 animate-slide-in">
+      <div className="bg-green-100 rounded-full p-2 mr-3">
+        <ShoppingCart size={16} className="text-green-600" />
+      </div>
+      <div>
+        <p className="text-sm font-medium text-gray-800">
+          <span className="font-bold">{currentPurchase.name}</span> comprou
+        </p>
+        <p className="text-xs">
+          <span className="font-medium text-green-600">Plano {currentPurchase.plan}</span>
+          <span className="text-gray-500"> • {currentPurchase.timeAgo}</span>
+        </p>
+      </div>
     </div>
   );
 }

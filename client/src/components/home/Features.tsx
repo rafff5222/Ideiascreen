@@ -8,6 +8,7 @@ import {
   Film,
   AlarmClock
 } from "lucide-react";
+import FakeDoorTest from "@/components/conversion/FakeDoorTest";
 
 export default function Features() {
   const features = [
@@ -56,6 +57,13 @@ export default function Features() {
   return (
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
+        <FakeDoorTest 
+          featureName="Edição por Editores Humanos"
+          featureDescription="Receba edição de profissionais especialistas em redes sociais"
+          buttonText="Quero ser beta tester"
+          className="mb-12 mx-auto max-w-2xl"
+        />
+        
         <div className="text-center mb-14">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Crie conteúdo viral com o poder da IA
