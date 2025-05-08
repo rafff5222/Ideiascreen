@@ -44,6 +44,11 @@ export default function PricingTable() {
     };
 
     fetchPricingData();
+    
+    // Importa e executa a unificação de preços
+    import('./PriceUnifier').then(module => {
+      module.inicializarUnificadorPrecos();
+    });
   }, []);
 
   // Função para padronizar a moeda para Reais
@@ -83,9 +88,10 @@ export default function PricingTable() {
         <div className="plano plano-basico bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 transition-all hover:shadow-xl">
           <div className="px-6 py-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Básico</h3>
-            <div className="flex items-end mb-6">
-              <div className="text-4xl font-bold text-gray-900 preco">{pricingData.prices.basic}</div>
-              <div className="text-gray-500 ml-2">/mês</div>
+            <div className="preco-container mb-6">
+              <div className="preco" data-valor={pricingData.prices.basic}>
+                R$ {pricingData.prices.basic}<small>/mês</small>
+              </div>
             </div>
             <ul className="space-y-4 mb-8">
               <PlanFeature 
@@ -118,9 +124,10 @@ export default function PricingTable() {
           </div>
           <div className="px-6 py-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Premium</h3>
-            <div className="flex items-end mb-6">
-              <div className="text-4xl font-bold text-purple-600 preco">{pricingData.prices.premium}</div>
-              <div className="text-gray-500 ml-2">/mês</div>
+            <div className="preco-container mb-6">
+              <div className="preco preco-premium" data-valor={pricingData.prices.premium}>
+                R$ {pricingData.prices.premium}<small>/mês</small>
+              </div>
             </div>
             <ul className="space-y-4 mb-8">
               <PlanFeature 
@@ -150,9 +157,10 @@ export default function PricingTable() {
         <div className="plano bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 transition-all hover:shadow-xl">
           <div className="px-6 py-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Ultimate</h3>
-            <div className="flex items-end mb-6">
-              <div className="text-4xl font-bold text-gray-900 preco">{pricingData.prices.ultimate}</div>
-              <div className="text-gray-500 ml-2">/mês</div>
+            <div className="preco-container mb-6">
+              <div className="preco preco-ultimate" data-valor={pricingData.prices.ultimate}>
+                R$ {pricingData.prices.ultimate}<small>/mês</small>
+              </div>
             </div>
             <ul className="space-y-4 mb-8">
               <PlanFeature 

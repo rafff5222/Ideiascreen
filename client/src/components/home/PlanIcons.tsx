@@ -1,8 +1,9 @@
 import { CheckCircle, XCircle } from "lucide-react";
+import { ReactNode } from "react";
 
 interface PlanFeatureProps {
   included: boolean;
-  text: string;
+  text: ReactNode;
 }
 
 /**
@@ -13,9 +14,9 @@ export const PlanFeature = ({ included, text }: PlanFeatureProps) => {
   return (
     <li className="flex items-start mt-2">
       {included ? (
-        <span className="text-green-500 mr-2 flex-shrink-0">✓</span>
+        <span className="text-green-500 mr-2 flex-shrink-0 check-icon">✓</span>
       ) : (
-        <span className="text-red-500 mr-2 flex-shrink-0">✗</span>
+        <span className="text-red-500 mr-2 flex-shrink-0 x-icon">✗</span>
       )}
       <span className={`${!included ? 'text-gray-500' : 'text-gray-800'}`}>
         {text}

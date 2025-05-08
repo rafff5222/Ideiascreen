@@ -1,50 +1,72 @@
 /* Estilos específicos para otimização mobile da tabela de preços */
 
+/* Formatação Consistente de Preços */
+.preco {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #333;
+  margin: 15px 0;
+  position: relative;
+}
+
+.preco small {
+  font-size: 1rem;
+  color: #666;
+  font-weight: normal;
+  margin-left: 2px;
+}
+
+.preco-premium {
+  color: #8B5CF6;
+}
+
+.preco-ultimate {
+  background: linear-gradient(90deg, #6366F1, #8B5CF6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 /* Layout Mobile */
 @media (max-width: 768px) {
   .planos-container {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
+    grid-template-columns: 1fr !important;
+    gap: 25px !important;
     margin-bottom: 30px;
+    padding: 0 10px !important;
   }
   
-  .plano-card {
+  .plano, .plano-card {
     width: 100% !important;
     max-width: 100%;
-    margin-bottom: 25px;
+    margin-bottom: 25px !important;
     transform: none !important;
     scale: 1 !important;
   }
   
   /* Ajuste para o plano Premium (mais vendido) */
-  .plano-card.mais-vendido {
+  .plano.mais-vendido, .plano-card.mais-vendido {
     transform: none !important;
     scale: 1 !important;
   }
   
   /* Ajustes de tamanho para mobile */
-  .plano-card h3 {
+  .plano h3, .plano-card h3 {
     font-size: 1.5rem !important;
   }
   
-  .plano-card .preco {
-    font-size: 2rem !important;
+  .preco {
+    font-size: 1.5rem !important;
   }
   
   /* Melhora espaçamento em mobile */
-  .plano-card {
+  .plano, .plano-card {
     padding: 1.25rem !important;
   }
   
   /* Melhora visibilidade dos benefícios */
-  .plano-card li {
+  .plano li, .plano-card li {
     padding: 0.5rem 0;
-  }
-  
-  /* Garante alinhamento correto dos preços */
-  .plano-card .flex.items-start {
-    align-items: center !important;
   }
 }
 
@@ -86,4 +108,15 @@
   display: flex;
   align-items: center;
   z-index: 10;
+}
+
+/* Melhor distinção para ícones */
+.check-icon {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.x-icon {
+  font-weight: bold;
+  font-size: 1.1em;
 }
