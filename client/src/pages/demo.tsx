@@ -121,9 +121,9 @@ export default function DemoPage() {
   const [outputFormat, setOutputFormat] = useState<string>('mp4_vertical');
   
   // Exemplo de roteiro otimizado
-  const exampleScript = `0:00 - [GANCHO] Você sabe como dobrar seus seguidores?
-0:03 - [DICA] Use 3 hashtags nichadas
-0:07 - [CTA] Comente 'QUERO' para a parte 2!`;
+  const exampleScript = `0:00 - [GANCHO] Você sabe como dobrar seus seguidores? #tutorial
+0:03 - [DICA] Use 3 hashtags nichadas para #trend
+0:07 - [CTA] Comente 'QUERO' para a parte 2! #viral`;
 
   // Preencher com o exemplo quando a página carrega
   useEffect(() => {
@@ -338,6 +338,70 @@ export default function DemoPage() {
         ? `Pré-visualização: ${texto.substring(0, 50)}${texto.length > 50 ? '...' : ''}`
         : 'Digite um roteiro para ver a pré-visualização';
     }
+    
+    // Detectar #tags no texto para sugerir assets
+    const keywords = texto.match(/\#\w+/g) || [];
+    if (keywords.length > 0) {
+      // Mostrar sugestões baseadas nas hashtags encontradas
+      console.log("Tags detectadas:", keywords);
+      suggestAssets(keywords);
+    }
+  };
+  
+  // Função para sugerir assets (templates, sons) baseados nas tags
+  const suggestAssets = (tags: string[]) => {
+    // Aqui implementaríamos a lógica completa para sugerir assets
+    // Com base nas tags detectadas no roteiro
+    
+    // Exemplo simples de mostrar um popup ou highlight quando detectamos uma tag
+    const assetSuggestions: {[key: string]: string} = {
+      '#trend': 'Template viral para trending topics',
+      '#tutorial': 'Formato passo-a-passo com legendas numeradas',
+      '#produto': 'Template de showcase com zoom in/out',
+      '#review': 'Formato comparativo antes/depois',
+      '#viral': 'Áudio trending no TikTok incluído automaticamente'
+    };
+    
+    // Verificar se existe alguma sugestão para as tags presentes
+    let foundSuggestions = false;
+    const suggestionDiv = document.createElement('div');
+    suggestionDiv.className = 'p-2 bg-yellow-50 text-sm border border-yellow-200 rounded-md mt-2';
+    
+    tags.forEach(tag => {
+      const tagWithoutHash = tag.substring(1).toLowerCase();
+      Object.keys(assetSuggestions).forEach(key => {
+        if (key.substring(1).toLowerCase().includes(tagWithoutHash)) {
+          foundSuggestions = true;
+          const suggestion = document.createElement('p');
+          suggestion.innerHTML = `<span class="font-medium text-yellow-700">${key}:</span> ${assetSuggestions[key]}`;
+          suggestionDiv.appendChild(suggestion);
+        }
+      });
+    });
+    
+    if (foundSuggestions) {
+      // Mostrar as sugestões
+      const container = document.querySelector('.preview-container');
+      const existingSuggestions = document.getElementById('asset-suggestions');
+      
+      if (existingSuggestions) {
+        existingSuggestions.remove();
+      }
+      
+      suggestionDiv.id = 'asset-suggestions';
+      
+      // Adicionar título
+      const title = document.createElement('div');
+      title.className = 'font-medium text-yellow-800 mb-1';
+      title.textContent = '✨ Sugestões de templates detectadas:';
+      suggestionDiv.prepend(title);
+      
+      // Adicionar ao container ou após o textarea
+      const editorElement = document.getElementById('editor-roteiro');
+      if (editorElement && editorElement.parentNode) {
+        editorElement.parentNode.insertBefore(suggestionDiv, editorElement.nextSibling);
+      }
+    }
   };
 
   return (
@@ -365,7 +429,7 @@ export default function DemoPage() {
                   id="editor-roteiro"
                   value={scriptText}
                   onChange={handleScriptChange}
-                  placeholder="Cole ou escreva seu roteiro aqui com timings específicos (0:00 - [HOOK] texto...)"
+                  placeholder="Cole ou escreva seu roteiro aqui. Use #tags para sugestões de templates (ex: #tutorial, #trend, #produto)"
                   className="w-full h-64 p-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none resize-none font-medium"
                 ></textarea>
                 
@@ -477,7 +541,7 @@ export default function DemoPage() {
                 <button
                   onClick={generateVideo}
                   disabled={isLoading}
-                  className="cta-pulse mt-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white py-4 px-6 rounded-md font-bold hover:from-pink-600 hover:to-purple-700 transition-all shadow-md w-full flex flex-col items-center justify-center"
+                  className="cta-pulse mt-2 cta-demo text-white py-4 px-6 rounded-md font-bold hover:from-orange-500 hover:to-yellow-500 transition-all shadow-md w-full flex flex-col items-center justify-center"
                   style={{animation: 'pulse 2s infinite'}}
                 >
                   {isLoading ? (
@@ -614,6 +678,29 @@ export default function DemoPage() {
             </p>
           </div>
         )}
+
+        {/* Seção "Resultados Reais" (Social Proof) */}
+        <div className="max-w-3xl mx-auto mb-16">
+          <h2 className="text-2xl font-bold mb-6 text-center flex items-center justify-center">
+            <FaUsers className="text-indigo-600 mr-2" />
+            Resultados Reais dos Nossos Usuários
+          </h2>
+          
+          <div className="results-grid">
+            <div className="result-card">
+              <p>@maria_social: +32k views</p>
+              <div className="aspect-video bg-gray-100 flex items-center justify-center text-gray-400">Vídeo resultado</div>
+            </div>
+            <div className="result-card">
+              <p>@marketing_now: +280% engajamento</p>
+              <div className="aspect-video bg-gray-100 flex items-center justify-center text-gray-400">Vídeo resultado</div>
+            </div>
+            <div className="result-card">
+              <p>@tech_br: 15K seguidores em 30 dias</p>
+              <div className="aspect-video bg-gray-100 flex items-center justify-center text-gray-400">Vídeo resultado</div>
+            </div>
+          </div>
+        </div>
 
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl font-bold mb-6 text-center">Como funciona?</h2>
