@@ -43,10 +43,10 @@ import TimeBasedOffers from "@/components/conversion/TimeBasedOffers";
 import MemoryChatbot from "@/components/conversion/MemoryChatbot";
 import SmartPricing from "@/components/conversion/SmartPricing";
 import PostInteractionUpsell from "@/components/conversion/PostInteractionUpsell";
+import InteractiveComparison from "@/components/conversion/InteractiveComparison";
 import PriorityLoading from "@/components/optimization/PriorityLoading";
 import VoiceCommandButton from "@/components/conversion/VoiceCommandButton";
 import MicroConversionsTracker from "@/components/analytics/MicroConversionsTracker";
-
 export default function Home() {
   // Scroll to top when navigating to home page
   useEffect(() => {
@@ -147,6 +147,7 @@ export default function Home() {
       <MemoryChatbot />
       <SmartPricing />
       <PostInteractionUpsell />
+      <InteractiveComparison />
       <VoiceCommandButton />
       <PriorityLoading />
       <MicroConversionsTracker />

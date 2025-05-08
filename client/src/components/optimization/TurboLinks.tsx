@@ -1,267 +1,305 @@
 import { useEffect } from 'react';
 
 /**
- * Implementa carregamento instantâneo de páginas (Turbo Links)
- * Substitui navegação padrão por AJAX para melhor experiência do usuário
- * 
- * Recursos adicionais:
- * - Pré-carregamento de assets críticos
- * - DNS prefetch para domínios externos
- * - Preconnect para APIs de terceiros
+ * Componente de Carregamento Instantâneo de Páginas (Turbo)
+ * Pré-carrega páginas e conteúdo antecipadamente para criar uma experiência
+ * de navegação instantânea para o usuário
  */
 export default function TurboLinks() {
   useEffect(() => {
-    // Implementa pré-carregamento de assets críticos
-    const preloadCriticalAssets = () => {
-      const criticalAssets = [
-        { href: '/assets/js/checkout.js', as: 'script' },
-        { href: '/assets/img/hero-bg.webp', as: 'image' },
-        { href: '/assets/fonts/inter.woff2', as: 'font', crossorigin: 'anonymous' }
-      ];
-      
-      // Domínios para preconnect
-      const preconnectDomains = [
-        'https://api.stripe.com',
-        'https://cdn.jsdelivr.net',
-        'https://fonts.googleapis.com'
-      ];
-      
-      // Adiciona os preloads
-      criticalAssets.forEach(asset => {
-        const link = document.createElement('link');
-        link.rel = 'preload';
-        link.href = asset.href;
-        link.as = asset.as;
-        if (asset.crossorigin) {
-          link.crossOrigin = asset.crossorigin;
-        }
-        document.head.appendChild(link);
-      });
-      
-      // Adiciona os preconnects
-      preconnectDomains.forEach(domain => {
-        const link = document.createElement('link');
-        link.rel = 'preconnect';
-        link.href = domain;
-        link.crossOrigin = 'anonymous';
-        document.head.appendChild(link);
-      });
-      
-      console.log('Assets críticos pré-carregados');
-    };
+    // Cache para armazenar conteúdo pré-carregado
+    const pageCache: Record<string, string> = {};
     
-    // Executa pré-carregamento de assets
-    preloadCriticalAssets();
+    // Rastreia quais links já estão sendo observados
+    const observedLinks = new Set<string>();
     
-    // Cache para páginas já carregadas
-    const pageCache = new Map();
+    // Nomes das classes para páginas carregadas de forma "lazy"
+    const lazySelectors = '.lazy-page, [data-lazy="page"], [data-turbo="true"]';
     
-    // Pré-carrega as páginas nos links quando o mouse passa por cima
-    const prefetchPage = (url: string) => {
-      if (pageCache.has(url)) return;
-      
-      fetch(url)
-        .then(response => response.text())
-        .then(html => {
-          pageCache.set(url, html);
-          console.log(`Página pré-carregada: ${url}`);
-        })
-        .catch(error => console.error('Erro ao pré-carregar página:', error));
-    };
-    
-    // Extrair o conteúdo principal da página carregada
-    const extractContent = (html: string): string => {
-      // Cria um DOM temporário para extrair apenas o conteúdo relevante
-      const tempDOM = document.createElement('div');
-      tempDOM.innerHTML = html;
-      
-      // Busca o elemento principal (ajuste conforme a estrutura do site)
-      const mainContent = tempDOM.querySelector('main') || 
-                          tempDOM.querySelector('#content') || 
-                          tempDOM.querySelector('#app') ||
-                          tempDOM.querySelector('body');
-      
-      return mainContent ? mainContent.innerHTML : html;
-    };
-    
-    // Atualiza o título da página a partir do HTML
-    const updatePageTitle = (html: string) => {
-      const tempDOM = document.createElement('div');
-      tempDOM.innerHTML = html;
-      
-      const titleTag = tempDOM.querySelector('title');
-      if (titleTag) {
-        document.title = titleTag.innerText;
+    // Verifica se a URL é válida para pré-carregamento
+    const isValidURL = (url: string): boolean => {
+      // Ignora URLs externas e recursos não-HTML
+      if (!url || url.startsWith('#') || url.startsWith('http') || url.includes('mailto:') || url.includes('tel:')) {
+        return false;
       }
+      
+      // Ignora urls de API ou recursos estáticos
+      if (url.startsWith('/api/') || url.includes('.jpg') || url.includes('.png') || url.includes('.js') || url.includes('.css')) {
+        return false;
+      }
+      
+      return true;
     };
     
-    // Configura os event listeners para prefetching
-    const setupPrefetching = () => {
-      document.querySelectorAll('a').forEach(link => {
-        // Pula links externos ou com atributo de download
-        const href = link.getAttribute('href');
-        if (!href || href.startsWith('http') || href.startsWith('#') || link.hasAttribute('download')) {
+    // Pré-carrega uma página
+    const preloadPage = (url: string): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        // Se já estiver em cache, retorna do cache
+        if (pageCache[url]) {
+          resolve(pageCache[url]);
           return;
         }
         
-        // Prefetch quando o mouse passar por cima
-        link.addEventListener('mouseenter', () => {
-          prefetchPage(href);
+        // Faz o fetch da página
+        fetch(url)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`Failed to fetch ${url}: ${response.status}`);
+            }
+            return response.text();
+          })
+          .then(html => {
+            // Armazena no cache
+            pageCache[url] = html;
+            
+            // Registra no log
+            console.log('Página pré-carregada:', url);
+            
+            resolve(html);
+          })
+          .catch(error => {
+            console.error('Erro ao pré-carregar página:', error);
+            reject(error);
+          });
+      });
+    };
+    
+    // Extrai o conteúdo relevante de uma página HTML
+    const extractPageContent = (html: string, selector: string = '.content'): string => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      // Tenta encontrar o conteúdo principal
+      const content = doc.querySelector(selector) || 
+                      doc.querySelector('main') || 
+                      doc.querySelector('#main-content') ||
+                      doc.body;
+      
+      return content ? content.innerHTML : '';
+    };
+    
+    // Configura a detecção de hover em links
+    const setupLinkHoverPreloading = () => {
+      // Usa event delegation para detectar hover em links
+      document.addEventListener('mouseover', (e) => {
+        const target = e.target as HTMLElement;
+        const link = target.closest('a') as HTMLAnchorElement;
+        
+        if (link && link.href && isValidURL(link.pathname)) {
+          // Evita pré-carregar a mesma página múltiplas vezes
+          if (observedLinks.has(link.pathname)) return;
+          
+          // Adiciona à lista de links observados
+          observedLinks.add(link.pathname);
+          
+          // Pré-carrega após um breve delay para evitar pré-carregamentos desnecessários
+          const timer = setTimeout(() => {
+            preloadPage(link.pathname)
+              .catch(() => {
+                // Remove da lista para permitir novas tentativas
+                observedLinks.delete(link.pathname);
+              });
+          }, 150);
+          
+          // Cancela o pré-carregamento se o mouse sair rapidamente
+          link.addEventListener('mouseout', () => {
+            clearTimeout(timer);
+          }, { once: true });
+        }
+      }, { passive: true });
+    };
+    
+    // Configura pré-carregamento de lazy-pages
+    const setupLazyPageLoading = () => {
+      // Cria um observador para detectar quando elementos entram no viewport
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const element = entry.target as HTMLElement;
+            
+            // Procura um link dentro do elemento
+            const link = element.querySelector('a');
+            if (link && isValidURL(link.pathname)) {
+              // Pré-carrega o conteúdo
+              preloadPage(link.pathname)
+                .then(html => {
+                  // Atualiza o conteúdo do elemento
+                  const contentHTML = extractPageContent(html);
+                  element.innerHTML = contentHTML;
+                  
+                  // Marca como carregado
+                  element.setAttribute('data-loaded', 'true');
+                  
+                  // Para de observar
+                  observer.unobserve(element);
+                })
+                .catch(error => {
+                  console.error('Erro ao carregar conteúdo lazy:', error);
+                });
+            }
+          }
+        });
+      }, {
+        // Começa a carregar quando o elemento está a 200px de entrar no viewport
+        rootMargin: '200px',
+        threshold: 0.1
+      });
+      
+      // Observe todas as lazy-pages
+      document.querySelectorAll(lazySelectors).forEach(page => {
+        observer.observe(page);
+      });
+      
+      // Configura observer para detectar novas lazy-pages adicionadas dinamicamente
+      const domObserver = new MutationObserver((mutations) => {
+        mutations.forEach(mutation => {
+          if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+            mutation.addedNodes.forEach(node => {
+              if (node.nodeType === Node.ELEMENT_NODE) {
+                const element = node as HTMLElement;
+                
+                // Verifica se o próprio elemento é uma lazy-page
+                if (element.matches && element.matches(lazySelectors)) {
+                  observer.observe(element);
+                }
+                
+                // Verifica se contém lazy-pages
+                if (element.querySelectorAll) {
+                  element.querySelectorAll(lazySelectors).forEach(page => {
+                    observer.observe(page);
+                  });
+                }
+              }
+            });
+          }
         });
       });
+      
+      domObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+      
+      // Cleanup
+      return () => {
+        observer.disconnect();
+        domObserver.disconnect();
+      };
     };
     
-    // Configura os event listeners para navegação AJAX
-    const setupAjaxNavigation = () => {
-      document.querySelectorAll('a').forEach(link => {
-        // Pula links externos ou com atributo de download
-        const href = link.getAttribute('href');
-        if (!href || href.startsWith('http') || href.startsWith('#') || link.hasAttribute('download')) {
-          return;
-        }
+    // Aprimoramento de navegação para páginas pré-carregadas
+    const enhanceNavigation = () => {
+      // Detecta cliques em links
+      document.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        const link = target.closest('a') as HTMLAnchorElement;
         
-        link.addEventListener('click', (e) => {
+        if (link && link.href && isValidURL(link.pathname) && pageCache[link.pathname]) {
+          // Previne a navegação padrão
           e.preventDefault();
           
-          // Mostra indicador de carregamento
-          document.body.classList.add('page-loading');
+          // Atualiza a URL
+          window.history.pushState({}, '', link.pathname);
           
-          // Tenta usar a versão em cache primeiro
-          if (pageCache.has(href)) {
-            console.log(`Carregando página do cache: ${href}`);
-            const html = pageCache.get(href);
-            
-            // Atualiza conteúdo, título e URL
-            const mainElement = document.querySelector('main') || document.body;
-            mainElement.innerHTML = extractContent(html);
-            updatePageTitle(html);
-            window.history.pushState({}, '', href);
-            
-            // Configura novamente os listeners em elementos novos
-            setupPrefetching();
-            setupAjaxNavigation();
-            
-            // Remove indicador de carregamento
-            document.body.classList.remove('page-loading');
-            
-            // Scroll para o topo
-            window.scrollTo(0, 0);
-            
-            // Registra no analytics
-            console.log('Analytics:', {
-              event: 'turbo_navigation',
-              path: href,
-              timestamp: new Date().toISOString(),
-              source: 'cache'
-            });
-            
-            return;
-          }
+          // Extrai e insere o conteúdo da página
+          const content = extractPageContent(pageCache[link.pathname]);
           
-          // Se não estiver em cache, faz a requisição
-          fetch(href)
-            .then(response => response.text())
-            .then(html => {
-              // Adiciona ao cache
-              pageCache.set(href, html);
-              
-              // Atualiza conteúdo, título e URL
-              const mainElement = document.querySelector('main') || document.body;
-              mainElement.innerHTML = extractContent(html);
-              updatePageTitle(html);
-              window.history.pushState({}, '', href);
-              
-              // Configura novamente os listeners em elementos novos
-              setupPrefetching();
-              setupAjaxNavigation();
-              
-              // Registra no analytics
-              console.log('Analytics:', {
-                event: 'turbo_navigation',
-                path: href,
-                timestamp: new Date().toISOString(),
-                source: 'fetch'
-              });
-            })
-            .catch(error => {
-              console.error('Erro ao carregar página:', error);
-              
-              // Fallback para navegação tradicional em caso de erro
-              window.location.href = href;
-            })
-            .finally(() => {
-              // Remove indicador de carregamento
-              document.body.classList.remove('page-loading');
+          // Encontra o container do conteúdo
+          const contentContainer = document.querySelector('main') || 
+                                   document.querySelector('#content') || 
+                                   document.querySelector('.content');
+          
+          if (contentContainer) {
+            // Insere o conteúdo com uma animação suave
+            contentContainer.style.opacity = '0';
+            contentContainer.style.transition = 'opacity 0.2s';
+            
+            setTimeout(() => {
+              contentContainer.innerHTML = content;
+              contentContainer.style.opacity = '1';
               
               // Scroll para o topo
               window.scrollTo(0, 0);
-            });
-        });
+              
+              // Executa scripts no conteúdo carregado
+              const scripts = contentContainer.querySelectorAll('script');
+              scripts.forEach(script => {
+                const newScript = document.createElement('script');
+                Array.from(script.attributes).forEach(attr => {
+                  newScript.setAttribute(attr.name, attr.value);
+                });
+                newScript.textContent = script.textContent;
+                script.parentNode?.replaceChild(newScript, script);
+              });
+              
+              // Registra o evento de navegação
+              console.log('Analytics:', {
+                event: 'turbo_navigation',
+                from: window.location.pathname,
+                to: link.pathname,
+                timestamp: new Date().toISOString()
+              });
+            }, 200);
+          }
+        }
+      });
+      
+      // Lida com navegação do histórico (botões de voltar/avançar)
+      window.addEventListener('popstate', () => {
+        const path = window.location.pathname;
+        
+        // Se tiver em cache, carrega do cache
+        if (pageCache[path]) {
+          const content = extractPageContent(pageCache[path]);
+          
+          const contentContainer = document.querySelector('main') || 
+                                   document.querySelector('#content') || 
+                                   document.querySelector('.content');
+          
+          if (contentContainer) {
+            contentContainer.innerHTML = content;
+            window.scrollTo(0, 0);
+          }
+        } else {
+          // Se não estiver em cache, deixa o navegador carregar normalmente
+          window.location.reload();
+        }
       });
     };
     
-    // Adiciona indicador de carregamento
-    const setupLoadingIndicator = () => {
-      const styleElement = document.createElement('style');
-      styleElement.textContent = `
-        .page-loading::after {
-          content: '';
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 3px;
-          background: linear-gradient(to right, #EC4899, #8B5CF6);
-          animation: loading-bar 1s infinite linear;
-          z-index: 9999;
+    // Executa as funções de aprimoramento
+    setupLinkHoverPreloading();
+    const cleanupLazyLoading = setupLazyPageLoading();
+    enhanceNavigation();
+    
+    // Carrega página atual no cache
+    pageCache[window.location.pathname] = document.documentElement.outerHTML;
+    
+    // Pré-carrega páginas importantes
+    const importantPages = [
+      '/',
+      '/pricing',
+      '/features',
+      '/about',
+      '/contact'
+    ];
+    
+    // Adiciona à fila de carregamento com um pequeno atraso para não competir com recursos críticos
+    setTimeout(() => {
+      importantPages.forEach(page => {
+        // Não recarrega a página atual
+        if (page !== window.location.pathname) {
+          preloadPage(page).catch(() => {}); // Ignora erros
         }
-        
-        @keyframes loading-bar {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-      `;
-      document.head.appendChild(styleElement);
+      });
+    }, 3000);
+    
+    // Cleanup
+    return () => {
+      cleanupLazyLoading();
     };
-    
-    // Inicializa
-    setupLoadingIndicator();
-    setupPrefetching();
-    setupAjaxNavigation();
-    
-    // Alerta o usuário antes de navegar para fora se tiver mudanças não salvas
-    window.addEventListener('beforeunload', (e) => {
-      const hasUnsavedChanges = false; // Lógica para verificar mudanças não salvas
-      
-      if (hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = 'Você tem mudanças não salvas. Tem certeza que deseja sair?';
-        return e.returnValue;
-      }
-    });
-    
-    // Para lidar com botões do navegador (voltar/avançar)
-    window.addEventListener('popstate', () => {
-      const currentPage = window.location.pathname;
-      
-      if (pageCache.has(currentPage)) {
-        // Usa a versão em cache
-        const html = pageCache.get(currentPage);
-        const mainElement = document.querySelector('main') || document.body;
-        mainElement.innerHTML = extractContent(html);
-        updatePageTitle(html);
-        
-        // Reconfigura os listeners
-        setupPrefetching();
-        setupAjaxNavigation();
-      } else {
-        // Recarrega a página normalmente se não estiver em cache
-        window.location.reload();
-      }
-    });
-    
   }, []);
   
-  // Este componente não renderiza nada visualmente
+  // Este componente não renderiza nada diretamente
   return null;
 }
