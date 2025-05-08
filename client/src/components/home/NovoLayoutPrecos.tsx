@@ -62,8 +62,8 @@ export default function NovoLayoutPrecos() {
             <div className="plano-preco">
               <span className="preco-antigo">R$149,00</span>
               <span className="preco-novo">R${precosFixos.basico}</span><small>/mês</small>
-              <span className="badge-desconto">ECONOMIZE 34%</span>
             </div>
+            <span className="badge-desconto">ECONOMIZE 34%</span>
             <p>Ideal para criadores iniciantes.</p>
             <ul className="my-4 space-y-2">
               <li className="flex items-start">
@@ -97,8 +97,8 @@ export default function NovoLayoutPrecos() {
             <div className="plano-preco">
               <span className="preco-antigo">R$299,90</span>
               <span className="preco-novo">R${precosFixos.premium}</span><small>/mês</small>
-              <span className="badge-desconto">ECONOMIZE 34%</span>
             </div>
+            <span className="badge-desconto">ECONOMIZE 34%</span>
             <p>Perfeito para criadores em crescimento.</p>
             <ul className="my-4 space-y-2">
               <li className="flex items-start">
@@ -126,8 +126,8 @@ export default function NovoLayoutPrecos() {
             <div className="plano-preco">
               <span className="preco-antigo">R$597,00</span>
               <span className="preco-novo">R${precosFixos.ultimate}</span><small>/mês</small>
-              <span className="badge-desconto melhor-valor">MELHOR CUSTO-BENEFÍCIO</span>
             </div>
+            <span className="badge-desconto melhor-valor">MELHOR CUSTO-BENEFÍCIO</span>
             <p>Para criadores profissionais e empresas.</p>
             <ul className="my-4 space-y-2">
               <li className="flex items-start">

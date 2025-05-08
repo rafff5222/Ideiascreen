@@ -57,9 +57,9 @@
 /* Estilos para preço com desconto */
 .preco-antigo {
   text-decoration: line-through;
-  color: #888;
-  font-size: 16px;
-  margin-right: 8px;
+  color: #999;
+  font-size: 14px;
+  margin-right: 5px;
   font-weight: normal;
 }
 
@@ -72,13 +72,12 @@
 .badge-desconto {
   background-color: #e53e3e;
   color: white;
-  padding: 2px 6px;
+  padding: 4px 8px;
   font-size: 12px;
   border-radius: 4px;
-  margin-left: 10px;
+  margin-top: 4px;
+  display: inline-block;
   font-weight: bold;
-  position: relative;
-  top: -1px;
 }
 
 /* Estilo para badge de melhor custo-benefício */
