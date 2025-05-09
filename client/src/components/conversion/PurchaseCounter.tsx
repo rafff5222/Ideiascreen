@@ -1,50 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
-/**
- * Componente que exibe um contador de compras em tempo real
- * Cria senso de prova social mostrando atividade recente
- */
-export default function PurchaseCounter() {
-  const [message, setMessage] = useState('✨ Carregando atividade recente...');
+const PurchaseCounter = () => {
+  const [purchaseCount, setPurchaseCount] = useState<string | null>(null);
   
   useEffect(() => {
-    // Função para simular compras (em um ambiente real, usaríamos uma API websocket)
-    function updatePurchaseInfo() {
-      const cities = [
-        'São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Curitiba', 
-        'Porto Alegre', 'Brasília', 'Salvador', 'Recife', 'Fortaleza'
-      ];
-      
-      const randomCity = cities[Math.floor(Math.random() * cities.length)];
-      const purchaseCount = Math.floor(Math.random() * 5) + 1;
-      const timeFrame = Math.floor(Math.random() * 15) + 5; // Entre 5 e 20 minutos
-      
-      setMessage(`✨ ${randomCity} - ${purchaseCount} ${purchaseCount > 1 ? 'compras' : 'compra'} nos últimos ${timeFrame} minutos`);
-    }
+    // Configuração inicial
+    const cities = [
+      'São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Curitiba', 
+      'Porto Alegre', 'Recife', 'Salvador', 'Brasília', 'Fortaleza'
+    ];
     
-    // Atualiza imediatamente
-    updatePurchaseInfo();
+    // Gera estatística inicial
+    const initialCity = cities[Math.floor(Math.random() * cities.length)];
+    const initialCount = Math.floor(Math.random() * 5) + 2; // 2-6 compras
+    setPurchaseCount(`${initialCity} - ${initialCount} compras nos últimos 10 minutos`);
     
-    // E depois a cada intervalo (entre 30s e 2 minutos em um site real)
-    // Usando 10s para fins de demonstração
+    // Atualiza a cada 45 segundos (em produção seria a cada 5min)
     const interval = setInterval(() => {
-      updatePurchaseInfo();
-    }, 10000);
+      // 30% de chance de mudar o contador
+      if (Math.random() < 0.3) {
+        const randomCity = cities[Math.floor(Math.random() * cities.length)];
+        const purchaseNumber = Math.floor(Math.random() * 5) + 1; // 1-5 compras
+        setPurchaseCount(`${randomCity} - ${purchaseNumber} compras nos últimos 10 minutos`);
+      }
+    }, 45000);
     
     return () => clearInterval(interval);
   }, []);
   
+  if (!purchaseCount) return null;
+  
   return (
-    <div className="fixed bottom-4 left-4 z-50 max-w-xs">
-      <div 
-        className="bg-white border border-purple-200 shadow-md rounded-lg px-4 py-2 text-sm animate-pulse"
-        style={{
-          animationDuration: '3s',
-          background: 'linear-gradient(to right, rgba(139, 92, 246, 0.05), rgba(139, 92, 246, 0.1))'
-        }}
-      >
-        {message}
+    <div className="fixed left-4 bottom-4 z-40">
+      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-100 rounded-lg shadow-md px-4 py-2 text-sm text-gray-700 max-w-xs animate-pulse">
+        <span className="inline-block mr-1">✨</span>
+        {purchaseCount}
       </div>
     </div>
   );
-}
+};
+
+export default PurchaseCounter;

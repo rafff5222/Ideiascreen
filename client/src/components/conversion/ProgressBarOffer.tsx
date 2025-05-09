@@ -1,71 +1,67 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
-/**
- * Componente de barra de progresso de oferta - Gatilho de urgência
- * Mostra uma barra de progresso e contador regressivo para gerar senso de urgência
- */
-export default function ProgressBarOffer() {
-  const [time, setTime] = useState(262); // 4 minutos e 22 segundos
-  const [progressWidth, setProgressWidth] = useState(72); // Começa com 72% preenchido
+const ProgressBarOffer = () => {
+  const [timeLeft, setTimeLeft] = useState(262); // 4:22 em segundos
+  const [progress, setProgress] = useState(72);
   
   useEffect(() => {
-    // Recupera o tempo salvo do sessionStorage (para persistir entre renderizações)
-    const savedTime = sessionStorage.getItem('offer-countdown');
-    const initialTime = savedTime ? parseInt(savedTime) : 262;
-    setTime(initialTime);
+    // Recupera do localStorage se existir
+    const savedTime = localStorage.getItem('offer-timer');
+    const savedProgress = localStorage.getItem('offer-progress');
     
-    // Calcula a porcentagem inicial da barra
-    const initialProgress = 72 + (262 - initialTime) / 10;
-    setProgressWidth(initialProgress > 100 ? 100 : initialProgress);
+    if (savedTime && savedProgress) {
+      setTimeLeft(parseInt(savedTime));
+      setProgress(parseFloat(savedProgress));
+    } else {
+      // Persistência no localStorage
+      localStorage.setItem('offer-timer', timeLeft.toString());
+      localStorage.setItem('offer-progress', progress.toString());
+    }
     
-    // Configura o intervalo para atualizar a cada segundo
-    const interval = setInterval(() => {
-      setTime(prevTime => {
+    // Contador regressivo
+    const timer = setInterval(() => {
+      setTimeLeft(prevTime => {
         const newTime = prevTime > 0 ? prevTime - 1 : 0;
-        
-        // Salva no sessionStorage
-        sessionStorage.setItem('offer-countdown', newTime.toString());
-        
-        // Atualiza a largura da barra
-        const newProgress = 72 + (262 - newTime) / 10;
-        setProgressWidth(newProgress > 100 ? 100 : newProgress);
-        
+        localStorage.setItem('offer-timer', newTime.toString());
         return newTime;
+      });
+      
+      // Aumenta a barra progressivamente
+      setProgress(prevProgress => {
+        // Garantir que não ultrapasse 100%
+        const newProgress = prevProgress < 99 ? prevProgress + 0.1 : 99;
+        localStorage.setItem('offer-progress', newProgress.toString());
+        return newProgress;
       });
     }, 1000);
     
-    return () => clearInterval(interval);
+    return () => clearInterval(timer);
   }, []);
   
-  // Formata o tempo para exibição (MM:SS)
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+  // Formata o tempo para exibição mm:ss
+  const formatTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
   
   return (
-    <div className="bg-gradient-to-r from-amber-50 to-amber-100 p-2 border-b border-amber-200">
-      <div className="max-w-7xl mx-auto relative">
-        <div className="relative h-6 bg-gray-200 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-gradient-to-r from-red-500 to-amber-500 rounded-full transition-all duration-1000 ease-linear"
-            style={{ width: `${progressWidth}%` }}
-          ></div>
+    <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-2 px-4 fixed top-0 left-0 right-0 z-50">
+      <div className="max-w-6xl mx-auto relative">
+        <div className="relative pt-1 z-10">
+          <div className="overflow-hidden h-2 text-xs flex rounded bg-purple-300 bg-opacity-30">
+            <div 
+              style={{ width: `${progress}%` }} 
+              className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-white"
+            ></div>
+          </div>
         </div>
-        <div className="absolute inset-0 flex items-center justify-center text-sm font-medium text-gray-800">
-          <span>
-            {progressWidth >= 95 ? 
-              "ÚLTIMA CHANCE! Oferta quase acabando" : 
-              `${Math.round(progressWidth)}% das vagas com desconto já foram preenchidas!`
-            }
-            {time > 0 ? 
-              <span className="ml-2 bg-red-600 text-white px-2 py-0.5 rounded-sm animate-pulse">{formatTime(time)}</span> : 
-              <span className="ml-2 bg-red-600 text-white px-2 py-0.5 rounded-sm">EXPIRANDO</span>
-            }
-          </span>
+        <div className="text-center text-sm mt-1 font-medium">
+          {progress.toFixed(0)}% das vagas com desconto já foram preenchidas! <span className="bg-white text-purple-700 px-2 py-0.5 rounded-full text-xs font-bold ml-1">{formatTime(timeLeft)}</span>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default ProgressBarOffer;

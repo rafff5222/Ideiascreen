@@ -25,6 +25,7 @@ import DiagnosticTool from "@/components/debug/DiagnosticTool";
 // Novos componentes de conversão
 import ProgressBarOffer from "@/components/conversion/ProgressBarOffer";
 import PurchaseCounter from "@/components/conversion/PurchaseCounter";
+import DynamicSocialProof from "@/components/conversion/DynamicSocialProof";
 
 function Router() {
   return (
@@ -67,6 +68,7 @@ function App() {
           <Route path="/">
             <ProgressBarOffer />
             <ExitPopup />
+            <DynamicSocialProof />
           </Route>
         </div>
       </TooltipProvider>
