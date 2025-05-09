@@ -22,6 +22,10 @@ import OneClickCheckout from "@/components/conversion/OneClickCheckout";
 import ErrorMonitor from "@/components/ErrorMonitor";
 import DiagnosticTool from "@/components/debug/DiagnosticTool";
 
+// Novos componentes de conversão
+import ProgressBarOffer from "@/components/conversion/ProgressBarOffer";
+import PurchaseCounter from "@/components/conversion/PurchaseCounter";
+
 function Router() {
   return (
     <Switch>
@@ -57,9 +61,11 @@ function App() {
           <OneClickCheckout />
           <ErrorMonitor />
           <DiagnosticTool />
+          <PurchaseCounter />
           
-          {/* Exibe o popup de saída apenas na página inicial */}
+          {/* Exibe componentes apenas na página inicial */}
           <Route path="/">
+            <ProgressBarOffer />
             <ExitPopup />
           </Route>
         </div>

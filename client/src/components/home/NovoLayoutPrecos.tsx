@@ -3,6 +3,8 @@ import { apiRequest } from '@/lib/queryClient';
 import PlanTooltip from './PlanTooltip';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { FaCheck, FaTimes, FaCrown, FaStar } from 'react-icons/fa';
+import ScarcityAlert from '@/components/conversion/ScarcityAlert';
+import PremiumUrgencyBadge from '@/components/conversion/PremiumUrgencyBadge';
 import './ComparisonTable.css';
 
 /**
@@ -49,6 +51,11 @@ export default function NovoLayoutPrecos() {
       <div className="comparison-title">
         <h2>Escolha Seu Plano</h2>
         <p>Compare e escolha a opção ideal para suas necessidades</p>
+      </div>
+      
+      {/* Alerta de escassez para gerar senso de urgência */}
+      <div className="max-w-4xl mx-auto mb-8">
+        <ScarcityAlert />
       </div>
 
       {/* Nova tabela de comparação de planos - implementação clara e organizada */}
@@ -114,6 +121,7 @@ export default function NovoLayoutPrecos() {
                   <span className="preco-novo">R$89,00</span> /mês
                 </p>
                 <span className="badge red">ECONOMIZE 24%</span>
+                <PremiumUrgencyBadge />
               </div>
               <p>Perfeito para criadores em crescimento.</p>
               <ul className="my-4 space-y-2">
@@ -132,7 +140,7 @@ export default function NovoLayoutPrecos() {
               </ul>
               <button 
                 onClick={() => window.location.href = '/checkout?plan=premium'}
-                className="w-full py-3 px-4 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 transition-colors pulse flex items-center justify-center">
+                className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium hover:from-purple-700 hover:to-purple-800 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 pulse flex items-center justify-center">
                 <span>Selecionar plano</span>
                 <span className="ml-1 bg-yellow-400 text-xs px-1 rounded text-purple-900 font-bold">POPULAR</span>
               </button>
@@ -191,6 +199,9 @@ export default function NovoLayoutPrecos() {
                 <div className="text-lg font-bold">R$89,00</div>
                 <div className="text-sm text-red-600 line-through">R$117,00</div>
                 <div className="text-xs bg-red-100 text-red-600 rounded-full px-2 py-1 inline-block mt-1">Economize 24%</div>
+                <div className="mt-2 mx-auto max-w-[200px]">
+                  <PremiumUrgencyBadge />
+                </div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-bold">R$129,90</div>
