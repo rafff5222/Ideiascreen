@@ -21,6 +21,13 @@ const speechGenerationSchema = z.object({
   speed: z.number().min(0.5).max(2.0).default(1.0)
 });
 
+// Contador global de requisições para monitoramento
+const requestCounter = {
+  total: 0,
+  success: 0,
+  failed: 0
+};
+
 // Esquema Zod para validação do request de geração de vídeo
 const videoGenerationSchema = z.object({
   script: z.string().min(1, "O roteiro não pode estar vazio"),
@@ -41,6 +48,25 @@ declare global {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Middleware para contagem de requisições
+  app.use((req: Request, res: Response, next) => {
+    requestCounter.total++;
+    
+    // Registrar o resultado da requisição
+    const originalSend = res.send;
+    res.send = function(body) {
+      // Registrar sucesso ou falha baseado no status
+      if (res.statusCode >= 200 && res.statusCode < 400) {
+        requestCounter.success++;
+      } else {
+        requestCounter.failed++;
+      }
+      
+      return originalSend.call(this, body);
+    };
+    
+    next();
+  });
   /**
    * Endpoint para gerar narração de áudio a partir de texto usando OpenAI TTS
    */
@@ -369,6 +395,41 @@ Stack Trace: ${stack || 'N/A'}
         nodeVersion: process.version,
         platform: process.platform,
         timestamp: new Date().toISOString()
+      }
+    });
+  });
+  
+  /**
+   * Endpoint para estatísticas do servidor - utilizado para monitoramento e debugging
+   */
+  app.get("/api/server-stats", (req: Request, res: Response) => {
+    // Obter uso de memória atual
+    const memoryUsage = process.memoryUsage();
+    
+    // Calcular estatísticas de requisições
+    const requestStats = {
+      totalRequests: requestCounter.total,
+      successfulRequests: requestCounter.success,
+      failedRequests: requestCounter.failed
+    };
+    
+    // Retornar estatísticas
+    res.json({
+      success: true,
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      memory: {
+        heapUsed: memoryUsage.heapUsed,
+        heapTotal: memoryUsage.heapTotal,
+        external: memoryUsage.external,
+        rss: memoryUsage.rss
+      },
+      requests: requestStats,
+      // Valores de config para debugging
+      config: {
+        maxScriptLength: process.env.MAX_SCRIPT_LENGTH || 500,
+        cacheTTL: process.env.CACHE_TTL || 3600,
+        ffmpegPath: process.env.FFMPEG_PATH || './ffmpeg',
       }
     });
   });
