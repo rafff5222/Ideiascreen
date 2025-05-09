@@ -301,6 +301,34 @@ Stack Trace: ${stack || 'N/A'}
       res.status(500).json({ success: false, error: "Falha ao registrar erro" });
     }
   });
+  
+  /**
+   * Endpoint para verificação de status das APIs e ambiente
+   */
+  app.get("/api/sys-status", (req: Request, res: Response) => {
+    // Verificar APIs e chaves de configuração
+    const elevenLabsKeyStatus = process.env.ELEVENLABS_API_KEY ? 
+      { configured: true, partial: `${process.env.ELEVENLABS_API_KEY.substring(0, 3)}...${process.env.ELEVENLABS_API_KEY.substring(process.env.ELEVENLABS_API_KEY.length - 3)}` } : 
+      { configured: false };
+    
+    const openAIKeyStatus = process.env.OPENAI_API_KEY ? 
+      { configured: true, partial: `${process.env.OPENAI_API_KEY.substring(0, 3)}...${process.env.OPENAI_API_KEY.substring(process.env.OPENAI_API_KEY.length - 3)}` } : 
+      { configured: false };
+      
+    // Retorna informações sobre o ambiente e status das APIs
+    res.json({
+      success: true,
+      apis: {
+        elevenlabs: elevenLabsKeyStatus,
+        openai: openAIKeyStatus
+      },
+      environment: {
+        nodeVersion: process.version,
+        platform: process.platform,
+        timestamp: new Date().toISOString()
+      }
+    });
+  });
 
   const httpServer = createServer(app);
   

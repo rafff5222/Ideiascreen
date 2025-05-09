@@ -536,8 +536,37 @@ export default function DemoPage() {
   // Instância do gerador
   const videoGenerator = new VideoGenerator();
 
+  // Verifica o status das APIs antes de tentar gerar o vídeo
+  async function checkAPIStatus(): Promise<{elevenlabs: boolean, openai: boolean}> {
+    try {
+      const response = await fetch('/api/sys-status');
+      const data = await response.json();
+      
+      console.log("Status das APIs:", data);
+      
+      return {
+        elevenlabs: data.apis.elevenlabs.configured,
+        openai: data.apis.openai.configured
+      };
+    } catch (error) {
+      console.error("Erro ao verificar status das APIs:", error);
+      return {
+        elevenlabs: false,
+        openai: false
+      };
+    }
+  }
+  
   // Função para geração com retry automático
   async function generateWithRetry(script: string, config: any, retries = 3): Promise<any> {
+    // Verificar status das APIs antes de tentar
+    const apiStatus = await checkAPIStatus();
+    
+    // Verificar se pelo menos uma API está disponível
+    if (!apiStatus.elevenlabs && !apiStatus.openai) {
+      throw new Error("As APIs ElevenLabs e OpenAI não estão configuradas. Entre em contato com o suporte.");
+    }
+    
     for (let i = 0; i < retries; i++) {
       try {
         console.log(`Tentativa ${i + 1}/${retries} de gerar vídeo...`);
