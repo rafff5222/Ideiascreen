@@ -75,8 +75,14 @@ export async function generateElevenLabsAudio(
     const similarityBoost = 0.75;
     
     try {
+      // Log detalhado da API key (apenas parcial por segurança)
+      const apiKeyMasked = process.env.ELEVENLABS_API_KEY ? 
+        `${process.env.ELEVENLABS_API_KEY.substring(0, 4)}...${process.env.ELEVENLABS_API_KEY.substring(process.env.ELEVENLABS_API_KEY.length - 4)}` : 
+        'não configurada';
+      console.log(`Usando API Key ElevenLabs: ${apiKeyMasked}`);
+      
       // Gera o áudio usando a API do ElevenLabs
-      await voice.textToSpeech({
+      const response = await voice.textToSpeech({
         voiceId: voiceId,
         textInput: formattedText,
         fileName: outputFilePath,
@@ -87,8 +93,14 @@ export async function generateElevenLabsAudio(
         style: speed > 1.0 ? 0.3 : 0, // Ajuste de estilo baseado na velocidade
       });
       
+      console.log('Resposta da API ElevenLabs:', response?.status || 'sem status');
+      
+      // Aguarda um pouco para ter certeza que o arquivo foi escrito completamente
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       // Lê o arquivo gerado
       if (!fs.existsSync(outputFilePath)) {
+        console.error('Arquivo de saída não encontrado:', outputFilePath);
         throw new Error('Arquivo de áudio não foi gerado corretamente');
       }
       

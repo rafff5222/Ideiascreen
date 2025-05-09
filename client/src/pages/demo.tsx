@@ -278,54 +278,133 @@ export default function DemoPage() {
     
     // Chama o endpoint simplificado /generate
     private async callSimpleEndpoint(script: string): Promise<any> {
-      const response = await fetch('/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Client-Version': '1.0.0'
-        },
-        body: JSON.stringify({ script })
-      });
-      
-      // Tratamento para rate limiting
-      if (response.status === 429) {
-        throw new Error('RATE_LIMIT');
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 30000); // 30 segundos de timeout
+        
+        // Limitar texto para evitar problemas com a API
+        const limitedScript = script.length > 500 ? script.substring(0, 500) + "..." : script;
+        
+        console.log("Status: Conectando ao endpoint /generate");
+        const response = await fetch('/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Client-Version': '1.0.0'
+          },
+          body: JSON.stringify({ script: limitedScript }),
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeout);
+        
+        // Tratamento para rate limiting
+        if (response.status === 429) {
+          throw new Error('RATE_LIMIT');
+        }
+        
+        if (!response.ok) {
+          console.error(`Erro HTTP: ${response.status} - ${response.statusText}`);
+          throw new Error(`Falha na API (${response.status}): ${response.statusText}`);
+        }
+        
+        console.log("Status: Recebendo dados da API");
+        const rawText = await response.text();
+        console.log("Resposta crua:", rawText.substring(0, 150) + "..."); // Log parcial para debug
+        
+        try {
+          const data = JSON.parse(rawText);
+          
+          // Validar os campos principais
+          if (!data.videoUrl) {
+            console.error("Resposta sem videoUrl:", data);
+            throw new Error("Dados incompletos: videoUrl ausente na resposta");
+          }
+          
+          return data;
+        } catch (error) {
+          const jsonError = error as Error;
+          console.error("Erro ao processar JSON:", jsonError);
+          throw new Error(`Resposta inválida do servidor: ${jsonError.message}`);
+        }
+      } catch (error: any) {
+        if (error.name === 'AbortError') {
+          throw new Error("Timeout da requisição após 30 segundos");
+        }
+        throw error;
       }
-      
-      if (!response.ok) {
-        throw new Error(`Falha na API (${response.status}): ${response.statusText}`);
-      }
-      
-      return await response.json();
     }
     
     // Chama o endpoint completo /api/generate-video
     private async callFullEndpoint(script: string, config: any): Promise<any> {
-      const response = await fetch('/api/generate-video', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Client-Version': '1.0.0'
-        },
-        body: JSON.stringify({
-          script,
-          voice: config.voice,
-          speed: config.speed,
-          transitions: config.transitions,
-          outputFormat: config.outputFormat
-        })
-      });
-      
-      // Tratamento para rate limiting
-      if (response.status === 429) {
-        throw new Error('RATE_LIMIT');
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 60000); // 60 segundos de timeout (endpoint mais lento)
+        
+        // Limitar texto para evitar problemas com a API
+        const limitedScript = script.length > 500 ? script.substring(0, 500) + "..." : script;
+        
+        console.log("Status: Conectando ao endpoint completo /api/generate-video");
+        const response = await fetch('/api/generate-video', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Client-Version': '1.0.0',
+            'X-Request-Type': 'full-generation'
+          },
+          body: JSON.stringify({
+            script: limitedScript,
+            voice: config.voice,
+            speed: config.speed,
+            transitions: config.transitions,
+            outputFormat: config.outputFormat
+          }),
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeout);
+        
+        // Tratamento para rate limiting
+        if (response.status === 429) {
+          throw new Error('RATE_LIMIT');
+        }
+        
+        if (!response.ok) {
+          console.error(`Erro HTTP: ${response.status} - ${response.statusText}`);
+          throw new Error(`Falha na API completa (${response.status}): ${response.statusText}`);
+        }
+        
+        console.log("Status: Recebendo dados do endpoint completo");
+        const rawText = await response.text();
+        console.log("Resposta crua (completa):", rawText.substring(0, 150) + "..."); // Log parcial para debug
+        
+        try {
+          const data = JSON.parse(rawText);
+          
+          // Validar os campos principais
+          if (!data.resources || !data.resources.audioData) {
+            console.error("Resposta incompleta:", data);
+            throw new Error("Dados incompletos: recursos de áudio ausentes na resposta");
+          }
+          
+          // Modificamos o formato para compatibilidade com o endpoint simplificado
+          return {
+            videoUrl: data.resources.audioData,
+            subtitles: data.resources.subtitles,
+            imageUrls: data.resources.imageUrls,
+            success: data.success
+          };
+        } catch (error) {
+          const jsonError = error as Error;
+          console.error("Erro ao processar JSON completo:", jsonError);
+          throw new Error(`Resposta inválida do servidor: ${jsonError.message}`);
+        }
+      } catch (error: any) {
+        if (error.name === 'AbortError') {
+          throw new Error("Timeout da requisição após 60 segundos");
+        }
+        throw error;
       }
-      
-      if (!response.ok) {
-        throw new Error(`Falha na API completa (${response.status}): ${response.statusText}`);
-      }
-      
-      return await response.json();
     }
 
     async handleRateLimit(script: string, config: {

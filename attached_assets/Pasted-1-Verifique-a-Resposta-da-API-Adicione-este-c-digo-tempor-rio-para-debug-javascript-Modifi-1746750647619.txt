@@ -1,0 +1,104 @@
+1. Verifique a Resposta da API
+Adicione este código temporário para debug:
+
+javascript
+// Modifique sua função de geração
+async function generateVideo() {
+  try {
+    const response = await fetch('/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ script: "Teste simples" }) // Texto fixo para teste
+    });
+    
+    console.log("Status:", response.status);
+    const rawData = await response.text();
+    console.log("Resposta crua:", rawData); // Verifique se o JSON é válido
+    
+    const data = JSON.parse(rawData);
+    if (!data.videoUrl) throw new Error("Campo videoUrl ausente");
+    
+    document.getElementById('video-preview').src = data.videoUrl;
+  } catch (error) {
+    console.error("Erro detalhado:", error);
+    showError(`Erro técnico: ${error.message}`);
+  }
+}
+2. Valide o Backend
+Exemplo de rota corrigida (Node.js):
+
+javascript
+app.post('/generate', async (req, res) => {
+  try {
+    const { script } = req.body;
+    
+    // 1. Gere áudio
+    const audioUrl = await elevenlabs.generate(script); 
+    // 2. Renderize vídeo
+    const videoUrl = await renderVideoWithFFmpeg(audioUrl);
+    
+    // Garanta que todos os campos estão presentes
+    res.json({ 
+      success: true,
+      videoUrl: videoUrl || "",
+      audioUrl: audioUrl || "",
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+});
+3. Adicione Fallback Visual
+No seu HTML:
+
+html
+<div id="video-result">
+  <video id="video-preview" controls style="display: none;"></video>
+  <div id="error-message" class="alert-error" style="display: none;">
+    <p>🚨 <span id="error-text"></span></p>
+    <button onclick="retryGeneration()">Tentar Novamente</button>
+  </div>
+</div>
+💡 Causas Comuns e Correções
+Problema	Solução
+Timeout da API	Aumente o timeout para 30s: fetch(url, { signal: AbortSignal.timeout(30000) })
+Payload grande	Limite o texto a 500 caracteres: if(script.length > 500) throw new Error("Texto muito longo")
+CORS	No backend: app.use(cors({ origin: '*' }))
+Erro na IA	Adicione logs: console.log("ElevenLabs status:", audioGeneration.status)
+📌 Checklist de Verificação
+Teste Manual da API
+
+bash
+curl -X POST http://localhost:3000/generate \
+-H "Content-Type: application/json" \
+-d '{"script":"Teste de conexão"}'
+Monitore os Logs
+
+bash
+# Backend (Node.js)
+tail -f logs.txt | grep "generate"
+Teste com Dados Mínimos
+
+javascript
+// Frontend
+fetch('/generate', { method: 'POST', body: JSON.stringify({ script: "a" }) })
+  .then(res => res.json())
+  .then(console.log);
+🌟 Solução Profissional
+Implemente retry automático e cache local:
+
+javascript
+async function generateWithRetry(script, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const data = await generateVideo(script);
+      if (data.videoUrl) return data;
+    } catch (error) {
+      if (i === retries - 1) throw error;
+      await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+    }
+  }
+}
