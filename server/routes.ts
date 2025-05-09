@@ -65,16 +65,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validar os dados de entrada
       const validatedData = videoGenerationSchema.parse(req.body);
       
-      // Gerar o vídeo completo
-      const result = await generateVideo(validatedData);
-      
-      // Retornar os dados do vídeo
-      res.json(JSON.parse(result));
+      // Usar o novo serviço de IA para geração de vídeo
+      try {
+        // Tentar a abordagem com novo sistema de IA
+        const videoResult = await generateAIVideo({
+          script: validatedData.script,
+          voice: validatedData.voice,
+          speed: validatedData.speed,
+          transitions: validatedData.transitions,
+          outputFormat: validatedData.outputFormat
+        });
+        
+        // Retornar os dados do vídeo
+        res.json(videoResult);
+      } catch (aiError: any) {
+        console.error("Erro no novo gerador de vídeo, usando fallback:", aiError);
+        
+        // Fallback para o sistema original
+        const result = await generateOpenAIVideo(validatedData);
+        res.json(JSON.parse(result));
+      }
       
     } catch (error: any) {
       console.error("Erro ao gerar vídeo:", error);
       res.status(400).json({ 
         error: error.message || "Erro ao gerar vídeo" 
+      });
+    }
+  });
+  
+  /**
+   * Endpoint para geração de vídeo usando nova sintaxe (/generate)
+   * Compatível com o código do cliente fornecido
+   */
+  app.post("/generate", async (req: Request, res: Response) => {
+    try {
+      // Extrair script do body
+      const { script } = req.body;
+      
+      if (!script || typeof script !== 'string') {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'O roteiro é obrigatório e deve ser uma string' 
+        });
+      }
+      
+      // Usar o novo serviço de IA para geração
+      const videoResult = await generateAIVideo({ script });
+      
+      // Retornar no formato esperado pelo cliente
+      res.json({ 
+        videoUrl: videoResult.resources.audioData,
+        subtitles: videoResult.resources.subtitles,
+        imageUrls: videoResult.resources.imageUrls,
+        success: true
+      });
+      
+    } catch (error: any) {
+      console.error('Erro na geração:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Falha ao processar a solicitação'
       });
     }
   });

@@ -231,31 +231,25 @@ export default function DemoPage() {
         setSubtitles(lines);
         
         console.log('Enviando requisição para gerar vídeo integrado...');
-        const videoResponse = await fetch('/api/generate-video', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Client-Version': '1.0.0' // Para rastreamento de versão
-          },
-          body: JSON.stringify({
-            script: script,
-            voice: config.voice,
-            speed: config.speed,
-            transitions: config.transitions,
-            outputFormat: config.outputFormat
-          }),
-        });
-
-        // Tratamento para rate limiting (429) ou outros erros HTTP
-        if (videoResponse.status === 429) {
-          return await this.handleRateLimit(script, config);
+        
+        // Usar o novo endpoint simplificado primeiro
+        let videoData;
+        try {
+          const result = await this.callSimpleEndpoint(script);
+          videoData = result;
+        } catch (simpleError) {
+          console.log('Erro no endpoint simplificado, tentando alternativa:', simpleError);
+          
+          // Se falhar, tentar o endpoint completo
+          try {
+            const result = await this.callFullEndpoint(script, config);
+            videoData = result;
+          } catch (fullError) {
+            console.error('Ambos os endpoints falharam:', fullError);
+            throw new Error('Não foi possível gerar o vídeo. Tente novamente.');
+          }
         }
-
-        if (!videoResponse.ok) {
-          throw new Error(`Falha na API (${videoResponse.status}): ${videoResponse.statusText}`);
-        }
-
-        const videoData = await videoResponse.json();
+        
         console.log('Vídeo integrado gerado com sucesso:', videoData);
         
         if (!videoData.resources || !videoData.resources.audioData) {
@@ -263,14 +257,13 @@ export default function DemoPage() {
         }
         
         this.setupVideoPlayback(videoData, lines);
-        
         return videoData;
-      } catch (error) {
+      } catch (error: any) {
         console.error('Erro durante geração:', error);
         
         // Tenta recuperar de certos tipos de erro
         if (this.retryCount < this.maxRetries && 
-            (error.message.includes('timeout') || error.message.includes('network'))) {
+            error.message && (error.message.includes('timeout') || error.message.includes('network'))) {
           return await this.handleRateLimit(script, config);
         }
         
@@ -281,6 +274,58 @@ export default function DemoPage() {
           setIsLoading(false);
         }
       }
+    }
+    
+    // Chama o endpoint simplificado /generate
+    private async callSimpleEndpoint(script: string): Promise<any> {
+      const response = await fetch('/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Client-Version': '1.0.0'
+        },
+        body: JSON.stringify({ script })
+      });
+      
+      // Tratamento para rate limiting
+      if (response.status === 429) {
+        throw new Error('RATE_LIMIT');
+      }
+      
+      if (!response.ok) {
+        throw new Error(`Falha na API (${response.status}): ${response.statusText}`);
+      }
+      
+      return await response.json();
+    }
+    
+    // Chama o endpoint completo /api/generate-video
+    private async callFullEndpoint(script: string, config: any): Promise<any> {
+      const response = await fetch('/api/generate-video', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Client-Version': '1.0.0'
+        },
+        body: JSON.stringify({
+          script,
+          voice: config.voice,
+          speed: config.speed,
+          transitions: config.transitions,
+          outputFormat: config.outputFormat
+        })
+      });
+      
+      // Tratamento para rate limiting
+      if (response.status === 429) {
+        throw new Error('RATE_LIMIT');
+      }
+      
+      if (!response.ok) {
+        throw new Error(`Falha na API completa (${response.status}): ${response.statusText}`);
+      }
+      
+      return await response.json();
     }
 
     async handleRateLimit(script: string, config: {
