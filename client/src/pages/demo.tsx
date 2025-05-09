@@ -486,7 +486,18 @@ export default function DemoPage() {
       console.error('Erro ao gerar vídeo:', error);
       setIsLoading(false);
       
-      // UI rica para erros
+      // Mostrar erro no overlay do vídeo
+      const videoResult = document.getElementById('video-result');
+      const errorMessage = document.getElementById('error-message');
+      const errorText = document.getElementById('error-text');
+      
+      if (videoResult && errorMessage && errorText) {
+        errorText.textContent = error.message || 'Erro ao processar o vídeo';
+        videoResult.style.display = 'block';
+        errorMessage.style.display = 'block';
+      }
+      
+      // UI rica para erros na área de formulário também
       const errorContainer = document.querySelector('.error-container');
       if (errorContainer) {
         const errorDiv = document.createElement('div');
@@ -500,6 +511,9 @@ export default function DemoPage() {
           </div>
           <div class="mt-2 text-xs">
             <p>Por favor, tente novamente ou contate o suporte se o problema persistir.</p>
+            <p class="mt-1 text-gray-700">
+              <strong>Dica:</strong> Verifique se as chaves de API estão configuradas corretamente.
+            </p>
           </div>
           <button class="mt-2 bg-red-100 hover:bg-red-200 text-red-800 text-xs px-3 py-1 rounded-md"
             onclick="this.parentNode.remove()">
@@ -522,6 +536,45 @@ export default function DemoPage() {
   // Instância do gerador
   const videoGenerator = new VideoGenerator();
 
+  // Função para geração com retry automático
+  async function generateWithRetry(script: string, config: any, retries = 3): Promise<any> {
+    for (let i = 0; i < retries; i++) {
+      try {
+        console.log(`Tentativa ${i + 1}/${retries} de gerar vídeo...`);
+        const data = await videoGenerator.generate(script, config);
+        
+        if (data && (data.videoUrl || (data.resources && data.resources.audioData))) {
+          console.log("Geração bem-sucedida na tentativa", i + 1);
+          return data;
+        }
+        
+        throw new Error("Resposta sem dados de vídeo/áudio");
+      } catch (error: any) {
+        console.warn(`Falha na tentativa ${i + 1}:`, error.message);
+        
+        // Na última tentativa, não aguardamos mais
+        if (i === retries - 1) {
+          throw error;
+        }
+        
+        // Backoff exponencial antes da próxima tentativa
+        const delayMs = 1000 * Math.pow(2, i);
+        console.log(`Aguardando ${delayMs}ms antes da próxima tentativa...`);
+        
+        // Feedback visual para o usuário
+        const statusElement = document.getElementById('retry-status');
+        if (statusElement) {
+          statusElement.textContent = `Tentativa ${i+1} falhou. Tentando novamente em ${delayMs/1000}s...`;
+          statusElement.style.display = 'block';
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+    
+    throw new Error("Todas as tentativas de geração falharam");
+  }
+
   // Função de geração de vídeo usando a classe
   const generateVideo = async () => {
     if (!scriptText.trim()) {
@@ -535,8 +588,29 @@ export default function DemoPage() {
       transitions: transitions,
       outputFormat: outputFormat
     };
-
-    await videoGenerator.generate(scriptText, config);
+    
+    try {
+      // Criar elemento de status para retries se não existir
+      let statusElement = document.getElementById('retry-status');
+      if (!statusElement) {
+        statusElement = document.createElement('div');
+        statusElement.id = 'retry-status';
+        statusElement.className = 'mt-2 p-2 bg-blue-50 text-sm text-blue-700 rounded-md';
+        statusElement.style.display = 'none';
+        
+        const container = document.querySelector('.error-container');
+        if (container) container.appendChild(statusElement);
+      }
+      
+      // Usar o sistema de retry automático
+      await generateWithRetry(scriptText, config, 3);
+      
+      // Esconder status após sucesso
+      if (statusElement) statusElement.style.display = 'none';
+    } catch (error: any) {
+      console.error("Falha após todas as tentativas:", error);
+      // O displayError já é chamado dentro do generate original
+    }
   };
   
   // Função para gerar um arquivo VTT de legendas a partir do roteiro
@@ -853,6 +927,24 @@ export default function DemoPage() {
                           <div id="caption-container" className="absolute bottom-12 left-0 right-0 text-center p-2 z-10">
                             <div id="current-caption" className="bg-black bg-opacity-70 text-white p-2 rounded-md inline-block text-lg font-medium">
                               {/* Será preenchido dinamicamente */}
+                            </div>
+                          </div>
+                          
+                          {/* Área para mostrar erros e oferecer retry */}
+                          <div id="video-result" className="absolute inset-0 flex items-center justify-center z-40" style={{display: 'none'}}>
+                            <div id="error-message" className="bg-red-800 bg-opacity-90 text-white p-6 rounded-lg shadow-lg max-w-sm text-center" style={{display: 'none'}}>
+                              <div className="text-3xl mb-3">🚨</div>
+                              <h3 className="text-lg font-semibold mb-2">Erro na Geração</h3>
+                              <p id="error-text" className="mb-4">Ocorreu um erro ao processar o vídeo.</p>
+                              <button 
+                                onClick={generateVideo}
+                                className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-md shadow-sm transition-colors"
+                              >
+                                Tentar Novamente
+                              </button>
+                              <p className="mt-3 text-xs text-red-200">
+                                Dica: Verifique as chaves de API nas configurações
+                              </p>
                             </div>
                           </div>
                         </div>
