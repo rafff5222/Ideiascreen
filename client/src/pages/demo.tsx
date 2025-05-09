@@ -343,8 +343,8 @@ export default function DemoPage() {
             const limitedScript = script.length > 500 ? script.substring(0, 500) + "..." : script;
             
             // Informar ao usuário que a operação pode demorar
-            console.log("Status: Conectando ao endpoint /generate (pode levar até 60 segundos)");
-            this.showProgressFeedback("Gerando vídeo. Isso pode levar até 60 segundos...");
+            console.log("Status: Conectando ao endpoint /generate (pode levar até 5 minutos)");
+            this.showProgressFeedback("Gerando vídeo. Isso pode levar até 5 minutos...");
             
             // Aumentado para 5 minutos (300000 ms) conforme recomendação
             // Isso dá muito mais tempo para processamento em servidores ocupados
@@ -401,7 +401,7 @@ export default function DemoPage() {
         }
       } catch (error: any) {
         if (error.name === 'AbortError') {
-          throw new Error("Timeout da requisição após 60 segundos. O servidor está processando muitas solicitações no momento.");
+          throw new Error("Timeout da requisição após 5 minutos. O servidor está processando muitas solicitações no momento.");
         }
         throw error;
       }
@@ -420,8 +420,8 @@ export default function DemoPage() {
             const limitedScript = script.length > 500 ? script.substring(0, 500) + "..." : script;
             
             // Informar ao usuário que a operação pode demorar
-            console.log("Status: Conectando ao endpoint completo /api/generate-video (pode levar até 60 segundos)");
-            this.showProgressFeedback("Processando vídeo através do endpoint avançado. Isso pode levar até 60 segundos...");
+            console.log("Status: Conectando ao endpoint completo /api/generate-video (pode levar até 5 minutos)");
+            this.showProgressFeedback("Processando vídeo através do endpoint avançado. Isso pode levar até 5 minutos...");
             
             // Aumentado para 5 minutos (300000 ms) conforme recomendação
             // Esse endpoint de vídeo completo pode levar mais tempo no servidor
@@ -492,7 +492,7 @@ export default function DemoPage() {
         }
       } catch (error: any) {
         if (error.name === 'AbortError') {
-          throw new Error("Timeout da requisição após 60 segundos. O servidor está processando muitas solicitações no momento.");
+          throw new Error("Timeout da requisição após 5 minutos. O servidor está processando muitas solicitações no momento.");
         }
         throw error;
       }
@@ -573,32 +573,110 @@ export default function DemoPage() {
       }, 5000);
     }
 
-    // Exibe um feedback de progresso para o usuário
+    // Exibe um feedback de progresso para o usuário com barra de progresso animada
     showProgressFeedback(message: string) {
       // Criar ou atualizar o elemento de progresso
       let progressElement = document.getElementById('progress-feedback');
+      let progressBarElement = document.getElementById('progress-bar');
+      let progressTimer: ReturnType<typeof setInterval> | null = null;
+      
       if (!progressElement) {
         progressElement = document.createElement('div');
         progressElement.id = 'progress-feedback';
-        progressElement.className = 'p-2 bg-blue-50 text-sm rounded-md text-blue-800 border border-blue-200 mt-2 mb-2 flex items-center';
+        progressElement.className = 'p-3 bg-blue-50 text-sm rounded-md text-blue-800 border border-blue-200 mt-2 mb-2';
         
-        // Adicionar ícone de processamento
+        // Layout com informações mais detalhadas
         progressElement.innerHTML = `
-          <svg class="animate-spin h-4 w-4 mr-2 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <span>${message}</span>
+          <div class="flex items-center mb-2">
+            <svg class="animate-spin h-4 w-4 mr-2 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="font-medium">${message}</span>
+          </div>
+          <div class="w-full bg-blue-100 rounded-full h-2 mb-1">
+            <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <div class="flex justify-between text-xs text-blue-700">
+            <span id="progress-percent">0%</span>
+            <span id="progress-time">Tempo estimado: ~5 min</span>
+          </div>
         `;
         
         // Adicionar ao container
         const container = document.querySelector('.error-container') || document.querySelector('.video-form');
         if (container) container.appendChild(progressElement);
+        
+        // Iniciar a animação da barra de progresso
+        let progress = 0;
+        let isSlowPhase = false;
+        
+        progressTimer = setInterval(() => {
+          progressBarElement = document.getElementById('progress-bar');
+          const progressPercentElement = document.getElementById('progress-percent');
+          
+          if (progressBarElement && progressPercentElement) {
+            // Algoritmo de progresso simulado
+            // - Rápido no início (0-30%)
+            // - Lento no meio (30-70%) onde o processamento geralmente demora
+            // - Moderado no final (70-95%)
+            // - Nunca chega a 100% até que realmente esteja concluído
+            
+            if (progress < 30) {
+              progress += 0.8; // Fase inicial rápida
+            } else if (progress < 70) {
+              if (!isSlowPhase) {
+                // Adicionar uma pausa antes da fase lenta para simular o início do processamento
+                isSlowPhase = true;
+                progressPercentElement.textContent = `${Math.round(progress)}% - Processando...`;
+                return;
+              }
+              progress += 0.2; // Fase média lenta (processamento do servidor)
+            } else if (progress < 95) {
+              progress += 0.4; // Fase final moderada
+            }
+            
+            // Limitar a 95% para que não pareça completo antes de realmente estar
+            progress = Math.min(progress, 95);
+            
+            // Atualizar a interface
+            progressBarElement.style.width = `${progress}%`;
+            progressPercentElement.textContent = `${Math.round(progress)}%`;
+            
+            // Atualizar o tempo estimado restante
+            const timeElement = document.getElementById('progress-time');
+            if (timeElement) {
+              const remainingPercent = 100 - progress;
+              const remainingTimeSeconds = Math.max(10, Math.round((remainingPercent / 100) * 300)); // Estimativa baseada em 5 minutos (300s)
+              
+              if (remainingTimeSeconds > 60) {
+                const minutes = Math.floor(remainingTimeSeconds / 60);
+                const seconds = remainingTimeSeconds % 60;
+                timeElement.textContent = `Estimativa: ~${minutes}m ${seconds}s`;
+              } else {
+                timeElement.textContent = `Estimativa: ~${remainingTimeSeconds}s`;
+              }
+            }
+          } else {
+            // Se os elementos não existirem mais, limpar o timer
+            if (progressTimer) clearInterval(progressTimer);
+          }
+        }, 600); // Atualiza a cada 600ms
+        
+        // Armazenar o timer no elemento para limpeza posterior
+        progressElement.dataset.timerId = progressTimer.toString();
       } else {
-        // Atualizar mensagem existente
+        // Atualizar apenas a mensagem no elemento existente
         const textSpan = progressElement.querySelector('span');
         if (textSpan) textSpan.textContent = message;
       }
+      
+      return function cleanup() {
+        if (progressTimer) clearInterval(progressTimer);
+        if (progressElement && progressElement.dataset.timerId) {
+          clearInterval(parseInt(progressElement.dataset.timerId));
+        }
+      };
     }
     
     displayError(error: Error) {
