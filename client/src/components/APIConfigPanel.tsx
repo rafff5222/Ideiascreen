@@ -24,6 +24,39 @@ export default function APIConfigPanel() {
   const [isConfigured, setIsConfigured] = useState(false);
   const { toast } = useToast();
 
+  // Função para testar uma chave de API
+  const testAPIKey = async (api: 'openai' | 'elevenlabs') => {
+    try {
+      const response = await fetch(`/api/test-api-connection/${api}`);
+      const data = await response.json();
+      
+      if (data.success && data.connection?.working) {
+        toast({
+          title: 'Conexão bem-sucedida',
+          description: `A chave da ${api === 'openai' ? 'OpenAI' : 'ElevenLabs'} está funcionando corretamente.`,
+          variant: 'default'
+        });
+        return true;
+      } else {
+        const errorMsg = data.connection?.message || `Erro ao conectar à API da ${api === 'openai' ? 'OpenAI' : 'ElevenLabs'}`;
+        toast({
+          title: 'Erro de conexão',
+          description: errorMsg,
+          variant: 'destructive'
+        });
+        return false;
+      }
+    } catch (error) {
+      console.error(`Erro ao testar chave ${api}:`, error);
+      toast({
+        title: 'Erro de teste',
+        description: `Não foi possível testar a conexão com a ${api === 'openai' ? 'OpenAI' : 'ElevenLabs'}.`,
+        variant: 'destructive'
+      });
+      return false;
+    }
+  };
+
   // Função para salvar as chaves de API
   const handleSaveKeys = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,30 +73,52 @@ export default function APIConfigPanel() {
     setIsSubmitting(true);
     
     try {
-      // Este é um exemplo de como poderia ser feito - o sistema real precisaria
-      // ser integrado com a funcionalidade ask_secrets do ambiente Replit
+      // Solicitar configuração das chaves de API via Replit
+      const missingKeys: string[] = [];
+      const messages: string[] = [];
       
       if (openAIKey) {
-        // Solicitar configuração da chave OpenAI
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulação
-        console.log('Configurando OpenAI key');
+        missingKeys.push('OPENAI_API_KEY');
+        messages.push(`OPENAI_API_KEY=${openAIKey}`);
       }
       
       if (elevenLabsKey) {
-        // Solicitar configuração da chave ElevenLabs
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulação
-        console.log('Configurando ElevenLabs key');
+        missingKeys.push('ELEVENLABS_API_KEY');
+        messages.push(`ELEVENLABS_API_KEY=${elevenLabsKey}`);
       }
       
+      // Chamar a função de solicitação de segredos com as chaves informadas
+      await requestSecrets(
+        missingKeys, 
+        'Configure estas chaves de API:\n\n' + messages.join('\n')
+      );
+      
       toast({
-        title: 'Chaves de API salvas',
-        description: 'Suas chaves foram armazenadas com sucesso.'
+        title: 'Chaves de API enviadas',
+        description: 'Suas chaves estão sendo configuradas. Aguarde um momento e clique em "Verificar novamente".'
       });
       
       // Limpar campos
       setOpenAIKey('');
       setElevenLabsKey('');
-      setIsConfigured(true);
+      
+      // Aguardar um pouco e verificar se as chaves foram configuradas
+      setTimeout(async () => {
+        let openaiOk = false;
+        let elevenlabsOk = false;
+        
+        if (missingKeys.includes('OPENAI_API_KEY')) {
+          openaiOk = await testAPIKey('openai');
+        }
+        
+        if (missingKeys.includes('ELEVENLABS_API_KEY')) {
+          elevenlabsOk = await testAPIKey('elevenlabs');
+        }
+        
+        if (openaiOk || elevenlabsOk) {
+          setIsConfigured(true);
+        }
+      }, 3000);
       
     } catch (error) {
       console.error('Erro ao salvar chaves:', error);
@@ -153,13 +208,31 @@ export default function APIConfigPanel() {
                   </Button>
                 </Label>
                 <div className="relative">
-                  <Input
-                    id="openai-key"
-                    type={showOpenAI ? "text" : "password"}
-                    placeholder="sk-..."
-                    value={openAIKey}
-                    onChange={(e) => setOpenAIKey(e.target.value)}
-                  />
+                  <div className="flex">
+                    <Input
+                      id="openai-key"
+                      type={showOpenAI ? "text" : "password"}
+                      placeholder="sk-..."
+                      value={openAIKey}
+                      onChange={(e) => setOpenAIKey(e.target.value)}
+                      className="rounded-r-none"
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline"
+                      size="sm"
+                      className="rounded-l-none border-l-0"
+                      disabled={!openAIKey || isSubmitting}
+                      onClick={() => {
+                        if (openAIKey) {
+                          setIsSubmitting(true);
+                          handleSaveKeys(new Event('submit') as any);
+                        }
+                      }}
+                    >
+                      Testar
+                    </Button>
+                  </div>
                 </div>
                 <p className="text-xs text-gray-500">
                   Obtenha sua chave em{" "}
@@ -188,13 +261,31 @@ export default function APIConfigPanel() {
                   </Button>
                 </Label>
                 <div className="relative">
-                  <Input
-                    id="elevenlabs-key"
-                    type={showElevenLabs ? "text" : "password"}
-                    placeholder="xxxxxxxx..."
-                    value={elevenLabsKey}
-                    onChange={(e) => setElevenLabsKey(e.target.value)}
-                  />
+                  <div className="flex">
+                    <Input
+                      id="elevenlabs-key"
+                      type={showElevenLabs ? "text" : "password"}
+                      placeholder="xxxxxxxx..."
+                      value={elevenLabsKey}
+                      onChange={(e) => setElevenLabsKey(e.target.value)}
+                      className="rounded-r-none"
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline"
+                      size="sm"
+                      className="rounded-l-none border-l-0"
+                      disabled={!elevenLabsKey || isSubmitting}
+                      onClick={() => {
+                        if (elevenLabsKey) {
+                          setIsSubmitting(true);
+                          handleSaveKeys(new Event('submit') as any);
+                        }
+                      }}
+                    >
+                      Testar
+                    </Button>
+                  </div>
                 </div>
                 <p className="text-xs text-gray-500">
                   Obtenha sua chave em{" "}
