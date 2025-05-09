@@ -334,23 +334,36 @@ export default function DemoPage() {
     private async callSimpleEndpoint(script: string): Promise<any> {
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 30000); // 30 segundos de timeout
+        let timeoutId: ReturnType<typeof setTimeout> | null = null;
         
-        // Limitar texto para evitar problemas com a API
-        const limitedScript = script.length > 500 ? script.substring(0, 500) + "..." : script;
+        // Criamos uma promessa com timeout
+        const fetchWithTimeout = async () => {
+          try {
+            // Limitar texto para evitar problemas com a API
+            const limitedScript = script.length > 500 ? script.substring(0, 500) + "..." : script;
+            
+            console.log("Status: Conectando ao endpoint /generate");
+            timeoutId = setTimeout(() => {
+              controller.abort(new Error('Request timeout after 30 seconds'));
+            }, 30000);
+            
+            const response = await fetch('/generate', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Client-Version': '1.0.0'
+              },
+              body: JSON.stringify({ script: limitedScript }),
+              signal: controller.signal
+            });
+            
+            return response;
+          } finally {
+            if (timeoutId) clearTimeout(timeoutId);
+          }
+        };
         
-        console.log("Status: Conectando ao endpoint /generate");
-        const response = await fetch('/generate', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Client-Version': '1.0.0'
-          },
-          body: JSON.stringify({ script: limitedScript }),
-          signal: controller.signal
-        });
-        
-        clearTimeout(timeout);
+        const response = await fetchWithTimeout();
         
         // Tratamento para rate limiting
         if (response.status === 429) {
@@ -393,30 +406,43 @@ export default function DemoPage() {
     private async callFullEndpoint(script: string, config: any): Promise<any> {
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 60000); // 60 segundos de timeout (endpoint mais lento)
+        let timeoutId: ReturnType<typeof setTimeout> | null = null;
         
-        // Limitar texto para evitar problemas com a API
-        const limitedScript = script.length > 500 ? script.substring(0, 500) + "..." : script;
+        // Função para fazer a chamada com timeout
+        const fetchWithTimeout = async () => {
+          try {
+            // Limitar texto para evitar problemas com a API
+            const limitedScript = script.length > 500 ? script.substring(0, 500) + "..." : script;
+            
+            console.log("Status: Conectando ao endpoint completo /api/generate-video");
+            timeoutId = setTimeout(() => {
+              controller.abort(new Error('Request timeout after 60 seconds'));
+            }, 60000); // 60 segundos por ser um endpoint mais lento
+            
+            const response = await fetch('/api/generate-video', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Client-Version': '1.0.0',
+                'X-Request-Type': 'full-generation'
+              },
+              body: JSON.stringify({
+                script: limitedScript,
+                voice: config.voice,
+                speed: config.speed,
+                transitions: config.transitions,
+                outputFormat: config.outputFormat
+              }),
+              signal: controller.signal
+            });
+            
+            return response;
+          } finally {
+            if (timeoutId) clearTimeout(timeoutId);
+          }
+        };
         
-        console.log("Status: Conectando ao endpoint completo /api/generate-video");
-        const response = await fetch('/api/generate-video', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Client-Version': '1.0.0',
-            'X-Request-Type': 'full-generation'
-          },
-          body: JSON.stringify({
-            script: limitedScript,
-            voice: config.voice,
-            speed: config.speed,
-            transitions: config.transitions,
-            outputFormat: config.outputFormat
-          }),
-          signal: controller.signal
-        });
-        
-        clearTimeout(timeout);
+        const response = await fetchWithTimeout();
         
         // Tratamento para rate limiting
         if (response.status === 429) {
