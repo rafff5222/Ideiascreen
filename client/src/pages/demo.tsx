@@ -569,6 +569,34 @@ export default function DemoPage() {
         oldErrors.forEach(el => el.remove());
         
         errorContainer.appendChild(errorDiv);
+        
+        // Adicionar event listeners aos botões
+        const tryAgainBtn = errorDiv.querySelector('.try-again-btn');
+        if (tryAgainBtn) {
+          tryAgainBtn.addEventListener('click', () => {
+            generateVideo();
+            errorDiv.remove();
+          });
+        }
+        
+        const checkApiBtn = errorDiv.querySelector('.check-api-btn');
+        if (checkApiBtn) {
+          checkApiBtn.addEventListener('click', async () => {
+            try {
+              const apiStatus = await checkAPIStatus();
+              alert(`Status das APIs:\n\n- ElevenLabs: ${apiStatus.elevenlabs ? "✓ Disponível" : "✗ Indisponível"}\n- OpenAI: ${apiStatus.openai ? "✓ Disponível" : "✗ Indisponível"}`);
+            } catch (error: any) {
+              alert("Não foi possível verificar o status das APIs: " + (error.message || "Erro desconhecido"));
+            }
+          });
+        }
+        
+        const closeBtn = errorDiv.querySelector('.close-btn');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', () => {
+            errorDiv.remove();
+          });
+        }
       } else {
         // Fallback para alert se não encontrar o container
         alert(`Falha ao processar: ${error.message || 'Erro desconhecido'}. Por favor, tente novamente.`);
@@ -579,9 +607,15 @@ export default function DemoPage() {
   // Instância do gerador
   const videoGenerator = new VideoGenerator();
 
-  // Verifica o status das APIs antes de tentar gerar o vídeo
+  /**
+   * Verifica o status das APIs antes de tentar gerar o vídeo
+   * Realiza uma chamada para o endpoint /api/sys-status para verificar quais APIs estão configuradas
+   * 
+   * @returns Objeto com status de cada API (true = configurada / false = não configurada)
+   */
   async function checkAPIStatus(): Promise<{elevenlabs: boolean, openai: boolean}> {
     try {
+      // Chamada para o novo endpoint de verificação de status
       const response = await fetch('/api/sys-status');
       const data = await response.json();
       
@@ -593,6 +627,8 @@ export default function DemoPage() {
       };
     } catch (error) {
       console.error("Erro ao verificar status das APIs:", error);
+      
+      // Em caso de falha, assumimos que as APIs não estão disponíveis
       return {
         elevenlabs: false,
         openai: false
@@ -1014,18 +1050,58 @@ export default function DemoPage() {
                           
                           {/* Área para mostrar erros e oferecer retry */}
                           <div id="video-result" className="absolute inset-0 flex items-center justify-center z-40" style={{display: 'none'}}>
-                            <div id="error-message" className="bg-red-800 bg-opacity-90 text-white p-6 rounded-lg shadow-lg max-w-sm text-center" style={{display: 'none'}}>
+                            <div id="error-message" className="bg-red-900 bg-opacity-90 text-white p-6 rounded-lg shadow-lg max-w-md text-center" style={{display: 'none'}}>
                               <div className="text-3xl mb-3">🚨</div>
                               <h3 className="text-lg font-semibold mb-2">Erro na Geração</h3>
                               <p id="error-text" className="mb-4">Ocorreu um erro ao processar o vídeo.</p>
-                              <button 
-                                onClick={generateVideo}
-                                className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-md shadow-sm transition-colors"
-                              >
-                                Tentar Novamente
-                              </button>
+                              
+                              <div className="flex justify-center gap-2 mb-4">
+                                <button 
+                                  onClick={generateVideo}
+                                  className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-md shadow-sm transition-colors"
+                                >
+                                  Tentar Novamente
+                                </button>
+                                <button 
+                                  id="check-api-status-btn"
+                                  onClick={async () => {
+                                    try {
+                                      const statusElement = document.getElementById('api-status-info');
+                                      if (statusElement) {
+                                        statusElement.textContent = "Verificando status das APIs...";
+                                        statusElement.style.display = 'block';
+                                      }
+                                      
+                                      const apiStatus = await checkAPIStatus();
+                                      
+                                      if (statusElement) {
+                                        statusElement.innerHTML = `
+                                          <span class="${apiStatus.elevenlabs ? 'text-green-400' : 'text-red-400'}">
+                                            ElevenLabs: ${apiStatus.elevenlabs ? "✓ Disponível" : "✗ Indisponível"}
+                                          </span>
+                                          <br>
+                                          <span class="${apiStatus.openai ? 'text-green-400' : 'text-red-400'}">
+                                            OpenAI: ${apiStatus.openai ? "✓ Disponível" : "✗ Indisponível"}
+                                          </span>
+                                        `;
+                                      }
+                                    } catch (error: any) {
+                                      const statusElement = document.getElementById('api-status-info');
+                                      if (statusElement) {
+                                        statusElement.textContent = "Falha ao verificar status: " + (error.message || "Erro desconhecido");
+                                      }
+                                    }
+                                  }}
+                                  className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md shadow-sm transition-colors"
+                                >
+                                  Verificar APIs
+                                </button>
+                              </div>
+                              
+                              <div id="api-status-info" className="mb-3 p-2 bg-gray-800 rounded text-xs" style={{display: 'none'}}></div>
+                              
                               <p className="mt-3 text-xs text-red-200">
-                                Dica: Verifique as chaves de API nas configurações
+                                Dica: Verifique se as chaves de API estão configuradas corretamente
                               </p>
                             </div>
                           </div>
