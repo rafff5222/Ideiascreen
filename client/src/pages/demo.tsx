@@ -444,9 +444,10 @@ export default function DemoPage() {
           // Modificamos o formato para compatibilidade com o endpoint simplificado
           return {
             videoUrl: data.resources.audioData,
-            subtitles: data.resources.subtitles,
-            imageUrls: data.resources.imageUrls,
-            success: data.success
+            subtitles: data.resources.subtitles || [],
+            imageUrls: data.resources.imageUrls || [],
+            success: data.success,
+            resources: data.resources, // Mantemos o objeto original também para compatibilidade
           };
         } catch (error) {
           const jsonError = error as Error;
