@@ -346,10 +346,11 @@ export default function DemoPage() {
             console.log("Status: Conectando ao endpoint /generate (pode levar até 60 segundos)");
             this.showProgressFeedback("Gerando vídeo. Isso pode levar até 60 segundos...");
             
-            // Aumentamos o timeout para 60 segundos para combinar com o endpoint completo
+            // Aumentado para 5 minutos (300000 ms) conforme recomendação
+            // Isso dá muito mais tempo para processamento em servidores ocupados
             timeoutId = setTimeout(() => {
-              controller.abort(new Error('Request timeout after 60 seconds'));
-            }, 60000);
+              controller.abort(new Error('Request timeout after 5 minutes'));
+            }, 300000);
             
             const response = await fetch('/generate', {
               method: 'POST',
@@ -422,10 +423,11 @@ export default function DemoPage() {
             console.log("Status: Conectando ao endpoint completo /api/generate-video (pode levar até 60 segundos)");
             this.showProgressFeedback("Processando vídeo através do endpoint avançado. Isso pode levar até 60 segundos...");
             
-            // Timeout de 60 segundos por ser um endpoint mais lento
+            // Aumentado para 5 minutos (300000 ms) conforme recomendação
+            // Esse endpoint de vídeo completo pode levar mais tempo no servidor
             timeoutId = setTimeout(() => {
-              controller.abort(new Error('Request timeout after 60 seconds'));
-            }, 60000);
+              controller.abort(new Error('Request timeout after 5 minutes'));
+            }, 300000);
             
             const response = await fetch('/api/generate-video', {
               method: 'POST',
