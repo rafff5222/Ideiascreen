@@ -5,6 +5,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { FaCheck, FaTimes, FaCrown, FaStar } from 'react-icons/fa';
 import ScarcityAlert from '@/components/conversion/ScarcityAlert';
 import PremiumUrgencyBadge from '@/components/conversion/PremiumUrgencyBadge';
+import RecommendedBadge from '@/components/conversion/RecommendedBadge';
 import './ComparisonTable.css';
 
 /**
@@ -67,9 +68,12 @@ export default function NovoLayoutPrecos() {
             <div className="grid-header">
               <div className="plan-name">Básico</div>
             </div>
-            <div className="grid-header">
+            <div className="grid-header relative">
               <div className="plan-name">Premium</div>
               <span className="plan-popular">POPULAR</span>
+              <div className="absolute top-[-10px] right-[20px]">
+                <RecommendedBadge />
+              </div>
             </div>
             <div className="grid-header">
               <div className="plan-name">Ultimate</div>
@@ -112,7 +116,8 @@ export default function NovoLayoutPrecos() {
             </div>
 
             {/* Plano Premium - Mobile */}
-            <div className="plano-card plan-box" data-plano="premium">
+            <div className="plano-card plan-box relative" data-plano="premium">
+              <RecommendedBadge />
               <span className="badge-economize mais-vendido">MAIS VENDIDO</span>
               <h3><FaStar className="inline-block text-yellow-500 mr-1" size={18} /> Premium</h3>
               <div className="preco-container">
@@ -255,7 +260,7 @@ export default function NovoLayoutPrecos() {
               <div className="text-center">
                 <button 
                   onClick={() => window.location.href = '/checkout?plan=premium'}
-                  className="w-full py-3 px-4 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 transition-colors pulse">
+                  className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium hover:from-purple-700 hover:to-purple-800 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 pulse">
                   Selecionar Premium
                 </button>
               </div>

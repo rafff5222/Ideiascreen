@@ -6,62 +6,65 @@ import React, { useState, useEffect } from 'react';
  * para criar senso de urgência para decisão de compra
  */
 export default function ScarcityAlert() {
-  const [vagas, setVagas] = useState(12);
-  const [progressWidth, setProgressWidth] = useState(30);
+  const [vagasRestantes, setVagasRestantes] = useState(12);
+  const [progresso, setProgresso] = useState(30);
   
   useEffect(() => {
-    // Recupera vagas do localStorage para manter entre sessões
-    const savedVagas = localStorage.getItem('vagas-restantes');
-    const initialVagas = savedVagas ? parseInt(savedVagas) : 12;
+    // Verifica se já existe um valor armazenado para persistência
+    const vagasSalvas = localStorage.getItem('vagas-restantes');
+    const progressoSalvo = localStorage.getItem('progresso-vagas');
     
-    // Se for a primeira visita ou as vagas foram resetadas
-    if (!savedVagas || initialVagas <= 0) {
-      setVagas(12);
-      localStorage.setItem('vagas-restantes', '12');
-      setProgressWidth(30);
+    if (vagasSalvas && progressoSalvo) {
+      setVagasRestantes(parseInt(vagasSalvas));
+      setProgresso(parseInt(progressoSalvo));
     } else {
-      setVagas(initialVagas);
-      setProgressWidth(100 - (initialVagas/12)*100);
+      // Salva valores iniciais
+      localStorage.setItem('vagas-restantes', vagasRestantes.toString());
+      localStorage.setItem('progresso-vagas', progresso.toString());
     }
     
-    // Configura o intervalo para atualizar a cada 30s (demonstração)
-    // No site real, seria a cada 3-5 minutos
+    // Atualiza a cada 45 segundos (para demonstração)
+    // Em produção seria a cada 3-5 minutos
     const interval = setInterval(() => {
-      setVagas(prev => {
-        // Diminui em 0 ou 1 vaga
-        const decrease = Math.random() > 0.7 ? 1 : 0;
-        const newVagas = Math.max(1, prev - decrease); // Nunca abaixo de 1
+      // 20% de chance de reduzir o número de vagas
+      if (Math.random() < 0.2) {
+        setVagasRestantes(prev => {
+          const novoValor = Math.max(1, prev - 1); // Nunca abaixo de 1
+          localStorage.setItem('vagas-restantes', novoValor.toString());
+          return novoValor;
+        });
         
-        // Salva no localStorage
-        localStorage.setItem('vagas-restantes', newVagas.toString());
-        
-        // Atualiza a largura da barra de progresso
-        setProgressWidth(100 - (newVagas/12)*100);
-        
-        return newVagas;
-      });
-    }, 30000);
+        // Atualiza a barra de progresso
+        setProgresso(prev => {
+          const novoProgresso = Math.min(95, 100 - (vagasRestantes / 12) * 100);
+          localStorage.setItem('progresso-vagas', novoProgresso.toString());
+          return novoProgresso;
+        });
+      }
+    }, 45000);
     
     return () => clearInterval(interval);
-  }, []);
-  
-  // Se as vagas estão acabando (3 ou menos), adiciona uma classe de urgência
-  const urgencyClass = vagas <= 3 ? 'bg-red-50 border-red-200 text-red-700' : 'bg-amber-50 border-amber-200 text-amber-700';
+  }, [vagasRestantes]);
   
   return (
-    <div className={`rounded-lg p-3 mb-4 ${urgencyClass}`}>
-      <p className="text-center font-medium">
-        {vagas <= 3 ? 
-          <>⚠️ <span className="font-bold text-red-600">ÚLTIMA CHANCE!</span> Apenas <span id="vagas-restantes" className="font-bold">{vagas}</span> {vagas === 1 ? 'vaga' : 'vagas'} com desconto!</> : 
-          <>⚠️ Apenas <span id="vagas-restantes" className="font-bold">{vagas}</span> {vagas === 1 ? 'vaga' : 'vagas'} com desconto disponíveis</>
-        }
-      </p>
-      <div className="w-full h-2 bg-gray-200 rounded-full mt-2 overflow-hidden">
+    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-8 max-w-lg mx-auto">
+      <div className="flex items-center justify-center mb-2">
+        <span className="text-amber-600 mr-1">⚠️</span>
+        <p className="text-amber-800 font-medium">
+          Apenas <span id="vagas-restantes" className="font-bold">{vagasRestantes}</span> vagas com desconto restantes!
+        </p>
+      </div>
+      
+      <div className="w-full bg-amber-200 rounded-full h-2.5 mb-1">
         <div 
-          className={`h-full rounded-full ${vagas <= 3 ? 'bg-red-500' : 'bg-amber-500'} transition-all duration-1000 ease-out`}
-          style={{ width: `${progressWidth}%` }}
+          className="bg-amber-600 h-2.5 rounded-full transition-all duration-1000 ease-out"
+          style={{ width: `${progresso}%` }}
         ></div>
       </div>
+      
+      <p className="text-xs text-center text-amber-700 mt-1">
+        Oferta por tempo limitado. Garanta seu acesso antes que acabe!
+      </p>
     </div>
   );
 }
