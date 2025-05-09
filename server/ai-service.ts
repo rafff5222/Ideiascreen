@@ -42,11 +42,15 @@ export async function generateVideo(config: GenerationConfig): Promise<VideoResu
   console.log('Gerando narração de áudio para o roteiro...');
   
   try {
-    // Verificação de chave API reforçada
-    if (!process.env.OPENAI_API_KEY || 
-        process.env.OPENAI_API_KEY.trim() === '' || 
-        !process.env.OPENAI_API_KEY.startsWith('sk-')) {
-      console.log('API key inválida ou não configurada, usando dados de demonstração');
+    // Verificação se pelo menos uma das APIs está disponível (ElevenLabs ou OpenAI)
+    const hasElevenLabsKey = !!process.env.ELEVENLABS_API_KEY;
+    const hasOpenAIKey = process.env.OPENAI_API_KEY && 
+                         process.env.OPENAI_API_KEY.trim() !== '' && 
+                         process.env.OPENAI_API_KEY.startsWith('sk-');
+    
+    // Se não temos nenhuma das APIs disponíveis, usar dados de demonstração
+    if (!hasElevenLabsKey && !hasOpenAIKey) {
+      console.log('Nenhuma API key válida encontrada, usando dados de demonstração');
       return generateDemoResult(config);
     }
     
