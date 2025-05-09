@@ -15,7 +15,7 @@ const commonOptions = {
   defaultJobOptions: {
     attempts: 3,            // Número máximo de tentativas
     removeOnComplete: true, // Remove jobs depois de completados com sucesso
-    timeout: 120000         // Timeout para jobs (2 minutos)
+    timeout: 300000         // Timeout para jobs (5 minutos)
   }
 };
 

@@ -19,7 +19,8 @@ export default function Navbar() {
     { name: "Como Funciona", href: "/#como-funciona" },
     { name: "Preços", href: "/#precos" },
     { name: "Depoimentos", href: "/#depoimentos" },
-    { name: "Demo", href: "/demo", highlight: true },
+    { name: "Demo", href: "/demo" },
+    { name: "Novo Demo", href: "/generation-demo", highlight: true },
   ];
 
   // Fixed DOM nesting by using div instead of a when using Link component
@@ -45,9 +46,17 @@ export default function Navbar() {
           ))}
           
           {!isHomePage && (
-            <Link href="/">
-              <div className="font-medium hover:text-primary transition cursor-pointer">Início</div>
-            </Link>
+            <>
+              <Link href="/">
+                <div className="font-medium hover:text-primary transition cursor-pointer">Início</div>
+              </Link>
+              <Link href="/demo">
+                <div className="font-medium hover:text-primary transition cursor-pointer">Demo</div>
+              </Link>
+              <Link href="/generation-demo">
+                <div className="font-medium text-purple-600 font-semibold hover:text-primary transition cursor-pointer">Novo Demo</div>
+              </Link>
+            </>
           )}
         </div>
         
