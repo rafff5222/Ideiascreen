@@ -1,0 +1,129 @@
+1. Verificação das Chaves de API
+Primeiro, confirme se as chaves estão corretamente configuradas:
+
+javascript
+// No seu arquivo de configuração (ex: config.js ou .env)
+export const API_KEYS = {
+  ELEVENLABS: import.meta.env.VITE_ELEVENLABS_API_KEY || 'sua-chave-aqui',
+  OPENAI: import.meta.env.VITE_OPENAI_API_KEY || 'sua-chave-aqui'
+};
+2. Teste de Conexão Manual
+Crie um endpoint de teste no seu backend:
+
+javascript
+// Rota de teste (backend)
+router.get('/test-apis', async (req, res) => {
+  try {
+    // Teste ElevenLabs
+    const elevenLabsResponse = await fetch('https://api.elevenlabs.io/v1/voices', {
+      headers: {
+        'xi-api-key': process.env.ELEVENLABS_API_KEY
+      }
+    });
+    
+    // Teste OpenAI
+    const openaiResponse = await fetch('https://api.openai.com/v1/engines', {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      }
+    });
+    
+    res.json({
+      elevenLabs: elevenLabsResponse.status === 200 ? 'OK' : 'Erro',
+      openAI: openaiResponse.status === 200 ? 'OK' : 'Erro'
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+3. Solução Frontend Temporária
+Adicione um fallback no seu código:
+
+tsx
+function useVoiceAPIs() {
+  const [apisStatus, setApisStatus] = useState({
+    elevenLabs: 'checking',
+    openAI: 'checking'
+  });
+
+  useEffect(() => {
+    const checkAPIs = async () => {
+      try {
+        const response = await fetch('/api/test-apis');
+        const data = await response.json();
+        setApisStatus({
+          elevenLabs: data.elevenLabs,
+          openAI: data.openAI
+        });
+      } catch (error) {
+        setApisStatus({
+          elevenLabs: 'error',
+          openAI: 'error'
+        });
+      }
+    };
+
+    checkAPIs();
+  }, []);
+
+  return apisStatus;
+}
+4. Mensagens de Erro Amigáveis
+Atualize sua interface para mostrar orientações úteis:
+
+tsx
+function APIStatusMessage({ status }) {
+  if (status.elevenLabs === 'OK' && status.openAI === 'OK') {
+    return null;
+  }
+
+  return (
+    <div className="api-error-banner">
+      <h3>Problema com serviços de voz</h3>
+      
+      {status.elevenLabs !== 'OK' && (
+        <p>
+          <strong>ElevenLabs:</strong> {getErrorMessage(status.elevenLabs)}
+          <a href="/settings?tab=api-keys">Configurar chave</a>
+        </p>
+      )}
+      
+      {status.openAI !== 'OK' && (
+        <p>
+          <strong>OpenAI:</strong> {getErrorMessage(status.openAI)}
+          <a href="/settings?tab=api-keys">Configurar chave</a>
+        </p>
+      )}
+      
+      <p>Dica: As chaves de API podem ser configuradas nas configurações do usuário.</p>
+    </div>
+  );
+}
+5. Soluções Alternativas
+Implemente um fallback caso as APIs estejam indisponíveis:
+
+javascript
+async function generateVoice(text, options = {}) {
+  // Tenta ElevenLabs primeiro
+  try {
+    return await elevenLabsAPI.generate(text, options);
+  } catch (e) {
+    console.warn('ElevenLabs failed, trying OpenAI...');
+    
+    // Tenta OpenAI como fallback
+    try {
+      return await openaiAPI.generate(text, options);
+    } catch (e) {
+      console.error('All voice APIs failed');
+      
+      // Fallback para voz do navegador
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        speechSynthesis.speak(utterance);
+        return { method: 'browser' };
+      }
+      
+      throw new Error('No voice generation method available');
+    }
+  }
+}

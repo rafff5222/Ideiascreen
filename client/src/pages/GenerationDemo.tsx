@@ -19,9 +19,13 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from '@/hooks/use-toast';
 import { ProcessingProgress } from '@/components/ProcessingProgress';
-import { Loader2, Video, Play } from 'lucide-react';
+import { Loader2, Video, Play, Settings, FileText } from 'lucide-react';
+import APIConfigPanel from '@/components/APIConfigPanel';
+import APIStatusChecker from '@/components/APIStatusChecker';
+import { checkSecrets, requestSecrets } from '@/lib/secrets';
 
 export default function GenerationDemo() {
   const [script, setScript] = useState('');
@@ -108,6 +112,37 @@ export default function GenerationDemo() {
     });
   };
   
+  // Verificar status das chaves de API
+  useEffect(() => {
+    const checkAPIKeys = async () => {
+      try {
+        const status = await checkSecrets(['OPENAI_API_KEY', 'ELEVENLABS_API_KEY']);
+        
+        // Se as chaves não estiverem configuradas, mostrar mensagem
+        if (!status.OPENAI_API_KEY || !status.ELEVENLABS_API_KEY) {
+          toast({
+            title: 'Chaves de API necessárias',
+            description: 'Configure as chaves de API para utilizar todos os recursos.',
+            variant: 'destructive'
+          });
+          
+          // Solicitar chaves faltantes
+          const missingKeys = [];
+          if (!status.OPENAI_API_KEY) missingKeys.push('OPENAI_API_KEY');
+          if (!status.ELEVENLABS_API_KEY) missingKeys.push('ELEVENLABS_API_KEY');
+          
+          if (missingKeys.length > 0) {
+            ask_secrets(missingKeys, 'Configure suas chaves de API para continuar');
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao verificar status das chaves:', error);
+      }
+    };
+    
+    checkAPIKeys();
+  }, [toast]);
+
   return (
     <div className="container mx-auto py-8 max-w-4xl">
       <div className="mb-8 text-center">
@@ -120,178 +155,202 @@ export default function GenerationDemo() {
         </p>
       </div>
       
-      <div className="grid md:grid-cols-2 gap-6">
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Roteiro e Configurações</CardTitle>
-              <CardDescription>
-                Digite seu roteiro e escolha as opções de narração
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} id="generation-form">
-                <div className="mb-4">
-                  <Label htmlFor="script" className="mb-2 block">Roteiro</Label>
-                  <Textarea
-                    id="script"
-                    placeholder="Digite seu roteiro aqui..."
-                    value={script}
-                    onChange={(e) => setScript(e.target.value)}
-                    rows={6}
-                    className="resize-none"
-                  />
-                  <div className="text-xs text-gray-500 mt-1 text-right">
-                    {script.length} caracteres
-                  </div>
-                </div>
-                
-                <div className="grid gap-4">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="voice" className="mb-2 block">Voz</Label>
-                      <Select 
-                        value={voice} 
-                        onValueChange={setVoice}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione uma voz" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pt-BR-Female-Professional">Feminina Profissional</SelectItem>
-                          <SelectItem value="pt-BR-Male-Professional">Masculina Profissional</SelectItem>
-                          <SelectItem value="pt-BR-Female-Young">Feminina Jovem</SelectItem>
-                          <SelectItem value="pt-BR-Male-Young">Masculina Jovem</SelectItem>
-                          <SelectItem value="pt-BR-Neutral">Neutra</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="speed" className="mb-2 block">
-                        Velocidade da fala: {speed.toFixed(1)}x
-                      </Label>
-                      <Slider
-                        id="speed"
-                        min={0.5}
-                        max={2.0}
-                        step={0.1}
-                        value={[speed]}
-                        onValueChange={(values) => setSpeed(values[0])}
-                        className="mt-3"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </CardContent>
-            <CardFooter>
-              <Button 
-                type="submit" 
-                form="generation-form" 
-                disabled={isSubmitting || !script.trim()}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-              >
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isSubmitting ? 'Processando...' : 'Gerar Vídeo'}
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
+      <Tabs defaultValue="editor" className="mb-6">
+        <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+          <TabsTrigger value="editor" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Editor
+          </TabsTrigger>
+          <TabsTrigger value="config" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Configuração
+          </TabsTrigger>
+        </TabsList>
         
-        <div>
-          <div className="space-y-4">
-            {taskId && (
-              <ProcessingProgress 
-                taskId={taskId} 
-                onComplete={handleProcessingComplete}
-                onError={handleProcessingError}
-              />
-            )}
-            
-            {result && (
+        <TabsContent value="editor" className="mt-4">
+          {/* Verificador de status das APIs */}
+          <APIStatusChecker showStripe={false} />
+          
+          {/* Conteúdo do editor e visualização */}
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Video className="mr-2 h-5 w-5 text-blue-600" />
-                    Vídeo Gerado
-                  </CardTitle>
+                  <CardTitle>Roteiro e Configurações</CardTitle>
                   <CardDescription>
-                    Vídeo processado com sucesso
+                    Digite seu roteiro e escolha as opções de narração
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="bg-gray-100 border border-gray-200 rounded-md p-4 text-center">
-                    {/* Aqui seria mostrado o vídeo ou imagens do resultado */}
-                    {result.resources?.imageUrls && (
-                      <div className="grid grid-cols-2 gap-2 mb-3">
-                        {result.resources.imageUrls.slice(0, 4).map((url: string, index: number) => (
-                          <div key={index} className="aspect-video bg-gray-200 rounded-md overflow-hidden">
-                            <img src={url} alt={`Geração ${index + 1}`} className="w-full h-full object-cover" />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {result.resources?.audioData && (
-                      <div className="mt-2">
-                        <audio 
-                          controls 
-                          src={result.resources.audioData} 
-                          className="w-full"
-                        />
-                      </div>
-                    )}
-                    
-                    <div className="mt-4">
-                      <Button className="bg-green-600 hover:bg-green-700">
-                        <Play className="mr-2 h-4 w-4" />
-                        Baixar Vídeo
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-4">
-                    <h4 className="font-semibold mb-2 text-sm">Metadados do Vídeo</h4>
-                    <div className="text-xs text-gray-600 space-y-1">
-                      <div className="flex justify-between">
-                        <span>Duração:</span>
-                        <span>{result.metadata?.duration || 0} segundos</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Segmentos:</span>
-                        <span>{result.metadata?.segments || 0}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Imagens:</span>
-                        <span>{result.resources?.imageUrls?.length || 0}</span>
+                  <form onSubmit={handleSubmit} id="generation-form">
+                    <div className="mb-4">
+                      <Label htmlFor="script" className="mb-2 block">Roteiro</Label>
+                      <Textarea
+                        id="script"
+                        placeholder="Digite seu roteiro aqui..."
+                        value={script}
+                        onChange={(e) => setScript(e.target.value)}
+                        rows={6}
+                        className="resize-none"
+                      />
+                      <div className="text-xs text-gray-500 mt-1 text-right">
+                        {script.length} caracteres
                       </div>
                     </div>
-                  </div>
+                    
+                    <div className="grid gap-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="voice" className="mb-2 block">Voz</Label>
+                          <Select 
+                            value={voice} 
+                            onValueChange={setVoice}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione uma voz" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pt-BR-Female-Professional">Feminina Profissional</SelectItem>
+                              <SelectItem value="pt-BR-Male-Professional">Masculina Profissional</SelectItem>
+                              <SelectItem value="pt-BR-Female-Young">Feminina Jovem</SelectItem>
+                              <SelectItem value="pt-BR-Male-Young">Masculina Jovem</SelectItem>
+                              <SelectItem value="pt-BR-Neutral">Neutra</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="speed" className="mb-2 block">
+                            Velocidade da fala: {speed.toFixed(1)}x
+                          </Label>
+                          <Slider
+                            id="speed"
+                            min={0.5}
+                            max={2.0}
+                            step={0.1}
+                            value={[speed]}
+                            onValueChange={(values) => setSpeed(values[0])}
+                            className="mt-3"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </form>
                 </CardContent>
+                <CardFooter>
+                  <Button 
+                    type="submit" 
+                    form="generation-form" 
+                    disabled={isSubmitting || !script.trim()}
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  >
+                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {isSubmitting ? 'Processando...' : 'Gerar Vídeo'}
+                  </Button>
+                </CardFooter>
               </Card>
-            )}
+            </div>
             
-            {!taskId && !result && (
-              <Card className="bg-gray-50">
-                <CardContent className="pt-6 pb-4 flex flex-col items-center justify-center text-center min-h-[300px]">
-                  <Video className="h-16 w-16 text-gray-300 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-700">Nenhum vídeo gerado</h3>
-                  <p className="text-gray-500 text-sm mt-1 max-w-xs">
-                    Preencha o formulário e clique em "Gerar Vídeo" para criar seu primeiro vídeo com IA.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+            <div>
+              <div className="space-y-4">
+                {taskId && (
+                  <ProcessingProgress 
+                    taskId={taskId} 
+                    onComplete={handleProcessingComplete}
+                    onError={handleProcessingError}
+                  />
+                )}
+                
+                {result && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <Video className="mr-2 h-5 w-5 text-blue-600" />
+                        Vídeo Gerado
+                      </CardTitle>
+                      <CardDescription>
+                        Vídeo processado com sucesso
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="bg-gray-100 border border-gray-200 rounded-md p-4 text-center">
+                        {/* Aqui seria mostrado o vídeo ou imagens do resultado */}
+                        {result.resources?.imageUrls && (
+                          <div className="grid grid-cols-2 gap-2 mb-3">
+                            {result.resources.imageUrls.slice(0, 4).map((url: string, index: number) => (
+                              <div key={index} className="aspect-video bg-gray-200 rounded-md overflow-hidden">
+                                <img src={url} alt={`Geração ${index + 1}`} className="w-full h-full object-cover" />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {result.resources?.audioData && (
+                          <div className="mt-2">
+                            <audio 
+                              controls 
+                              src={result.resources.audioData} 
+                              className="w-full"
+                            />
+                          </div>
+                        )}
+                        
+                        <div className="mt-4">
+                          <Button className="bg-green-600 hover:bg-green-700">
+                            <Play className="mr-2 h-4 w-4" />
+                            Baixar Vídeo
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-4">
+                        <h4 className="font-semibold mb-2 text-sm">Metadados do Vídeo</h4>
+                        <div className="text-xs text-gray-600 space-y-1">
+                          <div className="flex justify-between">
+                            <span>Duração:</span>
+                            <span>{result.metadata?.duration || 0} segundos</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Segmentos:</span>
+                            <span>{result.metadata?.segments || 0}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Imagens:</span>
+                            <span>{result.resources?.imageUrls?.length || 0}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                
+                {!taskId && !result && (
+                  <Card className="bg-gray-50">
+                    <CardContent className="pt-6 pb-4 flex flex-col items-center justify-center text-center min-h-[300px]">
+                      <Video className="h-16 w-16 text-gray-300 mb-4" />
+                      <h3 className="text-lg font-medium text-gray-700">Nenhum vídeo gerado</h3>
+                      <p className="text-gray-500 text-sm mt-1 max-w-xs">
+                        Preencha o formulário e clique em "Gerar Vídeo" para criar seu primeiro vídeo com IA.
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </TabsContent>
+        
+        <TabsContent value="config" className="mt-4">
+          <APIConfigPanel />
+        </TabsContent>
+      </Tabs>
       
       <div className="mt-8">
         <Separator className="my-4" />
         <div className="text-sm text-gray-500 text-center">
           <p>Este demo utiliza WebSocket para atualizações em tempo real do progresso do processamento.</p>
           <p className="mt-1">O tempo estimado de processamento é de aproximadamente 5 minutos.</p>
+          <p className="mt-1">Para configurar suas chaves de API, acesse a aba "Configuração".</p>
         </div>
       </div>
     </div>
