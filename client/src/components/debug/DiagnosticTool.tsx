@@ -156,7 +156,14 @@ export default function DiagnosticTool() {
       }
       const sysStatus = await sysStatusResponse.json();
       
-      // Testar estatísticas do servidor (memória e recursos)
+      // Obter diagnóstico completo do sistema
+      const diagResponse = await fetch('/api/debug-system-check');
+      if (diagResponse.ok) {
+        // Se o diagnóstico estiver disponível, usamos os dados detalhados
+        return await diagResponse.json();
+      }
+      
+      // Caso contrário, usamos o método antigo com múltiplas chamadas
       const statsResponse = await fetch('/api/server-stats');
       if (!statsResponse.ok) {
         throw new Error(`Não foi possível obter estatísticas do servidor (status ${statsResponse.status})`);

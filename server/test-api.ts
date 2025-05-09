@@ -53,10 +53,11 @@ async function testApis() {
     // Testar Redis usando fetch para acessar o endpoint de diagnóstico
     console.log('\n5. Testando conexão Redis via API...');
     try {
-      const redisStatusResponse = await fetch('http://localhost:5000/api/diagnose');
-      const redisStatusText = await redisStatusResponse.text();
-      console.log('Resposta do diagnóstico:', redisStatusText.substring(0, 500) + '...');
-    } catch (err) {
+      const redisStatusResponse = await fetch('http://localhost:5000/api/debug-system-check');
+      const redisStatus = await redisStatusResponse.json();
+      console.log('Resposta do diagnóstico:');
+      console.log(JSON.stringify(redisStatus?.components?.redis || {}, null, 2));
+    } catch (err: any) {
       console.error('❌ Erro ao verificar Redis:', err.message);
     }
     

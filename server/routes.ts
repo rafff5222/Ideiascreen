@@ -763,8 +763,9 @@ Stack Trace: ${stack || 'N/A'}
   
   /**
    * Endpoint para diagnóstico aprofundado - verificação API real
+   * Usamos uma rota alternativa para evitar problemas com o servidor Vite
    */
-  app.get("/api/diagnose", async (req: Request, res: Response) => {
+  app.get("/api/debug-system-check", async (req: Request, res: Response) => {
     const results: Record<string, { working: boolean, status: string, error?: string }> = {
       elevenlabs: { working: false, status: "unchecked" },
       openai: { working: false, status: "unchecked" },
