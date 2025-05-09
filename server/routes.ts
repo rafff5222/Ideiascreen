@@ -133,6 +133,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   /**
    * Endpoint para geração de vídeo usando nova sintaxe (/generate)
    * Compatível com o código do cliente fornecido
+   * Implementado com sistema de filas para processamento assíncrono
    */
   app.post("/generate", async (req: Request, res: Response) => {
     try {
@@ -148,33 +149,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Validar tamanho do roteiro
-      if (script.length > 500) {
+      const maxScriptLength = parseInt(process.env.MAX_SCRIPT_LENGTH || '500');
+      if (script.length > maxScriptLength) {
         return res.status(400).json({ 
           success: false, 
-          error: 'O roteiro deve ter no máximo 500 caracteres'
+          error: `O roteiro deve ter no máximo ${maxScriptLength} caracteres`
         });
       }
+
+      // Importar sistema de filas
+      const { queueVideoGeneration } = await import('./queue');
       
-      // Usar o novo serviço de IA para geração
-      const videoResult = await generateAIVideo({ script });
+      // Adicionar o job à fila
+      const queueResult = await queueVideoGeneration({ 
+        script,
+        voice: req.body.voice,
+        speed: req.body.speed,
+        transitions: req.body.transitions,
+        outputFormat: req.body.outputFormat
+      });
       
-      // Validação adicional do resultado
-      if (!videoResult || !videoResult.resources) {
-        throw new Error('Dados incompletos gerados pelo serviço de vídeo');
-      }
-      
-      // Retornar no formato esperado pelo cliente com campos adicionais
-      res.json({ 
-        videoUrl: videoResult.resources.audioData,
-        subtitles: videoResult.resources.subtitles,
-        imageUrls: videoResult.resources.imageUrls,
+      // Retornar o ID do job e status
+      return res.json({
         success: true,
-        metadata: {
-          duration: videoResult.metadata?.duration || 0,
-          segments: videoResult.metadata?.segments || 0,
-          format: videoResult.format || 'mp4',
-          generatedAt: videoResult.metadata?.generatedAt || new Date().toISOString()
-        }
+        jobId: queueResult.jobId,
+        status: queueResult.status,
+        message: queueResult.message
       });
       
     } catch (error: any) {
@@ -205,6 +205,136 @@ export async function registerRoutes(app: Express): Promise<Server> {
           : errorType === 'rate_limit_error'
           ? 'Aguarde alguns minutos e tente novamente'
           : 'Verifique os logs do servidor para mais detalhes'
+      });
+    }
+  });
+  
+  /**
+   * Endpoint para verificar o status de um job na fila
+   */
+  app.get("/job-status/:jobId", async (req: Request, res: Response) => {
+    try {
+      const { jobId } = req.params;
+      
+      if (!jobId) {
+        return res.status(400).json({
+          success: false,
+          error: 'ID do job não fornecido'
+        });
+      }
+      
+      // Importar sistema de filas
+      const { checkJobStatus } = await import('./queue');
+      
+      // Verificar status do job
+      const status = await checkJobStatus(jobId);
+      
+      if (!status.exists) {
+        return res.status(404).json({
+          success: false,
+          error: 'Job não encontrado'
+        });
+      }
+      
+      return res.json({
+        success: true,
+        jobId,
+        status: status.status,
+        progress: status.progress,
+        message: status.message,
+        processingTime: status.processingTime,
+        createdAt: status.createdAt
+      });
+      
+    } catch (error: any) {
+      console.error('Erro ao verificar status do job:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Erro ao verificar status do job'
+      });
+    }
+  });
+  
+  /**
+   * Endpoint para obter resultado de um job concluído
+   */
+  app.get("/job-result/:jobId", async (req: Request, res: Response) => {
+    try {
+      const { jobId } = req.params;
+      
+      if (!jobId) {
+        return res.status(400).json({
+          success: false,
+          error: 'ID do job não fornecido'
+        });
+      }
+      
+      // Importar sistema de filas e utilizar a função de verificação de status
+      const { checkJobStatus } = await import('./queue');
+      
+      // Verificar status do job
+      const status = await checkJobStatus(jobId);
+      
+      if (!status.exists) {
+        return res.status(404).json({
+          success: false,
+          error: 'Job não encontrado'
+        });
+      }
+      
+      if (status.status !== 'completed') {
+        return res.status(400).json({
+          success: false,
+          error: `Job ainda não concluído (status: ${status.status})`,
+          status: status.status,
+          progress: status.progress
+        });
+      }
+      
+      // Para acessar o resultado, precisamos obter o job da fila diretamente
+      // Usando um método não exportado pelo nosso módulo
+      // Solução: importamos diretamente do Bull
+      const Queue = require('bull');
+      const videoQueue = new Queue('video-generation', process.env.REDIS_URL || 'redis://127.0.0.1:6379');
+      
+      // Tentar obter o job e seu resultado
+      const job = await videoQueue.getJob(jobId);
+      
+      if (!job) {
+        return res.status(404).json({
+          success: false,
+          error: 'Job não encontrado após verificação de status'
+        });
+      }
+      
+      // Obter resultado
+      const videoResult = job.returnvalue;
+      
+      // Validação adicional do resultado
+      if (!videoResult || !videoResult.resources) {
+        throw new Error('Dados incompletos gerados pelo serviço de vídeo');
+      }
+      
+      // Retornar no formato esperado pelo cliente com campos adicionais
+      res.json({ 
+        videoUrl: videoResult.resources.audioData,
+        subtitles: videoResult.resources.subtitles,
+        imageUrls: videoResult.resources.imageUrls,
+        success: true,
+        metadata: {
+          duration: videoResult.metadata?.duration || 0,
+          segments: videoResult.metadata?.segments || 0,
+          format: videoResult.format || 'mp4',
+          generatedAt: videoResult.metadata?.generatedAt || new Date().toISOString()
+        },
+        jobId: job.id
+      });
+      
+    } catch (error: any) {
+      console.error('Erro ao obter resultado do job:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Erro ao obter resultado do job'
       });
     }
   });
@@ -402,7 +532,7 @@ Stack Trace: ${stack || 'N/A'}
   /**
    * Endpoint para estatísticas do servidor - utilizado para monitoramento e debugging
    */
-  app.get("/api/server-stats", (req: Request, res: Response) => {
+  app.get("/api/server-stats", async (req: Request, res: Response) => {
     // Obter uso de memória atual
     const memoryUsage = process.memoryUsage();
     
@@ -412,6 +542,16 @@ Stack Trace: ${stack || 'N/A'}
       successfulRequests: requestCounter.success,
       failedRequests: requestCounter.failed
     };
+    
+    // Obter estatísticas da fila de processamento (se disponível)
+    let queueStats = null;
+    try {
+      const { getQueueStats } = await import('./queue');
+      queueStats = await getQueueStats();
+    } catch (error) {
+      console.error("Erro ao obter estatísticas da fila:", error);
+      // Continua sem as estatísticas da fila
+    }
     
     // Retornar estatísticas
     res.json({
@@ -425,6 +565,7 @@ Stack Trace: ${stack || 'N/A'}
         rss: memoryUsage.rss
       },
       requests: requestStats,
+      queue: queueStats,
       // Valores de config para debugging
       config: {
         maxScriptLength: process.env.MAX_SCRIPT_LENGTH || 500,
@@ -432,6 +573,28 @@ Stack Trace: ${stack || 'N/A'}
         ffmpegPath: process.env.FFMPEG_PATH || './ffmpeg',
       }
     });
+  });
+  
+  /**
+   * Endpoint para estatísticas da fila de processamento
+   */
+  app.get("/api/queue-stats", async (req: Request, res: Response) => {
+    try {
+      const { getQueueStats } = await import('./queue');
+      const stats = await getQueueStats();
+      
+      res.json({
+        success: true,
+        timestamp: new Date().toISOString(),
+        stats
+      });
+    } catch (error: any) {
+      console.error("Erro ao obter estatísticas da fila:", error);
+      res.status(500).json({
+        success: false,
+        error: error.message || "Erro ao obter estatísticas da fila"
+      });
+    }
   });
 
   const httpServer = createServer(app);

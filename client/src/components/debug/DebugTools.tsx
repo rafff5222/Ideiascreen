@@ -12,6 +12,13 @@ interface SystemStatus {
     elevenlabs: boolean;
     openai: boolean;
   };
+  queue: {
+    active: number;
+    waiting: number;
+    completed: number;
+    failed: number;
+    total: number;
+  } | null;
   serverTime: string;
 }
 
@@ -27,6 +34,7 @@ export default function DebugTools() {
       elevenlabs: false,
       openai: false
     },
+    queue: null,
     serverTime: new Date().toISOString()
   });
   const [lastErrors, setLastErrors] = useState<Array<{message: string, timestamp: string}>>([]);
