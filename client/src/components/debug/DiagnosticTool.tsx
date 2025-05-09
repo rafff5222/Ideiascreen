@@ -30,6 +30,17 @@ interface DiagnosticResult {
   system_ready: boolean;
   api_status: string;
   suggestions: string[];
+  client_checks?: {
+    secure_connection: boolean;
+    audio_support: boolean;
+    video_support: boolean;
+    storage: {
+      available: boolean;
+      quota?: number;
+      usage?: number;
+      percent_used?: number;
+    };
+  };
 }
 
 // Status padrão para inicialização
@@ -57,6 +68,19 @@ export default function DiagnosticTool() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Interface para armazenar testes do cliente
+  interface ClientTests {
+    secure_connection: boolean;
+    audio_support: boolean;
+    video_support: boolean;
+    storage: {
+      available: boolean;
+      quota?: number;
+      usage?: number;
+      percent_used?: number;
+    };
+  }
+
   // Função para executar o diagnóstico do sistema
   const runDiagnostic = async () => {
     setIsLoading(true);
@@ -64,7 +88,7 @@ export default function DiagnosticTool() {
     
     try {
       // Diagnóstico do cliente (frontend)
-      const clientTests = {
+      const clientTests: ClientTests = {
         // Verificar se estamos em ambiente seguro (https)
         secure_connection: window.location.protocol === 'https:',
         
@@ -85,11 +109,13 @@ export default function DiagnosticTool() {
       const testElevenLabs = await testEndpoint('api/generate-speech', 'POST', { text: 'Teste', voice: 'feminino-profissional', speed: 1 });
       
       // Atualizar com todos os resultados
-      setResult({
+      const updatedResults = {
         ...serverResults,
         client_checks: clientTests,
         timestamp: new Date().toISOString()
-      } as any);
+      };
+      
+      setResult(updatedResults as DiagnosticResult);
     } catch (err: any) {
       console.error('Erro ao executar diagnóstico:', err);
       setError(err?.message || 'Erro desconhecido');
@@ -99,10 +125,13 @@ export default function DiagnosticTool() {
   };
   
   // Verificar espaço de armazenamento disponível
-  const estimateStorage = async (): Promise<{ available: boolean, quota?: number }> => {
+  const estimateStorage = async (): Promise<{ available: boolean, quota?: number, usage?: number, percent_used?: number }> => {
     if ('storage' in navigator && 'estimate' in navigator.storage) {
       try {
-        const { quota, usage } = await navigator.storage.estimate();
+        const estimate = await navigator.storage.estimate();
+        const quota = estimate.quota;
+        const usage = estimate.usage;
+        
         return {
           available: true,
           quota,
