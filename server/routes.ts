@@ -2,11 +2,12 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import OpenAI from "openai";
 import { contentGenerationSchema } from "../shared/schema";
-import { generateContent, generateSpeech, generateVideo, type SpeechGenerationRequest, type VideoGenerationRequest } from "./openai";
+import { generateContent, generateSpeech, generateVideo as generateOpenAIVideo, type SpeechGenerationRequest, type VideoGenerationRequest } from "./openai";
 import { storage } from "./storage";
 import fs from "fs";
 import path from "path";
 import { z } from 'zod';
+import { generateVideo as generateAIVideo } from "./ai-service";
 
 // Initialize OpenAI
 const openai = new OpenAI({

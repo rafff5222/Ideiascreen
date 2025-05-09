@@ -206,47 +206,119 @@ export default function DemoPage() {
     }
   };
 
-  const generateVideo = async () => {
-    if (!scriptText.trim()) {
-      alert('Por favor, adicione um roteiro de vídeo primeiro!');
-      return;
+  // Sistema robusto de geração com tratamento de erros e rate limiting
+  class VideoGenerator {
+    private retryCount: number;
+    private maxRetries: number;
+    
+    constructor() {
+      this.retryCount = 0;
+      this.maxRetries = 3;
     }
 
-    setIsLoading(true);
-    
-    try {
-      // Processa o roteiro para criar legendas
-      const lines = scriptText.split(/[.!?]/).filter(line => line.trim().length > 0).map(line => line.trim());
-      setSubtitles(lines);
-      
-      // Fazer requisição única para gerar vídeo completo (que já inclui áudio)
-      console.log('Enviando requisição para gerar vídeo integrado...');
-      const videoResponse = await fetch('/api/generate-video', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          script: scriptText,
-          voice: voiceType,
-          speed: speed,
-          transitions: transitions,
-          outputFormat: outputFormat
-        }),
-      });
+    async generate(script: string, config: {
+      voice: string;
+      speed: number;
+      transitions: string[];
+      outputFormat: string;
+    }): Promise<any> {
+      try {
+        // Mostrar estado de carregamento
+        setIsLoading(true);
+        
+        // Processa o roteiro para criar legendas
+        const lines = script.split(/[.!?]/).filter(line => line.trim().length > 0).map(line => line.trim());
+        setSubtitles(lines);
+        
+        console.log('Enviando requisição para gerar vídeo integrado...');
+        const videoResponse = await fetch('/api/generate-video', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Client-Version': '1.0.0' // Para rastreamento de versão
+          },
+          body: JSON.stringify({
+            script: script,
+            voice: config.voice,
+            speed: config.speed,
+            transitions: config.transitions,
+            outputFormat: config.outputFormat
+          }),
+        });
 
-      if (!videoResponse.ok) {
-        throw new Error('Falha ao gerar vídeo integrado');
-      }
+        // Tratamento para rate limiting (429) ou outros erros HTTP
+        if (videoResponse.status === 429) {
+          return await this.handleRateLimit(script, config);
+        }
 
-      const videoData = await videoResponse.json();
-      console.log('Vídeo integrado gerado com sucesso:', videoData);
+        if (!videoResponse.ok) {
+          throw new Error(`Falha na API (${videoResponse.status}): ${videoResponse.statusText}`);
+        }
+
+        const videoData = await videoResponse.json();
+        console.log('Vídeo integrado gerado com sucesso:', videoData);
+        
+        if (!videoData.resources || !videoData.resources.audioData) {
+          throw new Error('Dados incompletos recebidos do servidor');
+        }
+        
+        this.setupVideoPlayback(videoData, lines);
+        
+        return videoData;
+      } catch (error) {
+        console.error('Erro durante geração:', error);
+        
+        // Tenta recuperar de certos tipos de erro
+        if (this.retryCount < this.maxRetries && 
+            (error.message.includes('timeout') || error.message.includes('network'))) {
+          return await this.handleRateLimit(script, config);
+        }
+        
+        this.displayError(error);
+        return null;
+      } finally {
+        if (this.retryCount >= this.maxRetries) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    async handleRateLimit(script: string, config: {
+      voice: string;
+      speed: number;
+      transitions: string[];
+      outputFormat: string;
+    }): Promise<any> {
+      this.retryCount++;
+      // Espera exponencial (1s, 2s, 4s...)
+      const delay = Math.pow(2, this.retryCount - 1) * 1000;
       
-      if (!videoData.resources || !videoData.resources.audioData) {
-        throw new Error('Dados incompletos recebidos do servidor');
+      // UI feedback
+      const errorMessage = document.getElementById('error-message');
+      if (!errorMessage) {
+        const div = document.createElement('div');
+        div.id = 'error-message';
+        div.className = 'p-2 bg-yellow-100 text-sm rounded-md text-yellow-800 border border-yellow-300 mt-2';
+        div.innerHTML = `Servidor ocupado. Tentando novamente em ${delay/1000}s... (${this.retryCount}/${this.maxRetries})`;
+        
+        const container = document.querySelector('.error-container');
+        if (container) container.appendChild(div);
+      } else {
+        errorMessage.innerHTML = `Servidor ocupado. Tentando novamente em ${delay/1000}s... (${this.retryCount}/${this.maxRetries})`;
       }
       
-      // Guardar dados para reprodução sincronizada
+      await new Promise(resolve => setTimeout(resolve, delay));
+      
+      // Remove a mensagem de erro
+      const errorElement = document.getElementById('error-message');
+      if (errorElement) errorElement.remove();
+      
+      // Nova tentativa
+      return this.generate(script, config);
+    }
+
+    setupVideoPlayback(videoData: any, lines: string[]) {
+      // Configurar dados para reprodução sincronizada
       window.videoData = {
         subtitles: videoData.resources.subtitles || lines,
         images: videoData.resources.imageUrls || [
@@ -260,6 +332,12 @@ export default function DemoPage() {
       const audioElement = document.getElementById('demo-audio') as HTMLAudioElement;
       if (audioElement) {
         audioElement.src = videoData.resources.audioData;
+        
+        // Lidar com erros de áudio
+        audioElement.onerror = (e) => {
+          console.error('Erro ao carregar áudio:', e);
+          this.displayError(new Error('Falha ao carregar áudio. Tente novamente.'));
+        };
       }
       
       // Configurar o link de download
@@ -278,11 +356,63 @@ export default function DemoPage() {
       setTimeout(() => {
         setShowMessage(false);
       }, 5000);
-    } catch (error: any) {
+    }
+
+    displayError(error: Error) {
       console.error('Erro ao gerar vídeo:', error);
       setIsLoading(false);
-      alert(`Falha ao processar: ${error.message || 'Erro desconhecido'}. Por favor, tente novamente.`);
+      
+      // UI rica para erros
+      const errorContainer = document.querySelector('.error-container');
+      if (errorContainer) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'p-3 bg-red-50 text-sm rounded-md text-red-800 border border-red-200 mt-3 mb-3';
+        errorDiv.innerHTML = `
+          <div class="flex items-center">
+            <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="font-medium">Erro: ${error.message || 'Falha ao processar o vídeo'}</span>
+          </div>
+          <div class="mt-2 text-xs">
+            <p>Por favor, tente novamente ou contate o suporte se o problema persistir.</p>
+          </div>
+          <button class="mt-2 bg-red-100 hover:bg-red-200 text-red-800 text-xs px-3 py-1 rounded-md"
+            onclick="this.parentNode.remove()">
+            Fechar
+          </button>
+        `;
+        
+        // Remover mensagens de erro anteriores
+        const oldErrors = errorContainer.querySelectorAll('[class*="bg-red-50"]');
+        oldErrors.forEach(el => el.remove());
+        
+        errorContainer.appendChild(errorDiv);
+      } else {
+        // Fallback para alert se não encontrar o container
+        alert(`Falha ao processar: ${error.message || 'Erro desconhecido'}. Por favor, tente novamente.`);
+      }
     }
+  }
+
+  // Instância do gerador
+  const videoGenerator = new VideoGenerator();
+
+  // Função de geração de vídeo usando a classe
+  const generateVideo = async () => {
+    if (!scriptText.trim()) {
+      alert('Por favor, adicione um roteiro de vídeo primeiro!');
+      return;
+    }
+
+    const config = {
+      voice: voiceType,
+      speed: speed,
+      transitions: transitions,
+      outputFormat: outputFormat
+    };
+
+    await videoGenerator.generate(scriptText, config);
   };
   
   // Função para gerar um arquivo VTT de legendas a partir do roteiro
@@ -425,6 +555,7 @@ export default function DemoPage() {
                   <FaRocket className="text-indigo-600 mr-2" /> 
                   Seu Roteiro
                 </h2>
+                <div className="error-container"></div>
                 <textarea
                   id="editor-roteiro"
                   value={scriptText}
