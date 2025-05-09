@@ -583,16 +583,180 @@ Stack Trace: ${stack || 'N/A'}
       const { getQueueStats } = await import('./queue');
       const stats = await getQueueStats();
       
-      res.json({
-        success: true,
-        timestamp: new Date().toISOString(),
-        stats
-      });
+      // Verificar se é uma requisição de API ou uma página HTML
+      const acceptHeader = req.headers.accept || '';
+      const wantsHtml = acceptHeader.includes('text/html');
+      
+      if (wantsHtml) {
+        // Retornar uma página HTML com as estatísticas e jobs ativos
+        res.setHeader('Content-Type', 'text/html');
+        res.send(`
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Estatísticas da Fila de Processamento</title>
+          <style>
+            body {
+              font-family: system-ui, -apple-system, sans-serif;
+              line-height: 1.5;
+              color: #333;
+              max-width: 1000px;
+              margin: 0 auto;
+              padding: 20px;
+            }
+            h1 { color: #0066cc; }
+            h2 { color: #444; margin-top: 30px; }
+            .stat-card {
+              display: inline-block;
+              width: 140px;
+              text-align: center;
+              padding: 15px;
+              margin: 10px;
+              border-radius: 8px;
+              box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+            .stat-count {
+              font-size: 24px;
+              font-weight: bold;
+              margin: 10px 0;
+            }
+            .active { background-color: #fff4cc; }
+            .waiting { background-color: #e6f7ff; }
+            .completed { background-color: #e6ffea; }
+            .failed { background-color: #fff1f0; }
+            .total { background-color: #f4f4f7; }
+            .progress-bar {
+              height: 20px;
+              background-color: #e9ecef;
+              border-radius: 10px;
+              margin: 20px 0;
+              overflow: hidden;
+            }
+            .progress {
+              height: 100%;
+              background-color: #0066cc;
+              border-radius: 10px;
+              transition: width 0.3s ease;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 20px 0;
+            }
+            th, td {
+              padding: 12px;
+              text-align: left;
+              border-bottom: 1px solid #ddd;
+            }
+            th { background-color: #f8f9fa; }
+            .refresh { margin-top: 20px; }
+            .refresh-btn {
+              padding: 8px 16px;
+              background-color: #0066cc;
+              color: white;
+              border: none;
+              border-radius: 4px;
+              cursor: pointer;
+            }
+            .refresh-btn:hover { background-color: #0052a3; }
+          </style>
+        </head>
+        <body>
+          <h1>Estatísticas da Fila de Processamento</h1>
+          <p>Última atualização: ${new Date().toLocaleString()}</p>
+          
+          <div>
+            <div class="stat-card active">
+              <div>Ativos</div>
+              <div class="stat-count">${stats.active}</div>
+            </div>
+            <div class="stat-card waiting">
+              <div>Aguardando</div>
+              <div class="stat-count">${stats.waiting}</div>
+            </div>
+            <div class="stat-card completed">
+              <div>Concluídos</div>
+              <div class="stat-count">${stats.completed}</div>
+            </div>
+            <div class="stat-card failed">
+              <div>Falhas</div>
+              <div class="stat-count">${stats.failed}</div>
+            </div>
+            <div class="stat-card total">
+              <div>Total</div>
+              <div class="stat-count">${stats.total}</div>
+            </div>
+          </div>
+          
+          <div class="progress-bar">
+            <div class="progress" style="width: ${Math.min(100, (stats.completed / Math.max(1, stats.total)) * 100)}%"></div>
+          </div>
+          
+          <div class="refresh">
+            <button class="refresh-btn" onclick="location.reload()">Atualizar Dados</button>
+          </div>
+          
+          <h2>Detalhes dos Jobs</h2>
+          <p>Esta seção mostrará detalhes dos jobs em execução e em fila quando disponíveis.</p>
+          
+          <script>
+            // Auto-refresh a cada 5 segundos
+            setTimeout(() => location.reload(), 5000);
+          </script>
+        </body>
+        </html>
+        `);
+      } else {
+        // Retornar JSON para APIs
+        res.json({
+          success: true,
+          timestamp: new Date().toISOString(),
+          stats
+        });
+      }
     } catch (error: any) {
       console.error("Erro ao obter estatísticas da fila:", error);
       res.status(500).json({
         success: false,
         error: error.message || "Erro ao obter estatísticas da fila"
+      });
+    }
+  });
+  
+  /**
+   * Endpoint para limpar a fila de processamento
+   * Limpa todos os jobs pendentes (não afeta jobs ativos)
+   */
+  app.post("/api/clear-queue", async (req: Request, res: Response) => {
+    try {
+      // Importamos o módulo bull diretamente para ter acesso a métodos que não exportamos
+      const Queue = require('bull');
+      const videoQueue = new Queue('video-generation', process.env.REDIS_URL || 'redis://127.0.0.1:6379');
+      
+      // Obter todos os jobs pendentes
+      const waitingJobs = await videoQueue.getWaiting();
+      
+      // Remover cada job da fila
+      let removedCount = 0;
+      for (const job of waitingJobs) {
+        await job.remove();
+        removedCount++;
+      }
+      
+      console.log(`Fila limpa: ${removedCount} jobs removidos`);
+      
+      res.json({
+        success: true,
+        message: `Fila limpa com sucesso. ${removedCount} jobs removidos.`,
+        removedCount
+      });
+    } catch (error: any) {
+      console.error("Erro ao limpar fila:", error);
+      res.status(500).json({
+        success: false,
+        error: error.message || "Erro ao limpar fila"
       });
     }
   });

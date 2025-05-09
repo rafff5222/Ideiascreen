@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaBug, FaMemory, FaNetworkWired, FaTerminal } from 'react-icons/fa';
+import { FaBug, FaMemory, FaNetworkWired, FaTerminal, FaList, FaTrash } from 'react-icons/fa';
 
 interface SystemStatus {
   memory: {
@@ -59,6 +59,7 @@ export default function DebugTools() {
             elevenlabs: apiData.apis.elevenlabs.configured,
             openai: apiData.apis.openai.configured
           },
+          queue: statsData.queue,
           serverTime: apiData.environment.timestamp
         });
       } catch (error) {
@@ -187,6 +188,85 @@ export default function DebugTools() {
             </div>
           </div>
         </div>
+      </div>
+      
+      {/* Status da Fila */}
+      <div className="mb-3 border-b border-gray-700 pb-3">
+        <h4 className="font-semibold mb-2 flex items-center">
+          <FaNetworkWired className="mr-1" /> Fila de Processamento
+        </h4>
+        {systemStatus.queue ? (
+          <div className="grid grid-cols-2 gap-1">
+            <div>
+              <span className="text-gray-400">Ativos:</span>{' '}
+              <span className={systemStatus.queue.active > 0 ? "text-yellow-400" : "text-gray-300"}>
+                {systemStatus.queue.active}
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-400">Aguardando:</span>{' '}
+              <span className={systemStatus.queue.waiting > 0 ? "text-blue-400" : "text-gray-300"}>
+                {systemStatus.queue.waiting}
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-400">Concluídos:</span>{' '}
+              <span className="text-green-400">
+                {systemStatus.queue.completed}
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-400">Falhas:</span>{' '}
+              <span className={systemStatus.queue.failed > 0 ? "text-red-400" : "text-gray-300"}>
+                {systemStatus.queue.failed}
+              </span>
+            </div>
+            <div className="col-span-2 mt-1">
+              <div className="w-full bg-gray-700 rounded-full h-2.5">
+                <div 
+                  className="bg-blue-600 h-2.5 rounded-full" 
+                  style={{ 
+                    width: `${Math.min(100, (systemStatus.queue.completed / Math.max(1, systemStatus.queue.total)) * 100)}%` 
+                  }}
+                ></div>
+              </div>
+              <div className="text-xs text-right mt-1 text-gray-400">
+                {systemStatus.queue.completed}/{systemStatus.queue.total} processados
+              </div>
+            </div>
+            {/* Botões de ação para a fila */}
+            <div className="col-span-2 mt-2 flex justify-between">
+              <button 
+                onClick={() => window.open('/api/queue-stats', '_blank')}
+                className="px-2 py-1 bg-blue-900 text-white rounded text-xs hover:bg-blue-800 flex items-center"
+              >
+                <FaList className="mr-1" /> Ver Jobs
+              </button>
+              <button 
+                onClick={() => {
+                  if (confirm('Deseja realmente limpar todos os jobs pendentes da fila?')) {
+                    // Implementação futura: endpoint para limpar fila
+                    fetch('/api/clear-queue', { method: 'POST' })
+                      .then(res => res.json())
+                      .then(data => {
+                        if (data.success) {
+                          alert('Fila limpa com sucesso!');
+                        } else {
+                          alert(`Erro ao limpar fila: ${data.error}`);
+                        }
+                      })
+                      .catch(err => alert(`Erro ao limpar fila: ${err.message}`));
+                  }
+                }}
+                className="px-2 py-1 bg-red-900 text-white rounded text-xs hover:bg-red-800 flex items-center"
+              >
+                <FaTrash className="mr-1" /> Limpar Fila
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="text-gray-500">Fila não disponível</div>
+        )}
       </div>
       
       {/* Últimos Erros */}
