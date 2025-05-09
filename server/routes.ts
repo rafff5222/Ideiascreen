@@ -150,15 +150,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const content = await generateContent(validatedData);
       
       // Salva o item de conteúdo se o usuário estiver autenticado
-      if (req.isAuthenticated() && req.user) {
+      const isAuthenticated = typeof req.isAuthenticated === 'function' ? req.isAuthenticated() : false;
+      if (isAuthenticated && req.user) {
         const contentItem = await storage.saveContent({
           userId: req.user.id,
           contentType: validatedData.contentType,
           platform: validatedData.platform,
           topic: validatedData.topic,
           communicationStyle: validatedData.communicationStyle,
-          content,
-          createdAt: new Date()
+          content
         });
         
         return res.json({ content, contentItem });
@@ -179,7 +179,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
    */
   app.get("/api/content-history", async (req: Request, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
+      const isAuthenticated = typeof req.isAuthenticated === 'function' ? req.isAuthenticated() : false;
+      if (!isAuthenticated) {
         return res.status(401).json({ error: "Não autorizado" });
       }
       

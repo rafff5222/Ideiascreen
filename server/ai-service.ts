@@ -130,10 +130,37 @@ function processSubtitles(segments: string[]): string[] {
   });
 }
 
-// Gerar áudio a partir do roteiro usando OpenAI TTS
+import { generateElevenLabsAudio, VoiceType } from './elevenlabs-service';
+
+// Gerar áudio a partir do roteiro usando ElevenLabs ou fallback para OpenAI TTS
 async function generateAudio(script: string, voiceType: string): Promise<Buffer | null> {
   try {
-    // Verificações adicionais para a chave da API
+    // Mapeia os tipos de voz para as vozes disponíveis no ElevenLabs
+    const voiceMapping: { [key: string]: VoiceType } = {
+      'feminino-profissional': VoiceType.FEMININO_PROFISSIONAL,
+      'masculino-profissional': VoiceType.MASCULINO_PROFISSIONAL,
+      'feminino-jovem': VoiceType.FEMININO_JOVEM,
+      'masculino-jovem': VoiceType.MASCULINO_JOVEM,
+      'neutro': VoiceType.NEUTRO
+    };
+    
+    const selectedVoice = voiceMapping[voiceType] || VoiceType.FEMININO_PROFISSIONAL;
+    
+    // Tenta primeiro com ElevenLabs (vozes em PT-BR mais naturais)
+    if (process.env.ELEVENLABS_API_KEY) {
+      console.log(`Tentando gerar áudio com ElevenLabs usando voz ${selectedVoice}...`);
+      const elevenLabsBuffer = await generateElevenLabsAudio(script, selectedVoice);
+      
+      if (elevenLabsBuffer) {
+        console.log('Áudio gerado com sucesso via ElevenLabs!');
+        return elevenLabsBuffer;
+      }
+      
+      console.log('Falha na geração via ElevenLabs, tentando OpenAI como fallback...');
+    }
+    
+    // Fallback para OpenAI TTS
+    // Verificações adicionais para a chave da API OpenAI
     if (!process.env.OPENAI_API_KEY || 
         process.env.OPENAI_API_KEY.trim() === '' || 
         !process.env.OPENAI_API_KEY.startsWith('sk-')) {
@@ -142,7 +169,7 @@ async function generateAudio(script: string, voiceType: string): Promise<Buffer 
     }
     
     // Mapeia os tipos de voz para as vozes disponíveis na OpenAI
-    const voiceMapping: { [key: string]: string } = {
+    const openaiVoiceMapping: { [key: string]: string } = {
       'feminino-profissional': 'nova',
       'masculino-profissional': 'echo',
       'feminino-jovem': 'alloy',
@@ -150,20 +177,20 @@ async function generateAudio(script: string, voiceType: string): Promise<Buffer 
       'neutro': 'shimmer'
     };
     
-    const selectedVoice = voiceMapping[voiceType] || 'nova';
+    const openaiSelectedVoice = openaiVoiceMapping[voiceType] || 'nova';
     
-    console.log(`Gerando áudio com voz ${selectedVoice}...`);
+    console.log(`Gerando áudio com OpenAI usando voz ${openaiSelectedVoice}...`);
     
     try {
       const mp3 = await openai.audio.speech.create({
         model: "tts-1",
-        voice: selectedVoice,
+        voice: openaiSelectedVoice,
         input: script,
       });
       
       // Converter para buffer
       const buffer = Buffer.from(await mp3.arrayBuffer());
-      console.log('Áudio gerado com sucesso!');
+      console.log('Áudio gerado com sucesso via OpenAI!');
       return buffer;
     } catch (apiError: any) {
       // Log específico para erros da API OpenAI
