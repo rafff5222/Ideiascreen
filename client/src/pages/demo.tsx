@@ -342,10 +342,14 @@ export default function DemoPage() {
             // Limitar texto para evitar problemas com a API
             const limitedScript = script.length > 500 ? script.substring(0, 500) + "..." : script;
             
-            console.log("Status: Conectando ao endpoint /generate");
+            // Informar ao usuário que a operação pode demorar
+            console.log("Status: Conectando ao endpoint /generate (pode levar até 60 segundos)");
+            this.showProgressFeedback("Gerando vídeo. Isso pode levar até 60 segundos...");
+            
+            // Aumentamos o timeout para 60 segundos para combinar com o endpoint completo
             timeoutId = setTimeout(() => {
-              controller.abort(new Error('Request timeout after 30 seconds'));
-            }, 30000);
+              controller.abort(new Error('Request timeout after 60 seconds'));
+            }, 60000);
             
             const response = await fetch('/generate', {
               method: 'POST',
@@ -396,7 +400,7 @@ export default function DemoPage() {
         }
       } catch (error: any) {
         if (error.name === 'AbortError') {
-          throw new Error("Timeout da requisição após 30 segundos");
+          throw new Error("Timeout da requisição após 60 segundos. O servidor está processando muitas solicitações no momento.");
         }
         throw error;
       }
@@ -414,10 +418,14 @@ export default function DemoPage() {
             // Limitar texto para evitar problemas com a API
             const limitedScript = script.length > 500 ? script.substring(0, 500) + "..." : script;
             
-            console.log("Status: Conectando ao endpoint completo /api/generate-video");
+            // Informar ao usuário que a operação pode demorar
+            console.log("Status: Conectando ao endpoint completo /api/generate-video (pode levar até 60 segundos)");
+            this.showProgressFeedback("Processando vídeo através do endpoint avançado. Isso pode levar até 60 segundos...");
+            
+            // Timeout de 60 segundos por ser um endpoint mais lento
             timeoutId = setTimeout(() => {
               controller.abort(new Error('Request timeout after 60 seconds'));
-            }, 60000); // 60 segundos por ser um endpoint mais lento
+            }, 60000);
             
             const response = await fetch('/api/generate-video', {
               method: 'POST',
@@ -482,7 +490,7 @@ export default function DemoPage() {
         }
       } catch (error: any) {
         if (error.name === 'AbortError') {
-          throw new Error("Timeout da requisição após 60 segundos");
+          throw new Error("Timeout da requisição após 60 segundos. O servidor está processando muitas solicitações no momento.");
         }
         throw error;
       }
@@ -563,8 +571,40 @@ export default function DemoPage() {
       }, 5000);
     }
 
+    // Exibe um feedback de progresso para o usuário
+    showProgressFeedback(message: string) {
+      // Criar ou atualizar o elemento de progresso
+      let progressElement = document.getElementById('progress-feedback');
+      if (!progressElement) {
+        progressElement = document.createElement('div');
+        progressElement.id = 'progress-feedback';
+        progressElement.className = 'p-2 bg-blue-50 text-sm rounded-md text-blue-800 border border-blue-200 mt-2 mb-2 flex items-center';
+        
+        // Adicionar ícone de processamento
+        progressElement.innerHTML = `
+          <svg class="animate-spin h-4 w-4 mr-2 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>${message}</span>
+        `;
+        
+        // Adicionar ao container
+        const container = document.querySelector('.error-container') || document.querySelector('.video-form');
+        if (container) container.appendChild(progressElement);
+      } else {
+        // Atualizar mensagem existente
+        const textSpan = progressElement.querySelector('span');
+        if (textSpan) textSpan.textContent = message;
+      }
+    }
+    
     displayError(error: Error) {
       console.error('Erro ao gerar vídeo:', error);
+      
+      // Remover feedback de progresso se existir
+      const progressElement = document.getElementById('progress-feedback');
+      if (progressElement) progressElement.remove();
       
       // Log detalhado para depuração
       console.group("Detalhes do erro de geração de vídeo");
