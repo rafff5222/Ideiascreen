@@ -42,6 +42,7 @@ function updateTaskProgress(taskId: string, progress: number, message: string, s
   // Notificar clientes conectados
   const connections = activeConnections.get(taskId);
   if (connections) {
+    // Formato da mensagem deve corresponder exatamente ao formato esperado pelo cliente
     const update = JSON.stringify({
       type: 'progress_update',
       taskId,
@@ -55,9 +56,12 @@ function updateTaskProgress(taskId: string, progress: number, message: string, s
     
     connections.forEach(client => {
       if (client.readyState === WebSocket.OPEN) {
+        console.log(`[WebSocket] Enviando atualização para cliente: ${taskId}, progresso: ${progress}%`);
         client.send(update);
       }
     });
+  } else {
+    console.log(`[WebSocket] Nenhum cliente conectado para a tarefa: ${taskId}`);
   }
 }
 
@@ -120,16 +124,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log('Nova conexão WebSocket estabelecida');
     
     // Manipular mensagens recebidas
-    ws.on('message', (message: string) => {
+    ws.on('message', (message: Buffer | string) => {
       try {
-        const data = JSON.parse(message);
+        console.log('[WebSocket] Mensagem recebida:', message.toString());
+        const data = JSON.parse(message.toString());
+        console.log('[WebSocket] Dados da mensagem:', data);
         
         // Tratar comando de subscrição a uma tarefa
         if (data.type === 'subscribe' && data.taskId) {
           const taskId = data.taskId;
+          console.log(`[WebSocket] Cliente subscrevendo para tarefa: ${taskId}`);
           
           // Verificar se existe uma tarefa com este ID
           if (activeTasks.has(taskId)) {
+            console.log(`[WebSocket] Tarefa encontrada: ${taskId}`);
             // Adicionar esta conexão ao conjunto de clientes interessados nesta tarefa
             if (!activeConnections.has(taskId)) {
               activeConnections.set(taskId, new Set());
@@ -138,16 +146,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             // Enviar o estado atual da tarefa imediatamente
             const task = activeTasks.get(taskId);
-            ws.send(JSON.stringify({
+            const initialState = {
               type: 'initial_state',
               taskId,
               progress: task?.progress || 0,
               message: task?.message || 'Iniciando processamento...',
               status: task?.status || 'pending',
               estimatedTimeRemaining: calculateEstimatedTime(task?.progress || 0)
-            }));
+            };
+            console.log(`[WebSocket] Enviando estado inicial:`, initialState);
+            ws.send(JSON.stringify(initialState));
           } else {
             // Tarefa não encontrada
+            console.log(`[WebSocket] Tarefa não encontrada: ${taskId}`);
             ws.send(JSON.stringify({
               type: 'error',
               message: 'Tarefa não encontrada'

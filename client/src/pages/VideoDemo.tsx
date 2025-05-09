@@ -6,9 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from 'lucide-react';
-import ProcessingProgress from '@/components/ProcessingProgress';
-import VideoPlayer from '@/components/VideoPlayer';
-import APIStatusChecker from '@/components/APIStatusChecker';
+import { default as ProcessingProgress } from '../components/ProcessingProgress';
+import VideoPlayer from '../components/VideoPlayer';
+import APIStatusChecker from '../components/APIStatusChecker';
 
 /**
  * Página de demonstração da verificação de status de vídeo
@@ -113,7 +113,7 @@ export default function VideoDemo() {
                 <ProcessingProgress 
                   taskId={processingTaskId} 
                   autoConnect={true}
-                  onComplete={(result) => {
+                  onComplete={(result: any) => {
                     if (result && result.jobId) {
                       setJobId(result.jobId);
                     }

@@ -29,7 +29,7 @@ type ProcessingStatus = {
  * Componente para exibir progresso de processamento de vídeo em tempo real
  * Conecta-se ao WebSocket para atualizações em tempo real e mostra o resultado quando concluído
  */
-export default function ProcessingProgress({ taskId, onComplete, autoConnect = true }: ProcessingProgressProps) {
+function ProcessingProgress({ taskId, onComplete, autoConnect = true }: ProcessingProgressProps) {
   const [status, setStatus] = useState<ProcessingStatus>({
     connected: false,
     status: 'pending',
@@ -83,6 +83,15 @@ export default function ProcessingProgress({ taskId, onComplete, autoConnect = t
       // Configurar handlers
       socket.onopen = () => {
         console.log('[WebSocket] Conexão estabelecida');
+        
+        // Enviar mensagem de subscription após conexão estabelecida
+        const subscriptionMessage = JSON.stringify({
+          type: 'subscribe',
+          taskId: taskId
+        });
+        console.log('[WebSocket] Enviando mensagem de subscription:', subscriptionMessage);
+        socket.send(subscriptionMessage);
+        
         setStatus(prev => ({
           ...prev,
           connected: true,
@@ -93,9 +102,11 @@ export default function ProcessingProgress({ taskId, onComplete, autoConnect = t
       
       socket.onmessage = (event) => {
         try {
+          console.log('[WebSocket] Mensagem recebida:', event.data);
           const data = JSON.parse(event.data);
           
-          if (data.type === 'progress') {
+          // Processar inicial_state vindo do servidor
+          if (data.type === 'initial_state') {
             setStatus(prev => ({
               ...prev,
               progress: data.progress,
@@ -104,6 +115,21 @@ export default function ProcessingProgress({ taskId, onComplete, autoConnect = t
               lastUpdateTime: Date.now(),
               estimatedTimeRemaining: data.estimatedTimeRemaining || 0
             }));
+            
+            console.log('[WebSocket] Estado inicial recebido:', data);
+          }
+          // Processar atualizações de progresso
+          else if (data.type === 'progress_update') {
+            setStatus(prev => ({
+              ...prev,
+              progress: data.progress,
+              message: data.message,
+              status: data.status,
+              lastUpdateTime: Date.now(),
+              estimatedTimeRemaining: data.estimatedTimeRemaining || 0
+            }));
+            
+            console.log('[WebSocket] Atualização de progresso:', data);
             
             // Se concluído, notificar
             if (data.status === 'completed') {
@@ -142,6 +168,25 @@ export default function ProcessingProgress({ taskId, onComplete, autoConnect = t
                 variant: 'destructive'
               });
             }
+          }
+          // Processar mensagens de erro
+          else if (data.type === 'error') {
+            setStatus(prev => ({
+              ...prev,
+              error: data.message || 'Erro recebido do servidor',
+              message: 'Falha na comunicação com o servidor'
+            }));
+            
+            toast({
+              title: 'Erro na comunicação',
+              description: data.message || 'Ocorreu um erro durante a comunicação com o servidor.',
+              variant: 'destructive'
+            });
+            
+            console.error('[WebSocket] Erro recebido do servidor:', data);
+          }
+          else {
+            console.log('[WebSocket] Mensagem não reconhecida:', data);
           }
         } catch (error) {
           console.error('[WebSocket] Erro ao processar mensagem:', error);
@@ -348,3 +393,5 @@ export default function ProcessingProgress({ taskId, onComplete, autoConnect = t
     </div>
   );
 }
+
+export default ProcessingProgress;
