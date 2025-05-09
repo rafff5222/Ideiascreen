@@ -760,6 +760,151 @@ Stack Trace: ${stack || 'N/A'}
       });
     }
   });
+  
+  /**
+   * Endpoint para diagnóstico aprofundado - verificação API real
+   */
+  app.get("/api/diagnose", async (req: Request, res: Response) => {
+    const results: Record<string, { working: boolean, status: string, error?: string }> = {
+      elevenlabs: { working: false, status: "unchecked" },
+      openai: { working: false, status: "unchecked" },
+      ffmpeg: { working: false, status: "unchecked" },
+      redis: { working: false, status: "unchecked" }
+    };
+    
+    try {
+      // 1. Testar FFmpeg (mais rápido e local)
+      try {
+        const { execSync } = require('child_process');
+        const ffmpegVersion = execSync('ffmpeg -version').toString().split('\n')[0];
+        results.ffmpeg = { 
+          working: ffmpegVersion.includes('ffmpeg version'), 
+          status: "installed",
+          error: ffmpegVersion.includes('ffmpeg version') ? undefined : "Invalid version response"
+        };
+      } catch (err: any) {
+        results.ffmpeg = { 
+          working: false, 
+          status: "error", 
+          error: err?.message || "Not installed or inaccessible"
+        };
+      }
+      
+      // 2. Testar Redis
+      try {
+        const Redis = require('ioredis');
+        const redis = new Redis(process.env.REDIS_URL || 'redis://127.0.0.1:6379');
+        await redis.ping();
+        await redis.quit();
+        results.redis = { 
+          working: true, 
+          status: "connected" 
+        };
+      } catch (err: any) {
+        results.redis = { 
+          working: false, 
+          status: "error", 
+          error: err?.message || "Failed to connect"
+        };
+      }
+      
+      // 3. Testar ElevenLabs API
+      if (process.env.ELEVENLABS_API_KEY) {
+        try {
+          const ElevenLabs = require('elevenlabs-node');
+          const voice = new ElevenLabs({
+            apiKey: process.env.ELEVENLABS_API_KEY
+          });
+          
+          // Tentar obter lista de vozes para testar autenticação
+          try {
+            await voice.getVoices();
+            results.elevenlabs = { 
+              working: true, 
+              status: "connected" 
+            };
+          } catch (apiErr: any) {
+            results.elevenlabs = { 
+              working: false, 
+              status: "authentication error", 
+              error: apiErr?.message || "Failed to authenticate"
+            };
+          }
+        } catch (err: any) {
+          results.elevenlabs = { 
+            working: false, 
+            status: "error", 
+            error: err?.message || "Unknown error"
+          };
+        }
+      } else {
+        results.elevenlabs = { working: false, status: "no api key" };
+      }
+      
+      // 4. Testar OpenAI API
+      if (process.env.OPENAI_API_KEY) {
+        try {
+          const { OpenAI } = await import("openai");
+          const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+          
+          // Fazer uma requisição simples para testar a autenticação
+          try {
+            const response = await openai.chat.completions.create({
+              model: "gpt-4o",
+              messages: [
+                { role: "user", content: "API test" }
+              ],
+              max_tokens: 5
+            });
+            
+            results.openai = { 
+              working: !!response?.choices?.[0]?.message?.content, 
+              status: "connected"
+            };
+          } catch (apiErr: any) {
+            results.openai = { 
+              working: false, 
+              status: "authentication error", 
+              error: apiErr?.message || "Failed to authenticate"
+            };
+          }
+        } catch (err: any) {
+          results.openai = { 
+            working: false, 
+            status: "error", 
+            error: err?.message || "Unknown error"
+          };
+        }
+      } else {
+        results.openai = { working: false, status: "no api key" };
+      }
+      
+      // Calcular status geral do sistema
+      const allComponentsWorking = Object.values(results).every(r => r.working);
+      const apiStatus = (results.elevenlabs.working || results.openai.working) ? "partial" : "down";
+      
+      // Retornar diagnóstico completo
+      res.json({
+        success: true,
+        timestamp: new Date().toISOString(),
+        system_ready: allComponentsWorking,
+        api_status: apiStatus,
+        components: results,
+        suggestions: [
+          !results.redis.working ? "Reinicie o servidor Redis com: redis-server --daemonize yes" : null,
+          !results.ffmpeg.working ? "Instale o FFmpeg com: sudo apt-get install ffmpeg" : null,
+          !results.elevenlabs.working && results.elevenlabs.status === "authentication error" ? "Verifique a chave API do ElevenLabs" : null,
+          !results.openai.working && results.openai.status === "authentication error" ? "Verifique a chave API da OpenAI" : null
+        ].filter(Boolean)
+      });
+    } catch (error: any) {
+      console.error("Erro ao executar diagnóstico:", error);
+      res.status(500).json({
+        success: false,
+        error: error.message || "Erro ao executar diagnóstico"
+      });
+    }
+  });
 
   const httpServer = createServer(app);
   
