@@ -185,6 +185,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     });
   });
+
   // Middleware para contagem de requisições
   app.use((req: Request, res: Response, next) => {
     requestCounter.total++;
@@ -204,6 +205,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     next();
   });
+
   /**
    * Endpoint para gerar narração de áudio a partir de texto usando OpenAI TTS
    */
@@ -630,11 +632,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         metadata: {
           duration: videoResult.metadata?.duration || 0,
-          segments: videoResult.metadata?.segments || 0,
-          format: videoResult.format || 'mp4',
-          generatedAt: videoResult.metadata?.generatedAt || new Date().toISOString()
-        },
-        jobId: job.id
+          segments: videoResult.metadata?.segments || 0
+        }
       });
       
     } catch (error: any) {
@@ -652,29 +651,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/generate", async (req: Request, res: Response) => {
     try {
       const validatedData = contentGenerationSchema.parse(req.body);
+      const result = await generateContent(validatedData);
       
-      const content = await generateContent(validatedData);
+      // Salvar o conteúdo gerado
+      const savedContent = await storage.saveContent({
+        type: validatedData.type,
+        platform: validatedData.platform,
+        topic: validatedData.topic,
+        style: validatedData.style,
+        content: result,
+        createdAt: new Date()
+      });
       
-      // Salva o item de conteúdo se o usuário estiver autenticado
-      const isAuthenticated = typeof req.isAuthenticated === 'function' ? req.isAuthenticated() : false;
-      if (isAuthenticated && req.user) {
-        const contentItem = await storage.saveContent({
-          userId: req.user.id,
-          contentType: validatedData.contentType,
-          platform: validatedData.platform,
-          topic: validatedData.topic,
-          communicationStyle: validatedData.communicationStyle,
-          content
-        });
-        
-        return res.json({ content, contentItem });
-      }
-      
-      // Retorna apenas o conteúdo para usuários não autenticados
-      res.json({ content });
+      res.json({ 
+        success: true,
+        content: result,
+        contentId: savedContent.id
+      });
     } catch (error: any) {
       console.error("Erro ao gerar conteúdo:", error);
       res.status(400).json({ 
+        success: false,
         error: error.message || "Erro ao gerar conteúdo" 
       });
     }
@@ -685,15 +682,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
    */
   app.get("/api/content-history", async (req: Request, res: Response) => {
     try {
-      const isAuthenticated = typeof req.isAuthenticated === 'function' ? req.isAuthenticated() : false;
-      if (!isAuthenticated) {
-        return res.status(401).json({ error: "Não autorizado" });
-      }
-      
       const contentHistory = await storage.getContentHistory();
-      res.json(contentHistory);
+      res.json({
+        success: true,
+        history: contentHistory
+      });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      console.error("Erro ao obter histórico:", error);
+      res.status(500).json({
+        success: false,
+        error: error.message || "Erro ao obter histórico"
+      });
     }
   });
   
@@ -701,40 +700,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
    * Endpoint para dados de preços dinâmicos
    */
   app.get("/api/pricing-data", (req: Request, res: Response) => {
+    // Simulação de dados dinâmicos baseados na hora do dia e outros fatores
+    const now = new Date();
+    const hour = now.getHours();
+    
     // Preços base
     const basePrices = {
-      basic: 59,
-      premium: 89,
-      pro: 119,
-      ultimate: 149
+      basic: { original: 89, current: 59 },
+      premium: { original: 117, current: 89 },
+      ultimate: { original: 149, current: 129.90 }
     };
     
-    // Hora atual
-    const hour = new Date().getHours();
+    // Aplicar variação baseada na hora do dia
+    // Preços ligeiramente mais altos durante horário comercial (9h-18h)
+    const isPeakHour = hour >= 9 && hour <= 18;
+    const priceMultiplier = isPeakHour ? 1.00 : 0.97;
     
-    // Desconto noturno (22h às 8h)
-    const isNightTime = hour >= 22 || hour < 8;
-    const discount = isNightTime ? 0.10 : 0;
+    // Simular também baseado no dia da semana (promoção de fim de semana)
+    const dayOfWeek = now.getDay(); // 0 = Domingo, 6 = Sábado
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+    const weekendDiscount = isWeekend ? 0.95 : 1.0;
     
-    // Aplicando desconto
-    const dynamicPrices = {
-      basic: Math.round(basePrices.basic * (1 - discount)),
-      premium: Math.round(basePrices.premium * (1 - discount)),
-      pro: Math.round(basePrices.pro * (1 - discount)),
-      ultimate: Math.round(basePrices.ultimate * (1 - discount))
+    // Calcular preços finais
+    const finalPrices = {
+      basic: {
+        original: basePrices.basic.original,
+        current: Math.round(basePrices.basic.current * priceMultiplier * weekendDiscount)
+      },
+      premium: {
+        original: basePrices.premium.original,
+        current: Math.round(basePrices.premium.current * priceMultiplier * weekendDiscount),
+        expiresIn: Math.floor(Math.random() * 24) + 1 // Horas restantes (1-24)
+      },
+      ultimate: {
+        original: basePrices.ultimate.original,
+        current: Math.round(basePrices.ultimate.current * priceMultiplier * weekendDiscount * 100) / 100
+      }
     };
     
-    // Mensagem promocional
-    let promoMessage = '';
-    if (isNightTime) {
-      promoMessage = '🌙 Promoção especial noturna: 10% OFF em todos os planos!';
-    }
+    // Adicionar metadados da promoção
+    const metadata = {
+      promoActive: true,
+      promoName: isWeekend ? "Promoção de Fim de Semana" : "Oferta Relâmpago",
+      globalDiscount: isWeekend ? "5%" : null,
+      expiresAt: (() => {
+        const expiry = new Date();
+        expiry.setHours(23, 59, 59, 999); // Fim do dia atual
+        return expiry.toISOString();
+      })(),
+      userViews: Math.floor(Math.random() * 5) + 1, // Número de visualizações do usuário (1-5)
+      recentSales: Math.floor(Math.random() * 10) + 5 // Vendas recentes (5-15)
+    };
     
     res.json({
-      prices: dynamicPrices,
-      basePrices,
-      discount,
-      promoMessage
+      success: true,
+      prices: finalPrices,
+      metadata
     });
   });
   
@@ -742,96 +763,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
    * Endpoint para log de cliques de usuários
    */
   app.post("/api/clicks", (req: Request, res: Response) => {
-    // Registra cliques para análise de comportamento
-    console.log("Clique registrado:", req.body);
-    res.status(200).send({ success: true });
+    const { element, page, timestamp, sessionId } = req.body;
+    
+    // Log para debug e análise
+    console.log(`Clique registrado: ${element} em ${page} (${sessionId})`);
+    
+    // Aqui poderia salvar em banco de dados
+    
+    res.json({ success: true });
   });
   
   /**
    * Endpoint para log de dados de heatmap
    */
   app.post("/api/heatmap-data", (req: Request, res: Response) => {
-    // Registra dados para heatmap
-    console.log("Analytics:", req.body);
-    res.status(200).send({ success: true });
+    const { movements, page, sessionId } = req.body;
+    
+    // Log para debug (apenas quantidade para não sobrecarregar o log)
+    if (movements && Array.isArray(movements)) {
+      console.log(`Recebidos ${movements.length} movimentos para a página ${page} (${sessionId})`);
+    }
+    
+    res.json({ success: true });
   });
   
   /**
    * Endpoint para analytics gerais
    */
   app.post("/api/analytics", (req: Request, res: Response) => {
-    // Registra dados de analytics
-    console.log("Analytics:", req.body);
-    res.status(200).send({ success: true });
+    const { eventType, eventData, sessionId, timestamp } = req.body;
+    
+    // Log para debug
+    console.log(`Evento analytics: ${eventType} (${sessionId})`);
+    
+    res.json({ success: true });
   });
   
   /**
    * Endpoint para log de erros
    */
   app.post("/api/error-log", (req: Request, res: Response) => {
-    try {
-      const { message, source, lineno, colno, error, stack, userAgent, url, timestamp } = req.body;
-      
-      // Formata a mensagem de erro
-      const errorMessage = `
-[${new Date(timestamp).toLocaleString()}]
-Message: ${message}
-URL: ${url}
-Source: ${source}
-Line/Column: ${lineno}:${colno}
-User Agent: ${userAgent}
-Stack Trace: ${stack || 'N/A'}
-      `.trim();
-      
-      // Cria o diretório de logs se não existir
-      const logDir = path.join(process.cwd(), 'logs');
-      if (!fs.existsSync(logDir)) {
-        fs.mkdirSync(logDir, { recursive: true });
-      }
-      
-      // Escreve no arquivo de log
-      const logFile = path.join(logDir, 'error.log');
-      fs.appendFileSync(logFile, errorMessage + '\n\n');
-      
-      // Registra no console também
-      console.error("Erro capturado pelo ErrorMonitor:", {
-        message,
-        source,
-        url,
-        timestamp
-      });
-      
-      res.status(200).json({ success: true });
-    } catch (error) {
-      console.error("Erro ao registrar erro:", error);
-      res.status(500).json({ success: false, error: "Falha ao registrar erro" });
+    const { message, stack, componentStack, url, line, column, sessionId } = req.body;
+    
+    // Log para debug
+    console.error(`Erro do cliente: ${message} em ${url}:${line}:${column}`);
+    if (stack) {
+      console.error("Stack:", stack.split("\n").slice(0, 5).join("\n"));
     }
+    
+    res.json({ success: true, logged: true });
   });
   
   /**
    * Endpoint para verificação de status das APIs e ambiente
    */
   app.get("/api/sys-status", (req: Request, res: Response) => {
-    // Verificar APIs e chaves de configuração
-    const elevenLabsKeyStatus = process.env.ELEVENLABS_API_KEY ? 
-      { configured: true, partial: `${process.env.ELEVENLABS_API_KEY.substring(0, 3)}...${process.env.ELEVENLABS_API_KEY.substring(process.env.ELEVENLABS_API_KEY.length - 3)}` } : 
-      { configured: false };
+    const apiStatus = {
+      openai: !!process.env.OPENAI_API_KEY ? 'configured' : 'missing',
+      elevenlabs: !!process.env.ELEVENLABS_API_KEY ? 'configured' : 'missing',
+      stripe: !!process.env.STRIPE_SECRET_KEY ? 'configured' : 'missing'
+    };
     
-    const openAIKeyStatus = process.env.OPENAI_API_KEY ? 
-      { configured: true, partial: `${process.env.OPENAI_API_KEY.substring(0, 3)}...${process.env.OPENAI_API_KEY.substring(process.env.OPENAI_API_KEY.length - 3)}` } : 
-      { configured: false };
-      
-    // Retorna informações sobre o ambiente e status das APIs
     res.json({
       success: true,
-      apis: {
-        elevenlabs: elevenLabsKeyStatus,
-        openai: openAIKeyStatus
-      },
-      environment: {
-        nodeVersion: process.version,
-        platform: process.platform,
-        timestamp: new Date().toISOString()
+      status: {
+        server: 'online',
+        apis: apiStatus,
+        environment: process.env.NODE_ENV || 'development',
+        version: '1.0.0'
       }
     });
   });
@@ -840,46 +839,33 @@ Stack Trace: ${stack || 'N/A'}
    * Endpoint para estatísticas do servidor - utilizado para monitoramento e debugging
    */
   app.get("/api/server-stats", async (req: Request, res: Response) => {
-    // Obter uso de memória atual
-    const memoryUsage = process.memoryUsage();
-    
-    // Calcular estatísticas de requisições
-    const requestStats = {
-      totalRequests: requestCounter.total,
-      successfulRequests: requestCounter.success,
-      failedRequests: requestCounter.failed
-    };
-    
-    // Obter estatísticas da fila de processamento (se disponível)
-    let queueStats = null;
     try {
-      const { getQueueStats } = await import('./queue');
-      queueStats = await getQueueStats();
-    } catch (error) {
-      console.error("Erro ao obter estatísticas da fila:", error);
-      // Continua sem as estatísticas da fila
+      // Estatísticas simples
+      const stats = {
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+        requestCounts: requestCounter,
+        activeTasks: activeTasks.size,
+        activeWebSocketConnections: (() => {
+          let count = 0;
+          activeConnections.forEach(clients => {
+            count += clients.size;
+          });
+          return count;
+        })()
+      };
+      
+      res.json({
+        success: true,
+        stats
+      });
+    } catch (error: any) {
+      console.error("Erro ao obter estatísticas:", error);
+      res.status(500).json({
+        success: false,
+        error: error.message || "Erro ao obter estatísticas"
+      });
     }
-    
-    // Retornar estatísticas
-    res.json({
-      success: true,
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      memory: {
-        heapUsed: memoryUsage.heapUsed,
-        heapTotal: memoryUsage.heapTotal,
-        external: memoryUsage.external,
-        rss: memoryUsage.rss
-      },
-      requests: requestStats,
-      queue: queueStats,
-      // Valores de config para debugging
-      config: {
-        maxScriptLength: process.env.MAX_SCRIPT_LENGTH || 500,
-        cacheTTL: process.env.CACHE_TTL || 3600,
-        ffmpegPath: process.env.FFMPEG_PATH || './ffmpeg',
-      }
-    });
   });
   
   /**
@@ -887,142 +873,16 @@ Stack Trace: ${stack || 'N/A'}
    */
   app.get("/api/queue-stats", async (req: Request, res: Response) => {
     try {
+      // Importar sistema de filas
       const { getQueueStats } = await import('./queue');
+      
+      // Obter estatísticas
       const stats = await getQueueStats();
       
-      // Verificar se é uma requisição de API ou uma página HTML
-      const acceptHeader = req.headers.accept || '';
-      const wantsHtml = acceptHeader.includes('text/html');
-      
-      if (wantsHtml) {
-        // Retornar uma página HTML com as estatísticas e jobs ativos
-        res.setHeader('Content-Type', 'text/html');
-        res.send(`
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Estatísticas da Fila de Processamento</title>
-          <style>
-            body {
-              font-family: system-ui, -apple-system, sans-serif;
-              line-height: 1.5;
-              color: #333;
-              max-width: 1000px;
-              margin: 0 auto;
-              padding: 20px;
-            }
-            h1 { color: #0066cc; }
-            h2 { color: #444; margin-top: 30px; }
-            .stat-card {
-              display: inline-block;
-              width: 140px;
-              text-align: center;
-              padding: 15px;
-              margin: 10px;
-              border-radius: 8px;
-              box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            }
-            .stat-count {
-              font-size: 24px;
-              font-weight: bold;
-              margin: 10px 0;
-            }
-            .active { background-color: #fff4cc; }
-            .waiting { background-color: #e6f7ff; }
-            .completed { background-color: #e6ffea; }
-            .failed { background-color: #fff1f0; }
-            .total { background-color: #f4f4f7; }
-            .progress-bar {
-              height: 20px;
-              background-color: #e9ecef;
-              border-radius: 10px;
-              margin: 20px 0;
-              overflow: hidden;
-            }
-            .progress {
-              height: 100%;
-              background-color: #0066cc;
-              border-radius: 10px;
-              transition: width 0.3s ease;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              margin: 20px 0;
-            }
-            th, td {
-              padding: 12px;
-              text-align: left;
-              border-bottom: 1px solid #ddd;
-            }
-            th { background-color: #f8f9fa; }
-            .refresh { margin-top: 20px; }
-            .refresh-btn {
-              padding: 8px 16px;
-              background-color: #0066cc;
-              color: white;
-              border: none;
-              border-radius: 4px;
-              cursor: pointer;
-            }
-            .refresh-btn:hover { background-color: #0052a3; }
-          </style>
-        </head>
-        <body>
-          <h1>Estatísticas da Fila de Processamento</h1>
-          <p>Última atualização: ${new Date().toLocaleString()}</p>
-          
-          <div>
-            <div class="stat-card active">
-              <div>Ativos</div>
-              <div class="stat-count">${stats.active}</div>
-            </div>
-            <div class="stat-card waiting">
-              <div>Aguardando</div>
-              <div class="stat-count">${stats.waiting}</div>
-            </div>
-            <div class="stat-card completed">
-              <div>Concluídos</div>
-              <div class="stat-count">${stats.completed}</div>
-            </div>
-            <div class="stat-card failed">
-              <div>Falhas</div>
-              <div class="stat-count">${stats.failed}</div>
-            </div>
-            <div class="stat-card total">
-              <div>Total</div>
-              <div class="stat-count">${stats.total}</div>
-            </div>
-          </div>
-          
-          <div class="progress-bar">
-            <div class="progress" style="width: ${Math.min(100, (stats.completed / Math.max(1, stats.total)) * 100)}%"></div>
-          </div>
-          
-          <div class="refresh">
-            <button class="refresh-btn" onclick="location.reload()">Atualizar Dados</button>
-          </div>
-          
-          <h2>Detalhes dos Jobs</h2>
-          <p>Esta seção mostrará detalhes dos jobs em execução e em fila quando disponíveis.</p>
-          
-          <script>
-            // Auto-refresh a cada 5 segundos
-            setTimeout(() => location.reload(), 5000);
-          </script>
-        </body>
-        </html>
-        `);
-      } else {
-        // Retornar JSON para APIs
-        res.json({
-          success: true,
-          timestamp: new Date().toISOString(),
-          stats
-        });
-      }
+      res.json({
+        success: true,
+        stats
+      });
     } catch (error: any) {
       console.error("Erro ao obter estatísticas da fila:", error);
       res.status(500).json({
@@ -1038,26 +898,17 @@ Stack Trace: ${stack || 'N/A'}
    */
   app.post("/api/clear-queue", async (req: Request, res: Response) => {
     try {
-      // Importamos o módulo bull diretamente para ter acesso a métodos que não exportamos
       const Queue = require('bull');
       const videoQueue = new Queue('video-generation', process.env.REDIS_URL || 'redis://127.0.0.1:6379');
       
-      // Obter todos os jobs pendentes
-      const waitingJobs = await videoQueue.getWaiting();
-      
-      // Remover cada job da fila
-      let removedCount = 0;
-      for (const job of waitingJobs) {
-        await job.remove();
-        removedCount++;
-      }
-      
-      console.log(`Fila limpa: ${removedCount} jobs removidos`);
+      // Limpar jobs
+      await videoQueue.clean(0, 'wait');
+      await videoQueue.clean(0, 'delayed');
+      await videoQueue.clean(0, 'failed');
       
       res.json({
         success: true,
-        message: `Fila limpa com sucesso. ${removedCount} jobs removidos.`,
-        removedCount
+        message: 'Fila limpa com sucesso'
       });
     } catch (error: any) {
       console.error("Erro ao limpar fila:", error);
@@ -1073,130 +924,113 @@ Stack Trace: ${stack || 'N/A'}
    * Usamos uma rota alternativa para evitar problemas com o servidor Vite
    */
   app.get("/api/debug-system-check", async (req: Request, res: Response) => {
-    const results: Record<string, { working: boolean, status: string, error?: string }> = {
-      elevenlabs: { working: false, status: "unchecked" },
-      openai: { working: false, status: "unchecked" },
-      ffmpeg: { working: false, status: "unchecked" },
-      redis: { working: false, status: "unchecked" }
-    };
-    
     try {
-      // 1. Testar FFmpeg (mais rápido e local)
-      try {
-        const { execSync } = require('child_process');
-        const ffmpegVersion = execSync('ffmpeg -version').toString().split('\n')[0];
-        results.ffmpeg = { 
-          working: ffmpegVersion.includes('ffmpeg version'), 
-          status: "installed",
-          error: ffmpegVersion.includes('ffmpeg version') ? undefined : "Invalid version response"
-        };
-      } catch (err: any) {
-        results.ffmpeg = { 
-          working: false, 
-          status: "error", 
-          error: err?.message || "Not installed or inaccessible"
-        };
-      }
-      
-      // 2. Testar Redis
-      try {
-        const Redis = require('ioredis');
-        const redis = new Redis(process.env.REDIS_URL || 'redis://127.0.0.1:6379');
-        await redis.ping();
-        await redis.quit();
-        results.redis = { 
-          working: true, 
-          status: "connected" 
-        };
-      } catch (err: any) {
-        results.redis = { 
-          working: false, 
-          status: "error", 
-          error: err?.message || "Failed to connect"
-        };
-      }
-      
-      // 3. Testar ElevenLabs API
-      if (process.env.ELEVENLABS_API_KEY) {
+      const results = await (async () => {
+        // Verificar Redis
+        let redisResult = { working: false, status: "error" };
         try {
-          const ElevenLabs = require('elevenlabs-node');
-          const voice = new ElevenLabs({
-            apiKey: process.env.ELEVENLABS_API_KEY
-          });
-          
-          // Tentar obter lista de vozes para testar autenticação
-          try {
-            await voice.getVoices();
-            results.elevenlabs = { 
-              working: true, 
-              status: "connected" 
-            };
-          } catch (apiErr: any) {
-            results.elevenlabs = { 
-              working: false, 
-              status: "authentication error", 
-              error: apiErr?.message || "Failed to authenticate"
-            };
-          }
-        } catch (err: any) {
-          results.elevenlabs = { 
+          const Queue = require('bull');
+          const testQueue = new Queue('test-queue', process.env.REDIS_URL || 'redis://127.0.0.1:6379');
+          await testQueue.add({test: true});
+          await testQueue.clean(0, 'completed');
+          await testQueue.close();
+          redisResult = { working: true, status: "ok" };
+        } catch (error: any) {
+          redisResult = { 
             working: false, 
-            status: "error", 
-            error: err?.message || "Unknown error"
+            status: error.code === 'ECONNREFUSED' ? "connection_refused" : "error",
+            message: error.message 
           };
         }
-      } else {
-        results.elevenlabs = { working: false, status: "no api key" };
-      }
-      
-      // 4. Testar OpenAI API
-      if (process.env.OPENAI_API_KEY) {
+        
+        // Verificar FFmpeg
+        let ffmpegResult = { working: false, status: "not_found" };
         try {
-          const { OpenAI } = await import("openai");
-          const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-          
-          // Fazer uma requisição simples para testar a autenticação
+          const { execSync } = require('child_process');
+          const output = execSync('ffmpeg -version');
+          ffmpegResult = { working: true, status: "ok", version: output.toString().split('\n')[0] };
+        } catch (error: any) {
+          ffmpegResult = { 
+            working: false, 
+            status: error.code === 'ENOENT' ? "not_found" : "error",
+            message: error.message 
+          };
+        }
+        
+        // Verificar OpenAI
+        let openaiResult = { working: false, status: "unconfigured" };
+        if (process.env.OPENAI_API_KEY) {
           try {
-            const response = await openai.chat.completions.create({
-              model: "gpt-4o",
-              messages: [
-                { role: "user", content: "API test" }
-              ],
-              max_tokens: 5
+            const openai = new OpenAI({
+              apiKey: process.env.OPENAI_API_KEY
+            });
+            const models = await openai.models.list();
+            openaiResult = { 
+              working: true, 
+              status: "ok", 
+              models: models.data.slice(0, 5).map(m => m.id) 
+            };
+          } catch (error: any) {
+            openaiResult = { 
+              working: false, 
+              status: error.status === 401 ? "authentication error" : "api_error",
+              message: error.message 
+            };
+          }
+        }
+        
+        // Verificar ElevenLabs
+        let elevenlabsResult = { working: false, status: "unconfigured" };
+        if (process.env.ELEVENLABS_API_KEY) {
+          try {
+            // Chamada simples para listar vozes disponíveis
+            const response = await fetch('https://api.elevenlabs.io/v1/voices', {
+              headers: {
+                'Accept': 'application/json',
+                'xi-api-key': process.env.ELEVENLABS_API_KEY
+              }
             });
             
-            results.openai = { 
-              working: !!response?.choices?.[0]?.message?.content, 
-              status: "connected"
+            if (!response.ok) {
+              throw new Error(`Status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            elevenlabsResult = { 
+              working: true, 
+              status: "ok", 
+              voices: data.voices.slice(0, 3).map((v: any) => v.name) 
             };
-          } catch (apiErr: any) {
-            results.openai = { 
+          } catch (error: any) {
+            elevenlabsResult = { 
               working: false, 
-              status: "authentication error", 
-              error: apiErr?.message || "Failed to authenticate"
+              status: error.status === 401 ? "authentication error" : "api_error",
+              message: error.message 
             };
           }
-        } catch (err: any) {
-          results.openai = { 
-            working: false, 
-            status: "error", 
-            error: err?.message || "Unknown error"
-          };
         }
-      } else {
-        results.openai = { working: false, status: "no api key" };
-      }
+        
+        return {
+          redis: redisResult,
+          ffmpeg: ffmpegResult,
+          openai: openaiResult,
+          elevenlabs: elevenlabsResult,
+          environment: {
+            node: process.version,
+            platform: process.platform,
+            arch: process.arch,
+            memory: {
+              total: Math.round(require('os').totalmem() / (1024 * 1024)) + 'MB',
+              free: Math.round(require('os').freemem() / (1024 * 1024)) + 'MB'
+            }
+          }
+        };
+      })();
       
-      // Calcular status geral do sistema
-      const allComponentsWorking = Object.values(results).every(r => r.working);
-      const apiStatus = (results.elevenlabs.working || results.openai.working) ? "partial" : "down";
-      
-      // Retornar diagnóstico completo
+      // Retornar resultados
       res.json({
         success: true,
-        timestamp: new Date().toISOString(),
-        system_ready: allComponentsWorking,
-        api_status: apiStatus,
+        results,
         components: results,
         suggestions: [
           !results.redis.working ? "Reinicie o servidor Redis com: redis-server --daemonize yes" : null,
@@ -1213,6 +1047,7 @@ Stack Trace: ${stack || 'N/A'}
       });
     }
   });
-
+  
+  // Retornar o servidor HTTP
   return httpServer;
 }
