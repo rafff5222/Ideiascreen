@@ -871,6 +871,68 @@ export default function DemoPage() {
                   <FaRocket className="text-indigo-600 mr-2" /> 
                   Seu Roteiro
                 </h2>
+                
+                {/* Painel de Verificação de APIs */}
+                <div className="api-status-panel mb-4 bg-gray-50 border border-gray-200 rounded-md p-3">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                    <span className="inline-block w-3 h-3 bg-gray-300 rounded-full mr-2" id="api-status-indicator"></span>
+                    Verificação de APIs
+                  </h4>
+                  <div className="grid grid-cols-2 gap-2 mb-2 text-xs">
+                    <div className="flex items-center">
+                      <span className="text-gray-600 mr-1">ElevenLabs:</span>
+                      <span id="elevenlabs-status" className="text-gray-500">verificando...</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-gray-600 mr-1">OpenAI:</span>
+                      <span id="openai-status" className="text-gray-500">verificando...</span>
+                    </div>
+                  </div>
+                  <button 
+                    id="check-all-apis-btn"
+                    onClick={async () => {
+                      const indicatorEl = document.getElementById('api-status-indicator');
+                      const elevenLabsEl = document.getElementById('elevenlabs-status');
+                      const openaiEl = document.getElementById('openai-status');
+                      
+                      if (indicatorEl) indicatorEl.className = 'inline-block w-3 h-3 bg-yellow-400 rounded-full mr-2';
+                      if (elevenLabsEl) elevenLabsEl.textContent = 'verificando...';
+                      if (openaiEl) openaiEl.textContent = 'verificando...';
+                      
+                      try {
+                        const apiStatus = await checkAPIStatus();
+                        
+                        if (indicatorEl) {
+                          indicatorEl.className = `inline-block w-3 h-3 ${apiStatus.elevenlabs || apiStatus.openai ? 'bg-green-500' : 'bg-red-500'} rounded-full mr-2`;
+                        }
+                        
+                        if (elevenLabsEl) {
+                          elevenLabsEl.className = apiStatus.elevenlabs ? 'text-green-600 font-medium' : 'text-red-600';
+                          elevenLabsEl.textContent = apiStatus.elevenlabs ? '✓ Disponível' : '✗ Indisponível';
+                        }
+                        
+                        if (openaiEl) {
+                          openaiEl.className = apiStatus.openai ? 'text-green-600 font-medium' : 'text-red-600';
+                          openaiEl.textContent = apiStatus.openai ? '✓ Disponível' : '✗ Indisponível';
+                        }
+                      } catch (error) {
+                        if (indicatorEl) indicatorEl.className = 'inline-block w-3 h-3 bg-red-500 rounded-full mr-2';
+                        if (elevenLabsEl) {
+                          elevenLabsEl.className = 'text-red-600';
+                          elevenLabsEl.textContent = '✗ Erro';
+                        }
+                        if (openaiEl) {
+                          openaiEl.className = 'text-red-600';
+                          openaiEl.textContent = '✗ Erro';
+                        }
+                      }
+                    }}
+                    className="text-xs py-1 px-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-700 transition-colors"
+                  >
+                    Verificar Conexões
+                  </button>
+                </div>
+                
                 <div className="error-container"></div>
                 <textarea
                   id="editor-roteiro"

@@ -113,6 +113,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Extrair script do body
       const { script } = req.body;
       
+      // Validação aprimorada do input
       if (!script || typeof script !== 'string') {
         return res.status(400).json({ 
           success: false, 
@@ -120,22 +121,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Validar tamanho do roteiro
+      if (script.length > 500) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'O roteiro deve ter no máximo 500 caracteres'
+        });
+      }
+      
       // Usar o novo serviço de IA para geração
       const videoResult = await generateAIVideo({ script });
       
-      // Retornar no formato esperado pelo cliente
+      // Validação adicional do resultado
+      if (!videoResult || !videoResult.resources) {
+        throw new Error('Dados incompletos gerados pelo serviço de vídeo');
+      }
+      
+      // Retornar no formato esperado pelo cliente com campos adicionais
       res.json({ 
         videoUrl: videoResult.resources.audioData,
         subtitles: videoResult.resources.subtitles,
         imageUrls: videoResult.resources.imageUrls,
-        success: true
+        success: true,
+        metadata: {
+          duration: videoResult.metadata?.duration || 0,
+          segments: videoResult.metadata?.segments || 0,
+          format: videoResult.format || 'mp4',
+          generatedAt: videoResult.metadata?.generatedAt || new Date().toISOString()
+        }
       });
       
     } catch (error: any) {
       console.error('Erro na geração:', error);
-      res.status(500).json({
+      
+      // Classificação detalhada do erro
+      let statusCode = 500;
+      let errorMessage = error.message || 'Falha ao processar a solicitação';
+      let errorType = 'server_error';
+      
+      // Determinar tipos específicos de erro
+      if (error.message?.includes('API key')) {
+        errorType = 'api_key_error';
+        statusCode = 401;
+      } else if (error.message?.includes('rate limit')) {
+        errorType = 'rate_limit_error';
+        statusCode = 429;
+      } else if (error.message?.includes('incompletos')) {
+        errorType = 'data_error';
+      }
+      
+      res.status(statusCode).json({
         success: false,
-        error: error.message || 'Falha ao processar a solicitação'
+        error: errorMessage,
+        errorType: errorType,
+        dica: errorType === 'api_key_error' 
+          ? 'Verifique se suas chaves de API (ElevenLabs e OpenAI) estão configuradas corretamente'
+          : errorType === 'rate_limit_error'
+          ? 'Aguarde alguns minutos e tente novamente'
+          : 'Verifique os logs do servidor para mais detalhes'
       });
     }
   });

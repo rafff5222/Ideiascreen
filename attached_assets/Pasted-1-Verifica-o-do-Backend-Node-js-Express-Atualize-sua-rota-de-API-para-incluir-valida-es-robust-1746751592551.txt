@@ -1,0 +1,112 @@
+1. Verificação do Backend (Node.js/Express)
+Atualize sua rota de API para incluir validações robustas:
+
+javascript
+// Rota corrigida (backend)
+app.post('/generate', async (req, res) => {
+  try {
+    const { script } = req.body;
+
+    // Validação do input
+    if (!script || script.length > 500) {
+      return res.status(400).json({ 
+        error: "Script inválido: máximo 500 caracteres" 
+      });
+    }
+
+    // 1. Geração de áudio (ElevenLabs)
+    const audioResponse = await fetch('https://api.elevenlabs.io/v1/text-to-speech/XYZ', {
+      method: 'POST',
+      headers: {
+        'xi-api-key': process.env.ELEVENLABS_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ text: script })
+    });
+
+    if (!audioResponse.ok) throw new Error("Falha na API de áudio");
+    const audioBlob = await audioResponse.blob();
+
+    // 2. Geração de vídeo (FFmpeg)
+    const videoUrl = await generateVideoWithFFmpeg(audioBlob);
+
+    // Resposta garantindo todos os campos
+    res.json({
+      success: true,
+      videoUrl: videoUrl,
+      audioUrl: URL.createObjectURL(audioBlob),
+      metadata: {
+        duration: "00:00:15",
+        format: "mp4"
+      }
+    });
+
+  } catch (error) {
+    console.error("Erro no backend:", error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      dica: "Verifique as chaves de API e logs do servidor"
+    });
+  }
+});
+🖥 Atualização do Frontend (React/JS)
+Modifique sua função de chamada para tratar todos os cenários:
+
+javascript
+async function handleGenerate() {
+  try {
+    // Mostrar estado de carregamento
+    setStatus("Processando...");
+    
+    const response = await fetch('/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        script: inputText,
+        voice: selectedVoice // Ex: "feminino-profissional"
+      })
+    });
+
+    const data = await response.json();
+
+    // Verificação EXTRA dos dados
+    if (!data.videoUrl || !data.audioUrl) {
+      throw new Error("Dados incompletos da API");
+    }
+
+    // Atualizar estado
+    setVideoUrl(data.videoUrl);
+    setStatus("Pronto!");
+
+  } catch (error) {
+    // Feedback detalhado ao usuário
+    setStatus(`Erro: ${error.message}`);
+    setErrorDetails(
+      error.response?.data?.dica || 
+      "Verifique sua conexão e tente novamente"
+    );
+  }
+}
+🔍 Painel de Verificação de APIs
+Adicione esta seção para debug no frontend:
+
+jsx
+<div className="api-status">
+  <h4>Verificação de APIs</h4>
+  <ul>
+    <li>
+      ElevenLabs: 
+      <span className={elevenlabsOnline ? "online" : "offline"}>
+        {elevenlabsOnline ? "✔ Online" : "✖ Offline"}
+      </span>
+    </li>
+    <li>
+      FFmpeg: 
+      <span className={ffmpegOnline ? "online" : "offline"}>
+        {ffmpegOnline ? "✔ Online" : "✖ Offline"}
+      </span>
+    </li>
+  </ul>
+  <button onClick={testAllApis}>Testar Conexões</button>
+</div>
