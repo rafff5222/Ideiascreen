@@ -36,6 +36,7 @@ export default function APIStatusChecker({
     setIsLoading(true);
     
     try {
+      // Primeiro, verificar se as chaves estão configuradas
       const response = await fetch('/api/sys-status');
       
       if (!response.ok) {
@@ -48,12 +49,53 @@ export default function APIStatusChecker({
         throw new Error(data.error || 'Erro desconhecido');
       }
       
+      // Mapear status inicial
       const apiStatus: APIStatus = {
         openai: data.status.apis.openai,
         elevenlabs: data.status.apis.elevenlabs,
         stripe: showStripe ? data.status.apis.stripe : undefined
       };
       
+      // Atualizar status intermediário (indicando que as chaves existem)
+      setStatus(apiStatus);
+      
+      // Se as chaves estiverem configuradas, testar a conectividade real
+      if (apiStatus.openai === 'configured') {
+        try {
+          const openaiTestResponse = await fetch('/api/test-api-connection/openai');
+          const openaiTestData = await openaiTestResponse.json();
+          
+          if (openaiTestData.success && openaiTestData.connection.working) {
+            // Manter status 'configured'
+          } else {
+            // Atualizar para erro se a chave existe mas não funciona
+            apiStatus.openai = 'error';
+            console.error('Erro de conexão OpenAI:', openaiTestData.connection?.message);
+          }
+        } catch (e) {
+          console.error('Erro ao testar conexão OpenAI:', e);
+        }
+      }
+      
+      // Teste de conectividade para ElevenLabs
+      if (apiStatus.elevenlabs === 'configured') {
+        try {
+          const elevenlabsTestResponse = await fetch('/api/test-api-connection/elevenlabs');
+          const elevenlabsTestData = await elevenlabsTestResponse.json();
+          
+          if (elevenlabsTestData.success && elevenlabsTestData.connection.working) {
+            // Manter status 'configured'
+          } else {
+            // Atualizar para erro se a chave existe mas não funciona
+            apiStatus.elevenlabs = 'error';
+            console.error('Erro de conexão ElevenLabs:', elevenlabsTestData.connection?.message);
+          }
+        } catch (e) {
+          console.error('Erro ao testar conexão ElevenLabs:', e);
+        }
+      }
+      
+      // Atualizar o status final após os testes de conectividade
       setStatus(apiStatus);
       
       if (onStatusChange) {

@@ -132,7 +132,7 @@ export default function GenerationDemo() {
           if (!status.ELEVENLABS_API_KEY) missingKeys.push('ELEVENLABS_API_KEY');
           
           if (missingKeys.length > 0) {
-            ask_secrets(missingKeys, 'Configure suas chaves de API para continuar');
+            requestSecrets(missingKeys, 'Configure suas chaves de API para continuar');
           }
         }
       } catch (error) {

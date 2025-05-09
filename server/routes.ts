@@ -834,6 +834,120 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     });
   });
+
+  /**
+   * Endpoint para testar a conexão com uma API específica
+   * Realiza testes reais de conectividade em vez de apenas verificar se as chaves existem
+   */
+  app.get("/api/test-api-connection/:api", async (req: Request, res: Response) => {
+    const { api } = req.params;
+    
+    try {
+      // Verificação de OpenAI
+      if (api === 'openai') {
+        if (!process.env.OPENAI_API_KEY) {
+          return res.status(400).json({
+            success: false,
+            error: 'Chave de API da OpenAI não configurada'
+          });
+        }
+        
+        // Teste de conexão simples à API da OpenAI
+        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        
+        try {
+          const models = await openai.models.list();
+          
+          return res.json({
+            success: true,
+            connection: {
+              working: true,
+              status: 'connected',
+              models: models.data.length
+            }
+          });
+        } catch (openAIError: any) {
+          console.error('Erro OpenAI:', openAIError);
+          
+          return res.json({
+            success: false,
+            connection: {
+              working: false,
+              status: 'error',
+              message: openAIError.message
+            }
+          });
+        }
+      }
+      
+      // Verificação de ElevenLabs
+      if (api === 'elevenlabs') {
+        if (!process.env.ELEVENLABS_API_KEY) {
+          return res.status(400).json({
+            success: false,
+            error: 'Chave de API da ElevenLabs não configurada'
+          });
+        }
+        
+        try {
+          // Teste básico de conexão com a API da ElevenLabs
+          const response = await fetch('https://api.elevenlabs.io/v1/voices', {
+            headers: {
+              'xi-api-key': process.env.ELEVENLABS_API_KEY as string,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            return res.json({
+              success: true,
+              connection: {
+                working: true,
+                status: 'connected',
+                voices: data.voices?.length || 0
+              }
+            });
+          } else {
+            return res.json({
+              success: false,
+              connection: {
+                working: false,
+                status: 'error',
+                message: data.detail || 'Erro ao conectar à API ElevenLabs'
+              }
+            });
+          }
+        } catch (elevenLabsError: any) {
+          console.error('Erro ElevenLabs:', elevenLabsError);
+          
+          return res.json({
+            success: false,
+            connection: {
+              working: false,
+              status: 'error',
+              message: elevenLabsError.message
+            }
+          });
+        }
+      }
+      
+      // API não suportada
+      return res.status(400).json({
+        success: false,
+        error: `API não suportada: ${api}`
+      });
+      
+    } catch (error: any) {
+      console.error(`Erro ao testar API ${api}:`, error);
+      
+      return res.status(500).json({
+        success: false,
+        error: error.message || 'Erro interno ao testar conexão com API'
+      });
+    }
+  });
   
   /**
    * Endpoint para estatísticas do servidor - utilizado para monitoramento e debugging

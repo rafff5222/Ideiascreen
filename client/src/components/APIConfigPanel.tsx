@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, CheckCircle2, Loader2 } from 'lucide-react';
 import APIStatusChecker from './APIStatusChecker';
-import { ask_secrets } from '@/lib/api';
+import { requestSecrets } from '@/lib/secrets';
 
 export default function APIConfigPanel() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -77,7 +77,7 @@ export default function APIConfigPanel() {
     }
   };
 
-  // Solicitar chaves de API via Replit ask_secrets
+  // Solicitar chaves de API via Replit requestSecrets
   const requestAPIKeys = async () => {
     try {
       setIsSubmitting(true);
@@ -95,8 +95,11 @@ export default function APIConfigPanel() {
         return;
       }
       
-      // Esta é uma simulação - no ambiente Replit real, deveria usar o ask_secrets
-      console.log('Solicitando chaves:', missingKeys);
+      // Chamar a função de solicitação de segredos
+      await requestSecrets(
+        missingKeys, 
+        'Configure suas chaves de API para utilizar todas as funcionalidades de geração de vídeo'
+      );
       
       toast({
         title: 'Chaves de API solicitadas',
