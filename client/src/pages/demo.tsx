@@ -129,6 +129,60 @@ export default function DemoPage() {
   useEffect(() => {
     setScriptText(exampleScript);
   }, []);
+  
+  // Verificar status das APIs automaticamente ao carregar a página
+  useEffect(() => {
+    // Função para verificar o status das APIs e atualizar os indicadores
+    const checkInitialAPIStatus = async () => {
+      const indicatorEl = document.getElementById('api-status-indicator');
+      const elevenLabsEl = document.getElementById('elevenlabs-status');
+      const openaiEl = document.getElementById('openai-status');
+      
+      try {
+        const apiStatus = await checkAPIStatus();
+        
+        // Atualizar indicador de status geral
+        if (indicatorEl) {
+          indicatorEl.className = `inline-block w-3 h-3 ${apiStatus.elevenlabs || apiStatus.openai ? 'bg-green-500' : 'bg-red-500'} rounded-full mr-2`;
+        }
+        
+        // Atualizar status do ElevenLabs
+        if (elevenLabsEl) {
+          elevenLabsEl.className = apiStatus.elevenlabs ? 'text-green-600 font-medium' : 'text-red-600';
+          elevenLabsEl.textContent = apiStatus.elevenlabs ? '✓ Disponível' : '✗ Indisponível';
+        }
+        
+        // Atualizar status do OpenAI
+        if (openaiEl) {
+          openaiEl.className = apiStatus.openai ? 'text-green-600 font-medium' : 'text-red-600';
+          openaiEl.textContent = apiStatus.openai ? '✓ Disponível' : '✗ Indisponível';
+        }
+        
+        // Se nenhuma API estiver disponível, mostrar alerta
+        if (!apiStatus.elevenlabs && !apiStatus.openai) {
+          console.warn('Nenhuma API de geração está disponível. O sistema usará o modo de demonstração.');
+        }
+      } catch (error) {
+        // Em caso de erro na verificação
+        if (indicatorEl) indicatorEl.className = 'inline-block w-3 h-3 bg-red-500 rounded-full mr-2';
+        if (elevenLabsEl) {
+          elevenLabsEl.className = 'text-red-600';
+          elevenLabsEl.textContent = '✗ Erro';
+        }
+        if (openaiEl) {
+          openaiEl.className = 'text-red-600';
+          openaiEl.textContent = '✗ Erro';
+        }
+      }
+    };
+    
+    // Chamar a função de verificação com um pequeno atraso para garantir que os elementos estão renderizados
+    const timer = setTimeout(() => {
+      checkInitialAPIStatus();
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // Função para reproduzir vídeo com imagens e legendas
   window.startVideoPlayback = function() {
@@ -710,15 +764,43 @@ export default function DemoPage() {
         if (container) container.appendChild(statusElement);
       }
       
+      // Atualizar indicadores na interface
+      const indicatorEl = document.getElementById('api-status-indicator');
+      const elevenLabsEl = document.getElementById('elevenlabs-status');
+      const openaiEl = document.getElementById('openai-status');
+      
+      if (indicatorEl) indicatorEl.className = 'inline-block w-3 h-3 bg-yellow-400 rounded-full mr-2';
+      if (elevenLabsEl) elevenLabsEl.textContent = 'verificando...';
+      if (openaiEl) openaiEl.textContent = 'verificando...';
+      
       // Verificar status das APIs
       const apiStatus = await checkAPIStatus();
+      
+      // Atualizar indicadores com o resultado da verificação
+      if (indicatorEl) {
+        indicatorEl.className = `inline-block w-3 h-3 ${apiStatus.elevenlabs || apiStatus.openai ? 'bg-green-500' : 'bg-red-500'} rounded-full mr-2`;
+      }
+      
+      if (elevenLabsEl) {
+        elevenLabsEl.className = apiStatus.elevenlabs ? 'text-green-600 font-medium' : 'text-red-600';
+        elevenLabsEl.textContent = apiStatus.elevenlabs ? '✓ Disponível' : '✗ Indisponível';
+      }
+      
+      if (openaiEl) {
+        openaiEl.className = apiStatus.openai ? 'text-green-600 font-medium' : 'text-red-600';
+        openaiEl.textContent = apiStatus.openai ? '✓ Disponível' : '✗ Indisponível';
+      }
+      
+      // Verificar se pelo menos uma API está disponível
       if (!apiStatus.elevenlabs && !apiStatus.openai) {
         throw new Error("As APIs de geração de voz (ElevenLabs e OpenAI) não estão configuradas. Contate o suporte para resolver este problema.");
       }
       
       // Exibir quais APIs estão disponíveis
-      statusElement.textContent = `${apiStatus.elevenlabs ? "✓ ElevenLabs disponível" : "✗ ElevenLabs indisponível"} | ${apiStatus.openai ? "✓ OpenAI disponível" : "✗ OpenAI indisponível"}`;
-      statusElement.style.display = 'block';
+      if (statusElement) {
+        statusElement.textContent = `${apiStatus.elevenlabs ? "✓ ElevenLabs disponível" : "✗ ElevenLabs indisponível"} | ${apiStatus.openai ? "✓ OpenAI disponível" : "✗ OpenAI indisponível"}`;
+        statusElement.style.display = 'block';
+      }
       
       // Usar o sistema de retry automático
       await generateWithRetry(scriptText, config, 3);
