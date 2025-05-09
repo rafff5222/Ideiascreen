@@ -1,0 +1,185 @@
+1. Verificação do Processamento Completo
+Primeiro, confirme se o vídeo está realmente finalizado:
+
+javascript
+// Modifique seu endpoint de status para incluir mais informações
+app.get('/video-status/:id', async (req, res) => {
+  const video = await VideoModel.findById(req.params.id);
+  
+  if (!video) {
+    return res.status(404).json({ error: 'Vídeo não encontrado' });
+  }
+
+  res.json({
+    status: video.status,
+    path: video.filePath,
+    size: video.fileSize,
+    duration: video.duration,
+    isPlayable: video.status === 'completed' && fs.existsSync(video.filePath)
+  });
+});
+2. Solução Frontend para Reprodução
+Atualize seu player de vídeo para verificar o status antes de reproduzir:
+
+tsx
+function VideoPlayer({ videoId }) {
+  const [videoState, setVideoState] = useState({
+    loading: true,
+    error: null,
+    url: null
+  });
+
+  useEffect(() => {
+    const checkVideo = async () => {
+      try {
+        // Verifica o status periodicamente
+        const interval = setInterval(async () => {
+          const response = await fetch(`/video-status/${videoId}`);
+          const data = await response.json();
+          
+          if (data.isPlayable) {
+            clearInterval(interval);
+            setVideoState({
+              loading: false,
+              error: null,
+              url: `/video-stream/${videoId}`
+            });
+          }
+        }, 3000);
+        
+        return () => clearInterval(interval);
+      } catch (error) {
+        setVideoState({
+          loading: false,
+          error: 'Falha ao carregar vídeo',
+          url: null
+        });
+      }
+    };
+
+    checkVideo();
+  }, [videoId]);
+
+  if (videoState.loading) return <div>Verificando vídeo...</div>;
+  if (videoState.error) return <div>{videoState.error}</div>;
+
+  return (
+    <video controls width="100%">
+      <source src={videoState.url} type="video/mp4" />
+      Seu navegador não suporta o elemento de vídeo.
+    </video>
+  );
+}
+3. Endpoint para Download
+Crie um endpoint seguro para download:
+
+javascript
+app.get('/download-video/:id', async (req, res) => {
+  const video = await VideoModel.findById(req.params.id);
+  
+  if (!video || !fs.existsSync(video.filePath)) {
+    return res.status(404).send('Vídeo não disponível para download');
+  }
+
+  res.download(video.filePath, `video-${video._id}.mp4`, (err) => {
+    if (err) {
+      console.error('Erro no download:', err);
+    }
+  });
+});
+4. Botão de Download no Frontend
+tsx
+function DownloadButton({ videoId }) {
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const checkAvailability = async () => {
+      const response = await fetch(`/video-status/${videoId}`);
+      const data = await response.json();
+      setIsReady(data.isPlayable);
+    };
+    
+    checkAvailability();
+  }, [videoId]);
+
+  if (!isReady) return null;
+
+  return (
+    <a 
+      href={`/download-video/${videoId}`} 
+      download
+      className="download-button"
+    >
+      Baixar Vídeo
+    </a>
+  );
+}
+5. Verificações Adicionais
+No backend, adicione estas validações:
+
+javascript
+// Middleware para verificar vídeos completos
+app.get('/video-stream/:id', async (req, res) => {
+  const video = await VideoModel.findById(req.params.id);
+  
+  if (!video?.filePath || !fs.existsSync(video.filePath)) {
+    return res.status(404).send('Vídeo não encontrado');
+  }
+
+  const stat = fs.statSync(video.filePath);
+  const fileSize = stat.size;
+  const range = req.headers.range;
+
+  if (range) {
+    // Configuração para streaming
+    const parts = range.replace(/bytes=/, "").split("-");
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : fileSize-1;
+    
+    const chunksize = (end-start)+1;
+    const file = fs.createReadStream(video.filePath, {start, end});
+    const head = {
+      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunksize,
+      'Content-Type': 'video/mp4',
+    };
+
+    res.writeHead(206, head);
+    file.pipe(res);
+  } else {
+    const head = {
+      'Content-Length': fileSize,
+      'Content-Type': 'video/mp4',
+    };
+    res.writeHead(200, head);
+    fs.createReadStream(video.filePath).pipe(res);
+  }
+});
+6. Possíveis Causas e Soluções
+Se após estas implementações ainda houver problemas:
+
+Formato do Vídeo:
+
+javascript
+// Converta para um formato mais compatível (MP4/H.264)
+ffmpeg(input)
+  .outputOptions('-c:v libx264')
+  .format('mp4')
+  .save(outputPath)
+Permissões de Arquivo:
+
+bash
+chmod 644 /caminho/para/videos/*
+Headers CORS:
+
+javascript
+app.use('/video-stream', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
+});
+Tempo de Processamento:
+
+javascript
+// Adicione um delay antes de verificar disponibilidade
+await new Promise(resolve => setTimeout(resolve, 5000));
