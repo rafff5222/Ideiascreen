@@ -484,6 +484,26 @@ export default function DemoPage() {
 
     displayError(error: Error) {
       console.error('Erro ao gerar vídeo:', error);
+      
+      // Log detalhado para depuração
+      console.group("Detalhes do erro de geração de vídeo");
+      console.error("Mensagem:", error.message);
+      console.error("Stack trace:", error.stack);
+      console.error("Tipo:", error.constructor.name);
+      console.groupEnd();
+      
+      // Registro no servidor
+      fetch('/api/error-log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          component: 'VideoGenerator',
+          message: error.message,
+          stack: error.stack,
+          timestamp: new Date().toISOString()
+        })
+      }).catch(logErr => console.error("Falha ao registrar erro:", logErr));
+      
       setIsLoading(false);
       
       // Mostrar erro no overlay do vídeo
@@ -495,6 +515,21 @@ export default function DemoPage() {
         errorText.textContent = error.message || 'Erro ao processar o vídeo';
         videoResult.style.display = 'block';
         errorMessage.style.display = 'block';
+      }
+      
+      // Verificar se é um erro de API com informações extras
+      let errorDetails = "";
+      try {
+        // Tentar extrair informações adicionais de erro de API
+        if (error.message.includes('status code') || error.message.includes('RATE_LIMIT')) {
+          errorDetails = `
+            <div class="mt-2 text-xs bg-red-100 p-1 rounded">
+              Detalhes técnicos: ${error.message}
+            </div>
+          `;
+        }
+      } catch (e) {
+        // Ignorar erros na extração de detalhes
       }
       
       // UI rica para erros na área de formulário também
@@ -509,16 +544,24 @@ export default function DemoPage() {
             </svg>
             <span class="font-medium">Erro: ${error.message || 'Falha ao processar o vídeo'}</span>
           </div>
+          ${errorDetails}
           <div class="mt-2 text-xs">
             <p>Por favor, tente novamente ou contate o suporte se o problema persistir.</p>
             <p class="mt-1 text-gray-700">
               <strong>Dica:</strong> Verifique se as chaves de API estão configuradas corretamente.
             </p>
           </div>
-          <button class="mt-2 bg-red-100 hover:bg-red-200 text-red-800 text-xs px-3 py-1 rounded-md"
-            onclick="this.parentNode.remove()">
-            Fechar
-          </button>
+          <div class="mt-2 flex gap-2">
+            <button class="bg-red-100 hover:bg-red-200 text-red-800 text-xs px-3 py-1 rounded-md try-again-btn">
+              Tentar Novamente
+            </button>
+            <button class="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs px-3 py-1 rounded-md check-api-btn">
+              Verificar APIs
+            </button>
+            <button class="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs px-3 py-1 rounded-md close-btn">
+              Fechar
+            </button>
+          </div>
         `;
         
         // Remover mensagens de erro anteriores
@@ -631,6 +674,16 @@ export default function DemoPage() {
         if (container) container.appendChild(statusElement);
       }
       
+      // Verificar status das APIs
+      const apiStatus = await checkAPIStatus();
+      if (!apiStatus.elevenlabs && !apiStatus.openai) {
+        throw new Error("As APIs de geração de voz (ElevenLabs e OpenAI) não estão configuradas. Contate o suporte para resolver este problema.");
+      }
+      
+      // Exibir quais APIs estão disponíveis
+      statusElement.textContent = `${apiStatus.elevenlabs ? "✓ ElevenLabs disponível" : "✗ ElevenLabs indisponível"} | ${apiStatus.openai ? "✓ OpenAI disponível" : "✗ OpenAI indisponível"}`;
+      statusElement.style.display = 'block';
+      
       // Usar o sistema de retry automático
       await generateWithRetry(scriptText, config, 3);
       
@@ -638,7 +691,7 @@ export default function DemoPage() {
       if (statusElement) statusElement.style.display = 'none';
     } catch (error: any) {
       console.error("Falha após todas as tentativas:", error);
-      // O displayError já é chamado dentro do generate original
+      videoGenerator.displayError(error);
     }
   };
   
