@@ -3,38 +3,53 @@ import { generateVideo as generateAIVideo } from './ai-service';
 import { log } from './vite';
 
 // Configuração para conectar ao Redis com fallback para processamento em memória
+// Para desenvolvimento, usaremos a opção de memória para evitar dependência do Redis
+const USE_REDIS = false; // Definido como false para facilitar o desenvolvimento
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 
 // Fila para geração de vídeos
 export let videoQueue: Queue.Queue;
 
-try {
-  videoQueue = new Queue('video-generation', REDIS_URL, {
-    defaultJobOptions: {
-      attempts: 3,            // Número máximo de tentativas
-      backoff: {
-        type: 'exponential',  // Backoff exponencial
-        delay: 1000           // Tempo inicial de espera entre tentativas (1 segundo)
-      },
-      removeOnComplete: true, // Remove jobs depois de completados com sucesso
-      timeout: 120000         // Timeout para jobs (2 minutos)
-    }
-  });
-  
-  log('Sistema de filas inicializado com sucesso (Redis)', 'queue');
-} catch (error: any) {
-  log(`Erro ao configurar Redis: ${error.message}. Usando modo de memória.`, 'queue');
-  
-  // Fallback para fila em memória se não conseguir conectar ao Redis
+// Opções comuns para ambos os modos
+const commonOptions = {
+  defaultJobOptions: {
+    attempts: 3,            // Número máximo de tentativas
+    removeOnComplete: true, // Remove jobs depois de completados com sucesso
+    timeout: 120000         // Timeout para jobs (2 minutos)
+  }
+};
+
+if (USE_REDIS) {
+  try {
+    // Tentar usar Redis
+    videoQueue = new Queue('video-generation', REDIS_URL, {
+      ...commonOptions,
+      defaultJobOptions: {
+        ...commonOptions.defaultJobOptions,
+        backoff: {
+          type: 'exponential',  // Backoff exponencial
+          delay: 1000           // Tempo inicial de espera entre tentativas (1 segundo)
+        }
+      }
+    });
+    
+    log('Sistema de filas inicializado com sucesso (Redis)', 'queue');
+  } catch (error: any) {
+    log(`Erro ao configurar Redis: ${error.message}. Usando modo de memória.`, 'queue');
+    useMemoryQueue();
+  }
+} else {
+  // Usar memória diretamente sem tentar Redis
+  useMemoryQueue();
+}
+
+// Função para criar fila em memória
+function useMemoryQueue() {
   videoQueue = new Queue('video-generation-memory', {
+    ...commonOptions,
     limiter: {
       max: 2,                // Máximo de 2 jobs concorrentes
       duration: 5000         // Em um período de 5 segundos
-    },
-    defaultJobOptions: {
-      attempts: 3,
-      removeOnComplete: true,
-      timeout: 120000
     }
   });
   
