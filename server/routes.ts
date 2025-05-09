@@ -30,6 +30,16 @@ const videoGenerationSchema = z.object({
   outputFormat: z.string().default("mp4")
 });
 
+// Adicionar tipos para autenticação
+declare global {
+  namespace Express {
+    interface Request {
+      isAuthenticated?: () => boolean;
+      user?: any;
+    }
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   /**
    * Endpoint para gerar narração de áudio a partir de texto usando OpenAI TTS

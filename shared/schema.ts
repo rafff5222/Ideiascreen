@@ -31,7 +31,6 @@ export const contentItems = pgTable("content_items", {
 
 export const insertContentSchema = createInsertSchema(contentItems).omit({
   id: true,
-  createdAt: true,
 });
 
 export const contentGenerationSchema = z.object({
