@@ -646,6 +646,195 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   /**
+   * Endpoint para verificar o status de um vídeo e sua disponibilidade
+   * Inclui verificações avançadas para garantir que o vídeo está completo e pronto para visualização
+   */
+  app.get("/video-status/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const fs = require('fs');
+      const path = require('path');
+      
+      // Verificar se o ID é válido
+      if (!id) {
+        return res.status(400).json({
+          success: false,
+          error: 'ID de vídeo inválido'
+        });
+      }
+      
+      // Buscar o status do job
+      const { checkJobStatus } = await import('./queue');
+      const jobStatus = await checkJobStatus(id);
+      
+      // Verificar se o resultado do job está disponível
+      let jobResult;
+      let videoPath = '';
+      let fileSize = 0;
+      let duration = 0;
+      let isPlayable = false;
+      
+      if (jobStatus && jobStatus.status === 'completed') {
+        // Para acessar o resultado, precisamos obter o job da fila diretamente
+        const Queue = require('bull');
+        const videoQueue = new Queue('video-generation', process.env.REDIS_URL || 'redis://127.0.0.1:6379');
+        
+        // Tentar obter o job e seu resultado
+        const job = await videoQueue.getJob(id);
+        
+        if (job) {
+          jobResult = job.returnvalue;
+          
+          // Determinar o caminho do arquivo de vídeo (se disponível)
+          if (jobResult && jobResult.resources && jobResult.resources.audioData) {
+            videoPath = jobResult.resources.audioData;
+            
+            // Verificar se o arquivo existe e é acessível
+            if (fs.existsSync(videoPath)) {
+              const stat = fs.statSync(videoPath);
+              fileSize = stat.size;
+              
+              // Verificar integridade do arquivo (tamanho mínimo para ser um vídeo válido)
+              if (fileSize > 1024) { // Pelo menos 1KB
+                isPlayable = true;
+                
+                // Tentar obter a duração (opcional, pode exigir dependências adicionais)
+                if (jobResult.metadata && jobResult.metadata.duration) {
+                  duration = jobResult.metadata.duration;
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      res.json({
+        success: true,
+        status: jobStatus?.status || 'unknown',
+        jobId: id,
+        path: videoPath,
+        size: fileSize,
+        duration: duration,
+        isPlayable: isPlayable,
+        isComplete: jobStatus?.status === 'completed' && isPlayable,
+        result: jobResult || null
+      });
+      
+    } catch (error: any) {
+      console.error("Erro ao verificar status do vídeo:", error);
+      res.status(500).json({
+        success: false,
+        error: error.message || "Erro ao verificar status do vídeo"
+      });
+    }
+  });
+  
+  /**
+   * Endpoint para streaming de vídeo com suporte a range requests
+   * Permite streaming eficiente do conteúdo para o player de vídeo
+   */
+  app.get("/video-stream/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const fs = require('fs');
+      
+      // Primeiro, obter o caminho do arquivo de vídeo
+      // Verificar se o resultado do job está disponível
+      const Queue = require('bull');
+      const videoQueue = new Queue('video-generation', process.env.REDIS_URL || 'redis://127.0.0.1:6379');
+      
+      // Tentar obter o job e seu resultado
+      const job = await videoQueue.getJob(id);
+      
+      if (!job || !job.returnvalue || !job.returnvalue.resources || !job.returnvalue.resources.audioData) {
+        return res.status(404).send('Vídeo não encontrado');
+      }
+      
+      const videoPath = job.returnvalue.resources.audioData;
+      
+      // Verificar se o arquivo existe
+      if (!fs.existsSync(videoPath)) {
+        return res.status(404).send('Arquivo de vídeo não encontrado');
+      }
+      
+      // Configuração para streaming de vídeo
+      const stat = fs.statSync(videoPath);
+      const fileSize = stat.size;
+      const range = req.headers.range;
+      
+      if (range) {
+        // Streaming parcial (range request)
+        const parts = range.replace(/bytes=/, "").split("-");
+        const start = parseInt(parts[0], 10);
+        const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+        
+        const chunksize = (end - start) + 1;
+        const file = fs.createReadStream(videoPath, { start, end });
+        const head = {
+          'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+          'Accept-Ranges': 'bytes',
+          'Content-Length': chunksize,
+          'Content-Type': 'video/mp4',
+        };
+        
+        res.writeHead(206, head);
+        file.pipe(res);
+      } else {
+        // Streaming completo
+        const head = {
+          'Content-Length': fileSize,
+          'Content-Type': 'video/mp4',
+        };
+        res.writeHead(200, head);
+        fs.createReadStream(videoPath).pipe(res);
+      }
+    } catch (error: any) {
+      console.error('Erro ao realizar streaming de vídeo:', error);
+      res.status(500).send('Erro ao processar vídeo para streaming');
+    }
+  });
+  
+  /**
+   * Endpoint para download de vídeo
+   * Permite que os usuários baixem o vídeo completo
+   */
+  app.get("/download-video/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const fs = require('fs');
+      const path = require('path');
+      
+      // Obter o caminho do arquivo de vídeo
+      const Queue = require('bull');
+      const videoQueue = new Queue('video-generation', process.env.REDIS_URL || 'redis://127.0.0.1:6379');
+      
+      // Tentar obter o job e seu resultado
+      const job = await videoQueue.getJob(id);
+      
+      if (!job || !job.returnvalue || !job.returnvalue.resources || !job.returnvalue.resources.audioData) {
+        return res.status(404).send('Vídeo não disponível para download');
+      }
+      
+      const videoPath = job.returnvalue.resources.audioData;
+      
+      // Verificar se o arquivo existe
+      if (!fs.existsSync(videoPath)) {
+        return res.status(404).send('Arquivo de vídeo não encontrado');
+      }
+      
+      // Fornecer o arquivo para download
+      res.download(videoPath, `video-${id}.mp4`, (err) => {
+        if (err) {
+          console.error('Erro no download:', err);
+        }
+      });
+    } catch (error: any) {
+      console.error('Erro ao realizar download de vídeo:', error);
+      res.status(500).send('Erro ao processar vídeo para download');
+    }
+  });
+  
+  /**
    * Endpoint para gerar conteúdo com OpenAI
    */
   app.post("/api/generate", async (req: Request, res: Response) => {

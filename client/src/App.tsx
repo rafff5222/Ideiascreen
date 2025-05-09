@@ -9,6 +9,7 @@ import Dashboard from "@/pages/dashboard";
 import Generator from "@/pages/generator";
 import Demo from "@/pages/demo";
 import GenerationDemo from "@/pages/GenerationDemo";
+import VideoDemo from "@/pages/VideoDemo";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ExitPopup from "@/components/ui/exit-popup";
@@ -36,6 +37,7 @@ function Router() {
       <Route path="/generator" component={Generator} />
       <Route path="/demo" component={Demo} />
       <Route path="/generation-demo" component={GenerationDemo} />
+      <Route path="/video-demo" component={VideoDemo} />
       <Route component={NotFound} />
     </Switch>
   );
