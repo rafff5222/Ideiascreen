@@ -29,7 +29,7 @@ type ProcessingStatus = {
  * Componente para exibir progresso de processamento de vídeo em tempo real
  * Conecta-se ao WebSocket para atualizações em tempo real e mostra o resultado quando concluído
  */
-function ProcessingProgress({ taskId, onComplete, autoConnect = true }: ProcessingProgressProps) {
+export function ProcessingProgress({ taskId, onComplete, autoConnect = true }: ProcessingProgressProps) {
   const [status, setStatus] = useState<ProcessingStatus>({
     connected: false,
     status: 'pending',
@@ -394,4 +394,4 @@ function ProcessingProgress({ taskId, onComplete, autoConnect = true }: Processi
   );
 }
 
-export default ProcessingProgress;
+// Exportação já realizada como named export

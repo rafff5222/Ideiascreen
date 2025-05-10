@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from 'lucide-react';
-import ProcessingProgress from '@/components/ProcessingProgress';
+import { ProcessingProgress } from '@/components/ProcessingProgress';
 import VideoPlayer from '@/components/VideoPlayer';
 import APIStatusChecker from '@/components/APIStatusChecker';
 
