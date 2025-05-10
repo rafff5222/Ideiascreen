@@ -6,9 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from 'lucide-react';
-import { default as ProcessingProgress } from '../components/ProcessingProgress';
-import VideoPlayer from '../components/VideoPlayer';
-import APIStatusChecker from '../components/APIStatusChecker';
+import ProcessingProgress from '@/components/ProcessingProgress';
+import VideoPlayer from '@/components/VideoPlayer';
+import APIStatusChecker from '@/components/APIStatusChecker';
 
 /**
  * Página de demonstração da verificação de status de vídeo
