@@ -77,11 +77,30 @@ export default function VideoTester() {
   // Verificar o status do processamento periodicamente
   React.useEffect(() => {
     let interval: NodeJS.Timeout;
+    let errorCount = 0;
+    const MAX_ERRORS = 3; // Máximo de erros consecutivos antes de cancelar
     
     if (taskId && (status !== 'completed' && status !== 'failed')) {
       interval = setInterval(async () => {
         try {
           const response = await apiRequest('GET', `/api/task-status/${taskId}`);
+          
+          // Resetar contador de erro quando temos uma resposta bem-sucedida
+          errorCount = 0;
+          
+          // Se a resposta for 404, a tarefa não foi encontrada (talvez o servidor reiniciou)
+          if (response.status === 404) {
+            clearInterval(interval);
+            setStatus('failed');
+            setError('Tarefa não encontrada. O servidor pode ter reiniciado.');
+            toast({
+              title: "Tarefa não encontrada",
+              description: "O processamento foi interrompido. Por favor, tente novamente.",
+              variant: "destructive",
+            });
+            return;
+          }
+          
           const data = await response.json();
           
           if (data.success) {
@@ -117,6 +136,19 @@ export default function VideoTester() {
           }
         } catch (err) {
           console.error('Erro ao verificar status:', err);
+          errorCount++;
+          
+          // Se tivermos muitos erros consecutivos, cancelar o processamento
+          if (errorCount >= MAX_ERRORS) {
+            clearInterval(interval);
+            setStatus('failed');
+            setError('Muitos erros ao verificar o status. Verifique a conexão e tente novamente.');
+            toast({
+              title: "Erro de conexão",
+              description: "Ocorreram muitos erros ao verificar o progresso. Tente novamente.",
+              variant: "destructive",
+            });
+          }
         }
       }, 1500);
     }
