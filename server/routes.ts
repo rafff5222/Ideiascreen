@@ -1422,6 +1422,114 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   /**
+   * Endpoint para streaming de vídeos da biblioteca
+   */
+  app.get("/api/video-stream/:filePath(*)", async (req: Request, res: Response) => {
+    try {
+      const { filePath } = req.params;
+      
+      // Verificar se o nome do arquivo é seguro (não permite navegação para diretórios superiores)
+      if (filePath.includes('..')) {
+        return res.status(400).send('Caminho de arquivo inválido');
+      }
+
+      // Construir o caminho completo para o arquivo de vídeo
+      // O filePath pode ser um nome de arquivo direto ou incluir 'videos/'
+      let fullPath;
+      if (filePath.startsWith('videos/')) {
+        fullPath = path.join(process.cwd(), 'output', filePath);
+      } else {
+        fullPath = path.join(process.cwd(), 'output', filePath);
+      }
+
+      // Verificar se o arquivo existe
+      try {
+        await fs.promises.access(fullPath);
+      } catch (err) {
+        console.error(`Erro ao acessar arquivo de vídeo: ${fullPath}`, err);
+        return res.status(404).send('Arquivo de vídeo não encontrado');
+      }
+      
+      // Configuração para streaming de vídeo
+      const stat = await fs.promises.stat(fullPath);
+      const fileSize = stat.size;
+      const range = req.headers.range;
+      
+      if (range) {
+        // Streaming parcial (range request)
+        const parts = range.replace(/bytes=/, "").split("-");
+        const start = parseInt(parts[0], 10);
+        const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+        
+        const chunksize = (end - start) + 1;
+        const file = fs.createReadStream(fullPath, { start, end });
+        const head = {
+          'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+          'Accept-Ranges': 'bytes',
+          'Content-Length': chunksize,
+          'Content-Type': 'video/mp4',
+        };
+        
+        res.writeHead(206, head);
+        file.pipe(res);
+      } else {
+        // Streaming completo
+        const head = {
+          'Content-Length': fileSize,
+          'Content-Type': 'video/mp4',
+        };
+        
+        res.writeHead(200, head);
+        fs.createReadStream(fullPath).pipe(res);
+      }
+    } catch (error: any) {
+      console.error('Erro ao streamar vídeo:', error);
+      res.status(500).send(`Erro ao streamar vídeo: ${error.message}`);
+    }
+  });
+
+  /**
+   * Endpoint para download de vídeos da biblioteca
+   */
+  app.get("/download-video/:filePath(*)", async (req: Request, res: Response) => {
+    try {
+      const { filePath } = req.params;
+      
+      // Verificar se o nome do arquivo é seguro
+      if (filePath.includes('..')) {
+        return res.status(400).send('Caminho de arquivo inválido');
+      }
+
+      // Construir o caminho completo para o arquivo de vídeo
+      let fullPath;
+      if (filePath.startsWith('videos/')) {
+        fullPath = path.join(process.cwd(), 'output', filePath);
+      } else {
+        fullPath = path.join(process.cwd(), 'output', filePath);
+      }
+
+      // Verificar se o arquivo existe
+      try {
+        await fs.promises.access(fullPath);
+      } catch (err) {
+        console.error(`Erro ao acessar arquivo para download: ${fullPath}`, err);
+        return res.status(404).send('Arquivo de vídeo não encontrado');
+      }
+      
+      // Configurar headers para download
+      res.setHeader('Content-Disposition', `attachment; filename="${path.basename(filePath)}"`);
+      res.setHeader('Content-Type', 'video/mp4');
+      
+      // Enviar o arquivo
+      const fileStream = fs.createReadStream(fullPath);
+      fileStream.pipe(res);
+    } catch (error: any) {
+      console.error('Erro ao realizar download do vídeo:', error);
+      res.status(500).send(`Erro ao baixar vídeo: ${error.message}`);
+    }
+  });
+
+  /**
    * Endpoint para visualização de vídeo a partir do caminho do arquivo
    */
   app.get("/api/video/:videoPath(*)", async (req: Request, res: Response) => {

@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { RefreshCw, Play, Download, Trash2 } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
-import { useState as useHookState } from '@/hooks/use-state';
 import { useToast } from '@/hooks/use-toast';
 
 interface VideoFile {
@@ -70,7 +69,7 @@ export default function VideoLibrary() {
   const handleDownload = (video: VideoFile) => {
     // Criar um link para download e clicar nele
     const link = document.createElement('a');
-    link.href = `/api/video/${video.path}`;
+    link.href = `/download-video/${video.path}`;
     link.download = video.name;
     document.body.appendChild(link);
     link.click();
@@ -184,7 +183,7 @@ export default function VideoLibrary() {
               {selectedVideo ? (
                 <div className="border rounded-md p-4 bg-black">
                   <video 
-                    src={`/api/video/${selectedVideo.path}`} 
+                    src={`/api/video-stream/${selectedVideo.path}`} 
                     controls 
                     className="w-full rounded-md max-h-[400px]"
                     controlsList="nodownload"
