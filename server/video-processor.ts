@@ -21,7 +21,12 @@ const OUTPUT_DIR = path.join(process.cwd(), 'output');
 const IMAGES_DIR = path.join(TMP_DIR, 'images');
 
 // Resoluções de vídeo predefinidas
-const VIDEO_RESOLUTIONS = {
+interface Resolution {
+  width: number;
+  height: number;
+}
+
+const VIDEO_RESOLUTIONS: Record<string, Resolution> = {
   '1080p': { width: 1920, height: 1080 },
   '720p': { width: 1280, height: 720 },
   '480p': { width: 854, height: 480 },
@@ -357,18 +362,31 @@ export async function processAudioToVideo(
     await fs.writeFile(imageListFile, imageListContent);
     console.log(`Arquivo de lista de imagens criado em: ${imageListFile}`);
     
-    // Passo 4: Gerar arquivo de legendas SRT
+    // Passo 5: Gerar arquivo de legendas SRT
     let srtContent = '';
     
-    // Verificar se subtitles é um array ou string
+    // Verificar se subtitles é array ou string
     if (Array.isArray(subtitles)) {
-      let duration = 0;
-      for (let i = 0; i < subtitles.length; i++) {
-        const startTime = formatSrtTime(duration);
-        duration += imageDuration; // Ou ajustar conforme necessário para sincronização
-        const endTime = formatSrtTime(duration);
+      if (cutPoints.length > 1) {
+        // Distribuir legendas conforme os pontos de corte
+        for (let i = 0; i < Math.min(subtitles.length, cutPoints.length - 1); i++) {
+          const startTime = formatSrtTime(cutPoints[i]);
+          const endTime = formatSrtTime(cutPoints[i + 1]);
+          
+          srtContent += `${i + 1}\n${startTime} --> ${endTime}\n${subtitles[i]}\n\n`;
+        }
+      } else {
+        // Distribuir legendas uniformemente
+        const subtitleDuration = audioDuration / subtitles.length;
+        let time = 0;
         
-        srtContent += `${i + 1}\n${startTime} --> ${endTime}\n${subtitles[i]}\n\n`;
+        for (let i = 0; i < subtitles.length; i++) {
+          const startTime = formatSrtTime(time);
+          time += subtitleDuration;
+          const endTime = formatSrtTime(time);
+          
+          srtContent += `${i + 1}\n${startTime} --> ${endTime}\n${subtitles[i]}\n\n`;
+        }
       }
     } else {
       // Se for string, assumir que já está no formato SRT
@@ -378,32 +396,64 @@ export async function processAudioToVideo(
     await fs.writeFile(subtitlesFile, srtContent);
     console.log(`Arquivo de legendas criado em: ${subtitlesFile}`);
     
-    // Passo 5: Usar ffmpeg para combinar áudio e imagens em um vídeo
+    // Passo 6: Definir resolução e preparar filtros para o vídeo
+    let vfFilters = ["subtitles=" + subtitlesFile];
+    
+    // Adicionar resolução se especificada
+    if (options.resolution && VIDEO_RESOLUTIONS[options.resolution]) {
+      const { width, height } = VIDEO_RESOLUTIONS[options.resolution];
+      vfFilters.push(`scale=${width}:${height}`);
+      console.log(`Aplicando resolução ${width}x${height}`);
+    }
+    
+    // Adicionar transições se especificadas
+    if (options.transitions && options.transitions.length > 0) {
+      console.log(`Aplicando transições: ${options.transitions.join(', ')}`);
+      
+      if (options.transitions.includes('fade')) {
+        vfFilters.push(`fade=t=in:st=0:d=1,fade=t=out:st=${audioDuration-1}:d=1`);
+      }
+      
+      if (options.transitions.includes('zoom')) {
+        vfFilters.push('zoompan=d=1:zoom=1.2:x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):s=1280x720');
+      }
+      
+      // Outras transições podem ser adicionadas aqui...
+    }
+    
+    // Passo 7: Usar ffmpeg para combinar áudio e imagens em um vídeo
     console.log('Iniciando geração de vídeo com FFmpeg...');
     
-    // Comando para criar vídeo com transições
-    const command = `"${FFMPEG_PATH}" -y -f concat -safe 0 -i "${imageListFile}" -i "${audioPath}" -vf "subtitles=${subtitlesFile},fade=t=in:st=0:d=1,fade=t=out:st=${audioDuration-1}:d=1" -c:v libx264 -pix_fmt yuv420p -preset fast -c:a aac -strict experimental -b:a 192k "${outputVideoPath}"`;
+    // Comando para criar vídeo com filtros
+    const vfFilterString = vfFilters.join(',');
+    const command = `"${FFMPEG_PATH}" -y -f concat -safe 0 -i "${imageListFile}" -i "${audioPath}" -vf "${vfFilterString}" -c:v libx264 -pix_fmt yuv420p -preset fast -c:a aac -strict experimental -b:a 192k "${outputVideoPath}"`;
     
-    console.log(`Executando comando: ${command}`);
+    console.log(`Executando comando FFmpeg com filtros: ${vfFilterString}`);
     
     try {
       const { stdout, stderr } = await execAsync(command);
-      console.log('FFmpeg stdout:', stdout);
-      console.log('FFmpeg stderr:', stderr);
-    } catch (error) {
-      console.error('Erro ao executar FFmpeg:', error);
+      if (stderr) {
+        console.log('Saída de erro do FFmpeg (pode incluir avisos normais):', stderr);
+      }
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.error('Erro durante execução do FFmpeg:', error.message);
       
       // Se o comando principal falhar, tentar uma versão mais simples
       console.log('Tentando comando alternativo de FFmpeg mais simples...');
       
+      // Usar apenas a primeira imagem com o áudio
       const simpleCommand = `"${FFMPEG_PATH}" -y -loop 1 -i "${localImagePaths[0]}" -i "${audioPath}" -c:v libx264 -pix_fmt yuv420p -preset fast -c:a aac -strict experimental -b:a 192k -shortest "${outputVideoPath}"`;
       
       try {
+        console.log(`Executando comando simplificado: ${simpleCommand}`);
         const { stdout, stderr } = await execAsync(simpleCommand);
-        console.log('FFmpeg simples stdout:', stdout);
-        console.log('FFmpeg simples stderr:', stderr);
-      } catch (fallbackError: any) {
-        console.error('Erro no comando alternativo de FFmpeg:', fallbackError);
+        if (stderr) {
+          console.log('Saída de erro do FFmpeg simplificado:', stderr);
+        }
+      } catch (fallbackErr) {
+        const fallbackError = fallbackErr instanceof Error ? fallbackErr : new Error(String(fallbackErr));
+        console.error('Erro no comando alternativo de FFmpeg:', fallbackError.message);
         throw new Error('Falha ao gerar vídeo: ' + fallbackError.message);
       }
     }
@@ -417,8 +467,9 @@ export async function processAudioToVideo(
       if (stats.size < 1000) {
         throw new Error('Arquivo de vídeo muito pequeno, possivelmente corrompido');
       }
-    } catch (error: any) {
-      console.error('Erro ao verificar arquivo de vídeo:', error);
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.error('Erro ao verificar arquivo de vídeo:', error.message);
       throw new Error('Falha ao verificar arquivo de vídeo gerado: ' + error.message);
     }
     
