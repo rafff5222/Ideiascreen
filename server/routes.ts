@@ -1227,13 +1227,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           console.log('Chamando função testeGerarVideo com script e opções');
           // Processar o vídeo com as opções fornecidas
-          const videoPath = await testeGerarVideo(script, {
-            voz: options?.voz,
-            detectarSilencio: options?.detectarSilencio,
-            topico: options?.topico,
-            transicoes: options?.transicoes,
-            resolucao: options?.resolucao
-          });
+          let videoPath = null;
+          
+          try {
+            // Primeiro tenta usar o gerador normal com APIs externas
+            videoPath = await testeGerarVideo(script, {
+              voz: options?.voz,
+              detectarSilencio: options?.detectarSilencio,
+              topico: options?.topico,
+              transicoes: options?.transicoes,
+              resolucao: options?.resolucao
+            });
+          } catch (apiError) {
+            // Se falhar, tenta usar o modo de demonstração
+            console.error('Falha ao gerar vídeo usando APIs:', apiError);
+            updateTaskProgress(taskId, 20, 'Usando modo de demonstração (fallback)', 'processing');
+            
+            try {
+              // Importar dinamicamente o processador de demonstração
+              const demoProcessor = await import('./demo-processor.js');
+              videoPath = await demoProcessor.processTextToDemoVideo(script);
+              console.log('Vídeo gerado com sucesso no modo de demonstração:', videoPath);
+            } catch (demoError) {
+              console.error('Falha também no modo de demonstração:', demoError);
+              throw demoError; // Propagar o erro
+            }
+          }
           
           // Verificar se o caminho retornado é válido
           if (!videoPath) {
