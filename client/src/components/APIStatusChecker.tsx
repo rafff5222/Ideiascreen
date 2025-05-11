@@ -46,7 +46,16 @@ export default function APIStatusChecker() {
     checkStatus();
   }, []);
 
-  const getStatusBadge = (apiStatus: APIStatus) => {
+  const getStatusBadge = (apiStatus?: APIStatus) => {
+    if (!apiStatus) {
+      return (
+        <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">
+          <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+          Verificando
+        </Badge>
+      );
+    }
+  
     if (apiStatus.working) {
       return (
         <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
@@ -87,50 +96,50 @@ export default function APIStatusChecker() {
               <div className="border rounded-md p-3">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="font-semibold">OpenAI</h3>
-                  {getStatusBadge(status.openai)}
+                  {getStatusBadge(status?.openai)}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {status.openai.model ? `Modelo: ${status.openai.model}` : 
-                   status.openai.message || 'Serviço de IA para geração de conteúdo'}
+                  {status?.openai?.model ? `Modelo: ${status.openai.model}` : 
+                   status?.openai?.message || 'Serviço de IA para geração de conteúdo'}
                 </p>
               </div>
               
               <div className="border rounded-md p-3">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="font-semibold">ElevenLabs</h3>
-                  {getStatusBadge(status.elevenlabs)}
+                  {getStatusBadge(status?.elevenlabs)}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {status.elevenlabs.subscription ? 
+                  {status?.elevenlabs?.subscription ? 
                     `Plano: ${status.elevenlabs.subscription.tier}` :
-                    status.elevenlabs.message || 'Serviço de síntese de voz'}
+                    status?.elevenlabs?.message || 'Serviço de síntese de voz'}
                 </p>
               </div>
               
               <div className="border rounded-md p-3">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="font-semibold">Pexels</h3>
-                  {getStatusBadge(status.pexels)}
+                  {getStatusBadge(status?.pexels)}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {status.pexels.message || 'Biblioteca de imagens e vídeos'}
+                  {status?.pexels?.message || 'Biblioteca de imagens e vídeos'}
                 </p>
               </div>
               
               <div className="border rounded-md p-3">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="font-semibold">FFmpeg</h3>
-                  {getStatusBadge(status.ffmpeg)}
+                  {getStatusBadge(status?.ffmpeg)}
                 </div>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <p className="text-sm text-muted-foreground truncate">
-                        {status.ffmpeg.version || status.ffmpeg.message || 'Processador de vídeo'}
+                        {status?.ffmpeg?.version || status?.ffmpeg?.message || 'Processador de vídeo'}
                       </p>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-xs">
-                      <p>{status.ffmpeg.version || status.ffmpeg.message || 'Processador de vídeo'}</p>
+                      <p>{status?.ffmpeg?.version || status?.ffmpeg?.message || 'Processador de vídeo'}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

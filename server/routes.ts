@@ -1302,9 +1302,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Garantir que os diretórios necessários existem
       const ensureDir = async (dir: string) => {
         try {
-          await fs.access(dir);
-        } catch (e) {
-          await fs.mkdir(dir, { recursive: true });
+          // Usar o pacote fs-extra que tem suporte a promessas
+          const fsPromises = require('fs').promises;
+          try {
+            await fsPromises.access(dir);
+          } catch (e) {
+            await fsPromises.mkdir(dir, { recursive: true });
+          }
+        } catch (err) {
+          console.error(`Erro ao manipular diretório ${dir}:`, err);
+          // Se falhar com promises, tenta o método síncrono
+          const fs = require('fs');
+          if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+          }
         }
       };
       

@@ -374,11 +374,7 @@ export default function VideoTester() {
             
             <Button 
               type="submit" 
-              className={`w-full ${isSubmitting ? 'animate-pulse' : 'animate-gradient'} font-medium h-12 rounded-lg relative overflow-hidden shadow-lg`}
-              style={{
-                background: 'linear-gradient(-45deg, #4f46e5, #06b6d4, #8b5cf6, #3b82f6)',
-                backgroundSize: '400% 400%',
-              }}
+              className="w-full btn-gradient font-medium h-12 rounded-lg relative overflow-hidden shadow-lg"
               disabled={isSubmitting || (!!taskId && status !== 'completed' && status !== 'failed')}
             >
               <span className="relative z-10 flex items-center justify-center">
@@ -395,18 +391,6 @@ export default function VideoTester() {
                 )}
               </span>
             </Button>
-            
-            <style jsx>{`
-              @keyframes gradient {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
-              }
-              
-              .animate-gradient {
-                animation: gradient 8s ease infinite;
-              }
-            `}</style>
           </form>
         </CardContent>
       </Card>
