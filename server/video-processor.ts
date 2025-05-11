@@ -299,7 +299,7 @@ export async function convertVideo(
     console.log(`Vídeo convertido com sucesso, tamanho: ${stats.size} bytes`);
     
     return outputPath;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro ao converter vídeo:', error);
     throw new Error(`Falha ao converter vídeo: ${error.message}`);
   }

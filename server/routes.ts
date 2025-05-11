@@ -1444,31 +1444,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Importar o módulo de processamento de vídeo
+      // Importar os módulos necessários
       const { processAudioToVideo } = await import('./video-processor');
+      const fs = await import('fs/promises');
+      const fsSync = await import('fs');
+      const path = await import('path');
       
       // Gerar o vídeo
       console.log('Iniciando teste de geração de vídeo...');
       const videoPath = await processAudioToVideo(audioData, imageUrls, subtitles);
       
       // Verificar se o arquivo existe
-      const fs = require('fs');
-      if (!fs.existsSync(videoPath)) {
-        throw new Error(`Arquivo de vídeo não encontrado no caminho: ${videoPath}`);
+      try {
+        await fs.access(videoPath);
+        const stats = await fs.stat(videoPath);
+        console.log(`Vídeo gerado com sucesso: ${videoPath} (${stats.size} bytes)`);
+        
+        // Retornar o caminho do vídeo e URL para streaming
+        res.json({
+          success: true,
+          videoPath,
+          videoUrl: `/video-stream/${path.basename(videoPath)}`,
+          fileSize: stats.size
+        });
+      } catch (fileError: any) {
+        throw new Error(`Arquivo de vídeo não encontrado ou inacessível: ${videoPath} - ${fileError.message}`);
       }
-      
-      const stats = fs.statSync(videoPath);
-      console.log(`Vídeo gerado com sucesso: ${videoPath} (${stats.size} bytes)`);
-      
-      // Retornar o caminho do vídeo e URL para streaming
-      res.json({
-        success: true,
-        videoPath,
-        videoUrl: `/video-stream/${require('path').basename(videoPath)}`,
-        fileSize: stats.size
-      });
-      
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao testar geração de vídeo:', error);
       res.status(500).json({
         success: false,
@@ -1482,25 +1484,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
    */
   app.get("/api/check-ffmpeg", async (req: Request, res: Response) => {
     try {
-      const { exec } = require('child_process');
-      const util = require('util');
-      const execAsync = util.promisify(exec);
+      // Importação de módulos ESM
+      const childProcess = await import('child_process');
+      const util = await import('util');
+      const execAsync = util.promisify(childProcess.exec);
+      const path = await import('path');
+      const fs = await import('fs');
       
       // Verificar se o ffmpeg-static está disponível
+      let ffmpegStaticPath: string = '';
       try {
-        const ffmpegStatic = require('ffmpeg-static');
-        console.log('ffmpeg-static encontrado:', ffmpegStatic);
+        const ffmpegStaticImport = await import('ffmpeg-static');
+        // O tipo pode ser string ou null, então garantimos que seja string
+        ffmpegStaticPath = typeof ffmpegStaticImport.default === 'string' 
+          ? ffmpegStaticImport.default 
+          : '';
+        console.log('ffmpeg-static encontrado:', ffmpegStaticPath);
       } catch (e) {
         console.error('ffmpeg-static não encontrado:', e);
       }
       
-      // Tentar executar o ffmpeg
+      // Verificar se o caminho do ffmpeg-static existe
+      if (ffmpegStaticPath) {
+        try {
+          await fs.promises.access(ffmpegStaticPath, fs.constants.X_OK);
+          console.log('ffmpeg-static é executável:', ffmpegStaticPath);
+          
+          return res.json({
+            success: true,
+            source: 'ffmpeg-static',
+            path: ffmpegStaticPath,
+            available: true
+          });
+        } catch (err) {
+          console.error('ffmpeg-static não é executável:', err);
+        }
+      }
+      
+      // Tentar executar o ffmpeg do sistema
       try {
         const { stdout, stderr } = await execAsync('ffmpeg -version');
         console.log('ffmpeg stdout:', stdout);
         
         return res.json({
           success: true,
+          source: 'system',
           version: stdout.split('\n')[0],
           available: true
         });
@@ -1528,7 +1556,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao verificar ffmpeg:', error);
       res.status(500).json({
         success: false,
