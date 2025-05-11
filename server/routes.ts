@@ -1271,55 +1271,122 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
         }
         
-        // Verificar OpenAI
+        // Verificar OpenAI com teste mais robusto
         let openaiResult = { working: false, status: "unconfigured" };
         if (process.env.OPENAI_API_KEY) {
           try {
+            console.log('Verificando API OpenAI...');
             const openai = new OpenAI({
               apiKey: process.env.OPENAI_API_KEY
             });
-            const models = await openai.models.list();
+            
+            // Tentar fazer uma requisição real para testar autenticação e capacidade
+            const completion = await openai.chat.completions.create({
+              model: "gpt-3.5-turbo",
+              messages: [{ role: "user", content: "API test" }],
+              max_tokens: 5
+            });
+            
+            console.log('OpenAI respondeu com:', completion.choices[0]?.message?.content);
+            
             openaiResult = { 
               working: true, 
               status: "ok", 
-              models: models.data.slice(0, 5).map(m => m.id) 
+              model: completion.model,
+              response: completion.choices[0]?.message?.content,
+              usage: completion.usage
             };
           } catch (error: any) {
+            console.error('Erro detalhado OpenAI:', error);
+            
+            // Análise mais detalhada do erro
+            let errorStatus = "api_error";
+            if (error.status === 401) {
+              errorStatus = "invalid_api_key";
+            } else if (error.status === 429) {
+              errorStatus = "rate_limit_exceeded";
+            } else if (error.status === 403) {
+              errorStatus = "permission_denied";
+            }
+            
             openaiResult = { 
               working: false, 
-              status: error.status === 401 ? "authentication error" : "api_error",
-              message: error.message 
+              status: errorStatus,
+              message: error.message,
+              details: error.toString()
             };
           }
         }
         
-        // Verificar ElevenLabs
+        // Verificar ElevenLabs com teste mais robusto
         let elevenlabsResult = { working: false, status: "unconfigured" };
         if (process.env.ELEVENLABS_API_KEY) {
           try {
-            // Chamada simples para listar vozes disponíveis
-            const response = await fetch('https://api.elevenlabs.io/v1/voices', {
+            console.log('Verificando API ElevenLabs...');
+            // Usar endpoint de usuário para testar autenticação
+            const response = await fetch('https://api.elevenlabs.io/v1/user', {
               headers: {
                 'Accept': 'application/json',
                 'xi-api-key': process.env.ELEVENLABS_API_KEY
               }
             });
             
+            console.log('ElevenLabs respondeu com status:', response.status);
+            
             if (!response.ok) {
-              throw new Error(`Status: ${response.status}`);
+              const errorText = await response.text();
+              console.error('Erro ElevenLabs:', errorText);
+              
+              // Identificar o tipo de erro
+              let errorStatus = "api_error";
+              if (response.status === 401) {
+                errorStatus = "invalid_api_key";
+              } else if (response.status === 429) {
+                errorStatus = "rate_limit_exceeded";
+              }
+              
+              throw new Error(`${errorStatus}: Status ${response.status}`);
             }
             
-            const data = await response.json();
+            const userData = await response.json();
+            console.log('ElevenLabs dados de usuário recebidos:', userData.subscription?.tier || 'dados básicos');
+            
+            // Se o teste básico de autenticação funcionou, buscar as vozes disponíveis
+            const voicesResponse = await fetch('https://api.elevenlabs.io/v1/voices', {
+              headers: {
+                'Accept': 'application/json',
+                'xi-api-key': process.env.ELEVENLABS_API_KEY
+              }
+            });
+            
+            if (!voicesResponse.ok) {
+              throw new Error(`Erro ao buscar vozes: ${voicesResponse.status}`);
+            }
+            
+            const voicesData = await voicesResponse.json();
+            
             elevenlabsResult = { 
               working: true, 
               status: "ok", 
-              voices: data.voices.slice(0, 3).map((v: any) => v.name) 
+              subscription: userData.subscription?.tier || "desconhecido",
+              voices: voicesData.voices?.slice(0, 3).map((v: any) => v.name) || []
             };
           } catch (error: any) {
+            console.error('Erro detalhado ElevenLabs:', error);
+            
+            // Extrair tipo de erro da mensagem
+            let errorStatus = "api_error";
+            if (error.message.includes("invalid_api_key") || error.message.includes("401")) {
+              errorStatus = "invalid_api_key";
+            } else if (error.message.includes("rate_limit") || error.message.includes("429")) {
+              errorStatus = "rate_limit_exceeded";
+            }
+            
             elevenlabsResult = { 
               working: false, 
-              status: error.status === 401 ? "authentication error" : "api_error",
-              message: error.message 
+              status: errorStatus,
+              message: error.message,
+              details: error.toString() 
             };
           }
         }
