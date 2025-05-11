@@ -1236,7 +1236,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               detectarSilencio: options?.detectarSilencio,
               topico: options?.topico,
               transicoes: options?.transicoes,
-              resolucao: options?.resolucao
+              resolucao: options?.resolucao,
+              useDemoMode: options?.useDemoMode
             });
           } catch (apiError) {
             // Se falhar, tenta usar o modo de demonstração

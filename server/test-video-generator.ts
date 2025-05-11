@@ -27,6 +27,7 @@ export async function testeGerarVideo(
     topico?: string;
     transicoes?: string[];
     resolucao?: string;
+    useDemoMode?: boolean;
   } = {}
 ): Promise<string> {
   try {
@@ -65,6 +66,19 @@ export async function testeGerarVideo(
     console.log(`Texto dividido em ${frases.length} frases`);
     debugLog('Primeiras frases:', frases.slice(0, 3));
     
+    // Verificar se o usuário solicitou explicitamente o modo de demonstração
+    if (opcoes.useDemoMode === true) {
+      debugLog('Modo de demonstração solicitado pelo usuário. Usando gerador de áudio demo.');
+      console.log('Usando modo de demonstração conforme solicitado pelo usuário.');
+      
+      // Importar o gerador de demonstração
+      const { processTextToDemoVideo } = await import('./demo-processor');
+      const demoVideoPath = await processTextToDemoVideo(scriptText);
+      
+      debugLog('Vídeo de demonstração gerado em:', demoVideoPath);
+      return demoVideoPath;
+    }
+    
     // Gerar o áudio com ElevenLabs
     debugLog('Iniciando chamada para ElevenLabs');
     const voiceType = elevenLabsService.VoiceType[voz as keyof typeof elevenLabsService.VoiceType] || elevenLabsService.VoiceType.FEMININO_PROFISSIONAL;
@@ -77,7 +91,17 @@ export async function testeGerarVideo(
     
     if (!audioBuffer) {
       debugLog('Falha ao gerar áudio - buffer nulo retornado');
-      throw new Error('Falha ao gerar áudio com ElevenLabs');
+      
+      // Se falhar, informamos que estamos usando o modo de demonstração como fallback
+      console.log('Falha ao gerar áudio com API externa. Usando modo de demonstração como fallback.');
+      debugLog('Usando processador de demonstração como fallback');
+      
+      // Importar o gerador de demonstração
+      const { processTextToDemoVideo } = await import('./demo-processor');
+      const demoVideoPath = await processTextToDemoVideo(scriptText);
+      
+      debugLog('Vídeo de demonstração gerado em:', demoVideoPath);
+      return demoVideoPath;
     }
     
     debugLog('Áudio gerado com sucesso, tamanho do buffer:', audioBuffer.length);
