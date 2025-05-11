@@ -136,7 +136,7 @@ export async function detectSilence(
 /**
  * Obter a duração de um arquivo de áudio usando ffmpeg
  */
-async function getAudioDuration(audioPath: string): Promise<number> {
+export async function getAudioDuration(audioPath: string): Promise<number> {
   try {
     const command = `"${FFMPEG_PATH}" -i "${audioPath}" 2>&1 | grep "Duration"`;
     const { stdout } = await execAsync(command);

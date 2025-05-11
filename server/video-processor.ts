@@ -41,6 +41,122 @@ export async function ensureDirectoryExists(directory: string): Promise<void> {
 }
 
 /**
+ * Busca imagens relacionadas ao tópico usando a API do Pexels
+ * @param topic Tópico para busca de imagens
+ * @param count Quantidade de imagens
+ * @returns Caminhos das imagens baixadas
+ */
+export async function fetchRelatedImages(topic: string, count: number = 5): Promise<string[]> {
+  try {
+    await ensureDirectoryExists(IMAGES_DIR);
+    
+    console.log(`Buscando ${count} imagens para o tópico "${topic}" via Pexels`);
+    
+    // Buscar imagens usando o serviço Pexels
+    const imageUrls = await pexelsService.searchImages(topic, count);
+    
+    if (imageUrls.length === 0) {
+      console.warn('Nenhuma imagem encontrada para o tópico, usando placeholder');
+      return [];
+    }
+    
+    // Baixar as imagens
+    const localPaths = await pexelsService.downloadMultipleImages(imageUrls);
+    
+    console.log(`${localPaths.length} imagens baixadas com sucesso para "${topic}"`);
+    return localPaths;
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    console.error('Erro ao buscar imagens relacionadas:', error.message);
+    return [];
+  }
+}
+
+/**
+ * Cria uma imagem de cor sólida com texto
+ * @param text Texto a ser adicionado à imagem
+ * @param width Largura da imagem
+ * @param height Altura da imagem
+ * @param color Cor de fundo (formato hexadecimal ou nome)
+ * @returns Caminho da imagem criada
+ */
+export async function createTextImage(
+  text: string,
+  width: number = 1280,
+  height: number = 720,
+  color: string = 'black'
+): Promise<string> {
+  await ensureDirectoryExists(IMAGES_DIR);
+  
+  const filename = `text_${crypto.randomUUID()}.jpg`;
+  const outputPath = path.join(IMAGES_DIR, filename);
+  
+  try {
+    // Escapar texto para evitar problemas com aspas no comando
+    const escapedText = text.replace(/"/g, '\\"').replace(/\n/g, ' ');
+    
+    // Comando ffmpeg para criar imagem com texto centralizado
+    const command = `"${FFMPEG_PATH}" -y -f lavfi -i color=c=${color}:s=${width}x${height} -vf "drawtext=text='${escapedText}':fontcolor=white:fontsize=48:x=(w-text_w)/2:y=(h-text_h)/2" -frames:v 1 "${outputPath}"`;
+    
+    await execAsync(command);
+    
+    // Verificar se o arquivo foi criado
+    await fs.access(outputPath);
+    
+    console.log(`Imagem com texto criada: ${outputPath}`);
+    return outputPath;
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    console.error('Erro ao criar imagem com texto:', error.message);
+    
+    // Fallback: criar uma imagem em branco sem texto
+    try {
+      const backupCommand = `"${FFMPEG_PATH}" -y -f lavfi -i color=c=${color}:s=${width}x${height} -frames:v 1 "${outputPath}"`;
+      await execAsync(backupCommand);
+      return outputPath;
+    } catch (e) {
+      throw new Error(`Não foi possível criar nem mesmo uma imagem em branco: ${e}`);
+    }
+  }
+}
+
+/**
+ * Detecta pontos de corte em um arquivo de áudio baseados em silêncio
+ * @param audioPath Caminho do arquivo de áudio
+ * @param threshold Limiar de silêncio em dB (negativo, menor = mais sensível)
+ * @returns Lista de pontos de tempo (em segundos) para cortes
+ */
+export async function detectAudioCutPoints(
+  audioPath: string,
+  threshold: number = -30
+): Promise<number[]> {
+  try {
+    // Primeiro, garantir que o arquivo existe
+    await fs.access(audioPath);
+    
+    // Usar o analisador de áudio para detectar silêncio
+    const segments = await audioAnalyzer.detectSilence(audioPath, threshold);
+    
+    // Filtrar apenas o início dos segmentos não-silenciosos significativos
+    const cutPoints = segments
+      .filter(seg => !seg.isSilent && seg.duration >= 0.5)
+      .map(seg => seg.start);
+    
+    // Adicionar o tempo zero se não estiver presente
+    if (cutPoints.length > 0 && cutPoints[0] > 0) {
+      cutPoints.unshift(0);
+    }
+    
+    console.log(`Detectados ${cutPoints.length} pontos de corte baseados em silêncio`);
+    return cutPoints;
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    console.error('Erro ao detectar pontos de corte no áudio:', error.message);
+    return [0]; // Retornar apenas o ponto inicial como fallback
+  }
+}
+
+/**
  * Processa o áudio e gera um vídeo
  * @param audioData Base64 ou caminho para o arquivo de áudio
  * @param imageUrls URLs das imagens a serem usadas
@@ -60,6 +176,9 @@ export async function processAudioToVideo(
     resolution?: string;      // Resolução do vídeo (ex: "1080p", "720p")
   } = {}
 ): Promise<string> {
+  // Importar o serviço de Pexels
+  const pexelsService = await import('./pexels-service');
+  const audioAnalyzer = await import('./audio-analyzer');
   // Garantir que os diretórios existem
   await ensureDirectoryExists(TMP_DIR);
   await ensureDirectoryExists(OUTPUT_DIR);
@@ -104,39 +223,130 @@ export async function processAudioToVideo(
       throw new Error('Falha ao verificar arquivo de áudio: ' + error.message);
     }
     
-    // Passo 2: Baixar as imagens
-    const localImagePaths: string[] = [];
-    for (let i = 0; i < imageUrls.length; i++) {
-      const imagePath = path.join(TMP_DIR, `image_${processingId}_${i}.jpg`);
+    // Passo 2: Obter imagens (baixar URLs, usar as fornecidas ou buscar no Pexels)
+    let localImagePaths: string[] = [];
+    
+    // Se não houver URLs de imagem e houver um tópico fornecido, buscar do Pexels
+    if (imageUrls.length === 0 && options.topic) {
+      console.log(`Buscando imagens do Pexels para o tópico: "${options.topic}"`);
+      // Buscar imagens do Pexels
+      const pexelsImages = await pexelsService.searchImages(options.topic, 5);
       
-      if (imageUrls[i].startsWith('http')) {
-        // Baixar a imagem
-        const fetch = (await import('node-fetch')).default;
-        const response = await fetch(imageUrls[i]);
-        const buffer = await response.buffer();
-        await fs.writeFile(imagePath, buffer);
-      } else {
-        // Assume que já é um caminho de arquivo
-        await fs.copyFile(imageUrls[i], imagePath);
+      // Baixar as imagens encontradas
+      if (pexelsImages.length > 0) {
+        localImagePaths = await pexelsService.downloadMultipleImages(pexelsImages);
+        console.log(`${localImagePaths.length} imagens baixadas do Pexels`);
+      }
+    } else if (imageUrls.length > 0) {
+      // Usar as URLs fornecidas
+      for (let i = 0; i < imageUrls.length; i++) {
+        const imagePath = path.join(IMAGES_DIR, `image_${processingId}_${i}.jpg`);
+        
+        if (imageUrls[i].startsWith('http')) {
+          try {
+            // Baixar a imagem
+            const fetch = (await import('node-fetch')).default;
+            const response = await fetch(imageUrls[i]);
+            const buffer = await response.buffer();
+            await fs.writeFile(imagePath, buffer);
+            localImagePaths.push(imagePath);
+          } catch (err) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            console.error(`Erro ao baixar imagem de ${imageUrls[i]}:`, error.message);
+            // Continuar com as próximas imagens
+          }
+        } else {
+          try {
+            // Assume que já é um caminho de arquivo
+            await fs.copyFile(imageUrls[i], imagePath);
+            localImagePaths.push(imagePath);
+          } catch (err) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            console.error(`Erro ao copiar imagem de ${imageUrls[i]}:`, error.message);
+            // Continuar com as próximas imagens
+          }
+        }
       }
       
-      localImagePaths.push(imagePath);
+      console.log(`${localImagePaths.length} imagens processadas`);
     }
     
-    console.log(`${localImagePaths.length} imagens baixadas`);
+    // Se ainda não tiver imagens, criar uma imagem padrão de cor sólida
+    if (localImagePaths.length === 0) {
+      console.log('Nenhuma imagem disponível, criando imagem padrão');
+      // Criar imagem padrão com texto (se houver tópico) ou em branco
+      if (options.topic) {
+        const imagePath = await createTextImage(options.topic, 1280, 720, "black");
+        localImagePaths.push(imagePath);
+      } else {
+        // Gerar uma imagem preta simples com ffmpeg
+        const defaultImagePath = path.join(IMAGES_DIR, `default_${processingId}.jpg`);
+        const defaultImageCmd = `"${FFMPEG_PATH}" -y -f lavfi -i color=c=black:s=1280x720 -frames:v 1 "${defaultImagePath}"`;
+        await execAsync(defaultImageCmd);
+        localImagePaths.push(defaultImagePath);
+      }
+      console.log('Imagem padrão criada como fallback');
+    }
     
-    // Passo 3: Gerar arquivo de lista de imagens para o ffmpeg
+    // Passo 3: Processar o áudio para detectar silêncio, se solicitado
+    let cutPoints: number[] = [];
+    let audioDuration = 0;
+    
+    try {
+      // Obter a duração do áudio usando a própria função
+      audioDuration = await getAudioDuration(audioPath);
+      console.log(`Duração do áudio: ${audioDuration} segundos`);
+      
+      // Detectar silêncio para cortes, se solicitado
+      if (options.detectSilence) {
+        const silenceThreshold = options.silenceThreshold || -30;
+        console.log(`Detectando silêncio com limiar de ${silenceThreshold}dB`);
+        
+        const segments = await audioAnalyzer.detectSilence(audioPath, silenceThreshold);
+        
+        // Gerar pontos de corte
+        cutPoints = segments
+          .filter(seg => !seg.isSilent && seg.duration >= 0.5) // Filtrar segmentos significativos
+          .map(seg => seg.start);
+        
+        console.log(`Detectados ${cutPoints.length} pontos de corte baseados em silêncio`);
+      }
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.warn('Erro ao processar áudio para detecção de silêncio:', error.message);
+      // Continuar sem detecção de silêncio
+    }
+    
+    // Passo 4: Gerar arquivo de lista de imagens para o ffmpeg
     let imageListContent = '';
-    // Duração total do áudio
-    const audioDuration = await getAudioDuration(audioPath);
-    console.log(`Duração do áudio: ${audioDuration} segundos`);
     
-    // Calcular duração de cada imagem baseado no número de imagens
-    const imageDuration = audioDuration / localImagePaths.length;
-    
-    // Criar arquivo de lista para o ffmpeg
-    for (const imagePath of localImagePaths) {
-      imageListContent += `file '${imagePath}'\nduration ${imageDuration}\n`;
+    // Se tiver pontos de corte, usar eles para definir a duração das imagens
+    if (cutPoints.length > 0) {
+      // Garantir que o primeiro corte começa do zero
+      if (cutPoints[0] > 0) {
+        cutPoints.unshift(0);
+      }
+      
+      // Adicionar o fim do áudio como último ponto
+      if (cutPoints[cutPoints.length - 1] < audioDuration) {
+        cutPoints.push(audioDuration);
+      }
+      
+      // Distribuir as imagens pelos segmentos de áudio
+      for (let i = 0; i < cutPoints.length - 1; i++) {
+        const segmentDuration = cutPoints[i + 1] - cutPoints[i];
+        // Usar imagem conforme o índice do segmento, com wrap-around se necessário
+        const imageIndex = i % localImagePaths.length;
+        
+        imageListContent += `file '${localImagePaths[imageIndex]}'\nduration ${segmentDuration}\n`;
+      }
+    } else {
+      // Sem pontos de corte, distribuir imagens uniformemente
+      const imageDuration = audioDuration / Math.max(1, localImagePaths.length);
+      
+      for (const imagePath of localImagePaths) {
+        imageListContent += `file '${imagePath}'\nduration ${imageDuration}\n`;
+      }
     }
     
     // Adicionar a última imagem novamente sem duração (exigência do ffmpeg)
