@@ -6,6 +6,15 @@ import * as audioAnalyzer from './audio-analyzer';
 import * as pexelsService from './pexels-service';
 import * as elevenLabsService from './elevenlabs-service';
 
+// Flag para modo debug/depuração
+const DEBUG_MODE = true;
+// Função para logs de debug
+function debugLog(...args: any[]) {
+  if (DEBUG_MODE) {
+    console.log('[DEBUG]', ...args);
+  }
+}
+
 /**
  * Função de teste para gerar um vídeo com o processador
  * @returns Caminho do vídeo gerado
@@ -21,24 +30,31 @@ export async function testeGerarVideo(
   } = {}
 ): Promise<string> {
   try {
+    debugLog('Iniciando teste de geração de vídeo com opções:', JSON.stringify(opcoes));
     console.log('Iniciando teste de geração de vídeo...');
     
     // Gerar ID único para este processamento
     const processingId = crypto.randomUUID();
     const tmpAudioPath = path.join(process.cwd(), 'tmp', `audio_test_${processingId}.mp3`);
+    debugLog('ID de processamento gerado:', processingId);
+    debugLog('Caminho de áudio temporário:', tmpAudioPath);
     
     // Garantir que o diretório existe
     const tmpDir = path.join(process.cwd(), 'tmp');
     try {
       await fs.access(tmpDir);
+      debugLog('Diretório tmp já existe');
     } catch (e) {
+      debugLog('Criando diretório tmp');
       await fs.mkdir(tmpDir, { recursive: true });
     }
     
     // Gerar áudio a partir do texto usando ElevenLabs
     console.log('Gerando áudio a partir do texto...');
+    debugLog('Script para áudio:', scriptText.substring(0, 100) + '...');
     
     const voz = opcoes.voz || 'pt-BR-Female-Professional';
+    debugLog('Voz selecionada:', voz);
     
     // Dividir o texto em frases para melhor processamento
     const frases = scriptText
@@ -47,20 +63,41 @@ export async function testeGerarVideo(
       .filter(frase => frase.length > 0);
     
     console.log(`Texto dividido em ${frases.length} frases`);
+    debugLog('Primeiras frases:', frases.slice(0, 3));
     
     // Gerar o áudio com ElevenLabs
+    debugLog('Iniciando chamada para ElevenLabs');
+    const voiceType = elevenLabsService.VoiceType[voz as keyof typeof elevenLabsService.VoiceType] || elevenLabsService.VoiceType.FEMININO_PROFISSIONAL;
+    debugLog('Tipo de voz mapeado:', voiceType);
+    
     const audioBuffer = await elevenLabsService.generateElevenLabsAudio(
       scriptText, 
-      elevenLabsService.VoiceType[voz as keyof typeof elevenLabsService.VoiceType] || elevenLabsService.VoiceType.FEMININO_PROFISSIONAL
+      voiceType
     );
     
     if (!audioBuffer) {
+      debugLog('Falha ao gerar áudio - buffer nulo retornado');
       throw new Error('Falha ao gerar áudio com ElevenLabs');
     }
+    
+    debugLog('Áudio gerado com sucesso, tamanho do buffer:', audioBuffer.length);
     
     // Salvar o áudio no arquivo temporário
     await fs.writeFile(tmpAudioPath, audioBuffer);
     console.log(`Áudio gerado e salvo em ${tmpAudioPath}`);
+    
+    // Verificar se o arquivo foi criado corretamente
+    try {
+      const audioStat = await fs.stat(tmpAudioPath);
+      debugLog('Arquivo de áudio verificado, tamanho:', audioStat.size);
+      
+      if (audioStat.size < 1000) {
+        debugLog('ALERTA: Arquivo de áudio parece muito pequeno');
+      }
+    } catch (e) {
+      debugLog('Erro ao verificar arquivo de áudio:', e);
+      throw new Error('Falha ao verificar arquivo de áudio');
+    }
     
     // Definir opções para processamento de vídeo
     const videoOptions = {
@@ -71,12 +108,19 @@ export async function testeGerarVideo(
       resolution: opcoes.resolucao || '720p'
     };
     
+    debugLog('Opções de vídeo configuradas:', videoOptions);
+    
     // Realizar busca de imagens relacionadas ao tópico via Pexels
     console.log(`Buscando imagens para o tópico: ${videoOptions.topic}`);
+    debugLog('Iniciando busca de imagens via Pexels');
+    
     const imageUrls = await pexelsService.searchImages(videoOptions.topic, 5);
+    debugLog('Imagens retornadas:', imageUrls.length, 'primeira URL:', imageUrls[0]?.substring(0, 50) + '...');
     
     // Processar o áudio em vídeo com as imagens e legendas
     console.log('Processando áudio para vídeo...');
+    debugLog('Iniciando processamento de áudio para vídeo');
+    
     const videoPath = await processAudioToVideo(
       tmpAudioPath,
       imageUrls,
@@ -84,11 +128,27 @@ export async function testeGerarVideo(
       videoOptions
     );
     
+    debugLog('Processo de vídeo concluído, caminho:', videoPath);
     console.log(`Vídeo gerado com sucesso: ${videoPath}`);
+    
+    // Verificar se o vídeo foi gerado corretamente
+    try {
+      const videoStat = await fs.stat(videoPath);
+      debugLog('Arquivo de vídeo verificado, tamanho:', videoStat.size);
+      
+      if (videoStat.size < 10000) {
+        debugLog('ALERTA: Arquivo de vídeo parece muito pequeno');
+      }
+    } catch (e) {
+      debugLog('Erro ao verificar arquivo de vídeo:', e);
+      throw new Error('Falha ao verificar arquivo de vídeo');
+    }
+    
     return videoPath;
     
   } catch (err) {
     const error = err instanceof Error ? err : new Error(String(err));
+    debugLog('ERRO na geração de vídeo:', error.message, error.stack);
     console.error('Erro no teste de geração de vídeo:', error.message);
     throw error;
   }

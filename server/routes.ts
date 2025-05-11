@@ -1160,17 +1160,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
    */
   app.post("/api/test-video-generator", async (req: Request, res: Response) => {
     try {
+      console.log('Recebida solicitação para gerar vídeo de teste');
       const { script, options } = req.body;
       
       if (!script || typeof script !== 'string') {
+        console.warn('Script inválido recebido na solicitação');
         return res.status(400).json({
           success: false,
           error: 'O script é obrigatório e deve ser uma string'
         });
       }
       
+      // Verificar diretórios necessários antes de iniciar o processamento
+      try {
+        // Garantir que diretórios existem
+        const tmpDir = path.join(process.cwd(), 'tmp');
+        const outputDir = path.join(process.cwd(), 'output');
+        
+        // Verificar/criar diretório tmp
+        try {
+          await fs.promises.access(tmpDir);
+          console.log('Diretório tmp existe');
+        } catch (e) {
+          console.log('Criando diretório tmp');
+          await fs.promises.mkdir(tmpDir, { recursive: true });
+        }
+        
+        // Verificar/criar diretório output
+        try {
+          await fs.promises.access(outputDir);
+          console.log('Diretório output existe');
+        } catch (e) {
+          console.log('Criando diretório output');
+          await fs.promises.mkdir(outputDir, { recursive: true });
+        }
+      } catch (dirError) {
+        console.error('Erro ao verificar/criar diretórios:', dirError);
+        return res.status(500).json({
+          success: false,
+          error: 'Falha ao preparar diretórios para processamento'
+        });
+      }
+      
       // Criar uma nova tarefa
       const taskId = nanoid();
+      console.log(`Nova tarefa criada: ${taskId}`);
       
       // Registrar a tarefa
       activeTasks.set(taskId, {
@@ -1182,11 +1216,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Iniciar processamento assíncrono
+      console.log('Iniciando processamento assíncrono');
       setTimeout(async () => {
         try {
+          // Marcar início para rastrear duração
+          const startTime = Date.now();
+          
           // Atualizar status para processando
           updateTaskProgress(taskId, 10, 'Gerando vídeo de teste...', 'processing');
           
+          console.log('Chamando função testeGerarVideo com script e opções');
           // Processar o vídeo com as opções fornecidas
           const videoPath = await testeGerarVideo(script, {
             voz: options?.voz,
@@ -1196,24 +1235,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
             resolucao: options?.resolucao
           });
           
-          // Preparar resultado com estatísticas básicas
-          // Usar o fs nativo para obter estatísticas do arquivo
-          const fsSync = require('fs');
-          const fileStats = fsSync.statSync(videoPath);
+          // Verificar se o caminho retornado é válido
+          if (!videoPath) {
+            throw new Error('Caminho de vídeo inválido retornado pelo processador');
+          }
           
-          // Atualizar status para concluído
-          updateTaskProgress(
-            taskId, 
-            100, 
-            'Vídeo gerado com sucesso!', 
-            'completed',
-            {
-              videoPath,
-              size: fileStats.size,
-              duration: 'N/A', // Poderia ser obtido com FFmpeg
-              createdAt: new Date().toISOString()
+          console.log(`Vídeo processado com sucesso: ${videoPath}`);
+          
+          // Verificar se o arquivo realmente existe
+          try {
+            // Preparar resultado com estatísticas básicas
+            // Usar o fs nativo para obter estatísticas do arquivo
+            const fsSync = fs;
+            const fileStats = await fsSync.promises.stat(videoPath);
+            
+            if (fileStats.size < 1000) {
+              console.warn(`Arquivo de vídeo gerado é muito pequeno: ${fileStats.size} bytes`);
+              throw new Error('Arquivo de vídeo gerado é muito pequeno ou inválido');
             }
-          );
+            
+            const processingTime = Date.now() - startTime;
+            console.log(`Tempo total de processamento: ${processingTime}ms`);
+            
+            // Atualizar status para concluído
+            updateTaskProgress(
+              taskId, 
+              100, 
+              'Vídeo gerado com sucesso!', 
+              'completed',
+              {
+                videoPath,
+                size: fileStats.size,
+                duration: 'N/A', // Poderia ser obtido com FFmpeg
+                createdAt: new Date().toISOString(),
+                processingTime
+              }
+            );
+          } catch (statError: any) {
+            console.error('Erro ao verificar arquivo de vídeo:', statError);
+            throw new Error(`Falha ao verificar arquivo de vídeo: ${statError.message}`);
+          }
+          
         } catch (err) {
           const error = err instanceof Error ? err : new Error(String(err));
           console.error('Erro na geração de vídeo de teste:', error);
