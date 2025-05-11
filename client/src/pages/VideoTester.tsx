@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,10 +9,11 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, FolderCheck } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 import { Loader2, Video, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import APIStatusChecker from '@/components/APIStatusChecker';
 
 export default function VideoTester() {
   const [script, setScript] = useState<string>('Este é um teste de geração de vídeo com detecção de silêncio. A pausa entre frases será detectada automaticamente. Isso permite criar vídeos mais naturais e sincronizados.');
@@ -25,7 +26,49 @@ export default function VideoTester() {
   const [status, setStatus] = useState<string>('');
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [ensureDirectories, setEnsureDirectories] = useState<{
+    success: boolean;
+    directories?: { 
+      tmp: string;
+      output: string;
+      images: string;
+    };
+    error?: string;
+  } | null>(null);
+  const [isEnsuring, setIsEnsuring] = useState<boolean>(false);
   const { toast } = useToast();
+  
+  // Função para garantir que os diretórios necessários existem
+  const handleEnsureDirectories = async () => {
+    try {
+      setIsEnsuring(true);
+      const response = await apiRequest('GET', '/api/ensure-directories');
+      const data = await response.json();
+      
+      setEnsureDirectories(data);
+      
+      if (data.success) {
+        toast({
+          title: "Diretórios verificados",
+          description: "Todos os diretórios necessários estão prontos para uso.",
+        });
+      } else {
+        toast({
+          title: "Erro ao verificar diretórios",
+          description: data.error || "Não foi possível garantir a existência dos diretórios necessários.",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erro na comunicação",
+        description: "Não foi possível verificar os diretórios. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsEnsuring(false);
+    }
+  };
 
   // Verificar o status do processamento periodicamente
   React.useEffect(() => {

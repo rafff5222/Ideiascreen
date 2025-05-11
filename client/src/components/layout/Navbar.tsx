@@ -20,7 +20,8 @@ export default function Navbar() {
     { name: "Preços", href: "/#precos" },
     { name: "Depoimentos", href: "/#depoimentos" },
     { name: "Demo", href: "/demo" },
-    { name: "Novo Demo", href: "/generation-demo", highlight: true },
+    { name: "Gerador Demo", href: "/generation-demo" },
+    { name: "Nova Versão", href: "/video-tester", highlight: true },
   ];
 
   // Fixed DOM nesting by using div instead of a when using Link component
@@ -54,7 +55,10 @@ export default function Navbar() {
                 <div className="font-medium hover:text-primary transition cursor-pointer">Demo</div>
               </Link>
               <Link href="/generation-demo">
-                <div className="font-medium text-purple-600 font-semibold hover:text-primary transition cursor-pointer">Novo Demo</div>
+                <div className="font-medium hover:text-primary transition cursor-pointer">Gerador Demo</div>
+              </Link>
+              <Link href="/video-tester">
+                <div className="font-medium text-purple-600 font-semibold hover:text-primary transition cursor-pointer">Nova Versão</div>
               </Link>
             </>
           )}
@@ -102,14 +106,40 @@ export default function Navbar() {
                 ))}
                 
                 {!isHomePage && (
-                  <Link href="/">
-                    <div 
-                      className="py-2 text-lg font-medium hover:text-primary transition cursor-pointer"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Início
-                    </div>
-                  </Link>
+                  <>
+                    <Link href="/">
+                      <div 
+                        className="py-2 text-lg font-medium hover:text-primary transition cursor-pointer"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Início
+                      </div>
+                    </Link>
+                    <Link href="/demo">
+                      <div 
+                        className="py-2 text-lg font-medium hover:text-primary transition cursor-pointer"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Demo
+                      </div>
+                    </Link>
+                    <Link href="/generation-demo">
+                      <div 
+                        className="py-2 text-lg font-medium hover:text-primary transition cursor-pointer"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Gerador Demo
+                      </div>
+                    </Link>
+                    <Link href="/video-tester">
+                      <div 
+                        className="py-2 text-lg font-medium text-purple-600 hover:text-primary font-semibold transition cursor-pointer"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Nova Versão
+                      </div>
+                    </Link>
+                  </>
                 )}
                 
                 {location === "/" ? (

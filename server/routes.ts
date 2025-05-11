@@ -1247,6 +1247,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   /**
+   * Endpoint para verificar o status de uma tarefa de processamento
+   */
+  app.get("/api/task-status/:taskId", async (req: Request, res: Response) => {
+    try {
+      const { taskId } = req.params;
+      
+      if (!taskId) {
+        return res.status(400).json({
+          success: false,
+          error: 'ID da tarefa não fornecido'
+        });
+      }
+      
+      // Verificar se a tarefa existe
+      const task = activeTasks.get(taskId);
+      
+      if (!task) {
+        return res.status(404).json({
+          success: false,
+          error: 'Tarefa não encontrada'
+        });
+      }
+      
+      // Calcular o tempo de processamento
+      const processingTime = Date.now() - task.startTime;
+      
+      return res.json({
+        success: true,
+        task: {
+          id: task.id,
+          status: task.status,
+          progress: task.progress,
+          message: task.message,
+          processingTime,
+          result: task.result,
+          error: task.error
+        }
+      });
+    } catch (error: any) {
+      console.error('Erro ao verificar status da tarefa:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message || 'Erro interno ao verificar status da tarefa'
+      });
+    }
+  });
+  
+  /**
+   * Endpoint para garantir a existência dos diretórios necessários
+   */
+  app.get("/api/ensure-directories", async (req: Request, res: Response) => {
+    try {
+      // Garantir que os diretórios necessários existem
+      const ensureDir = async (dir: string) => {
+        try {
+          await fs.access(dir);
+        } catch (e) {
+          await fs.mkdir(dir, { recursive: true });
+        }
+      };
+      
+      await ensureDir(TMP_DIR);
+      await ensureDir(OUTPUT_DIR);
+      await ensureDir(IMAGES_DIR);
+      
+      return res.json({
+        success: true,
+        directories: {
+          tmp: TMP_DIR,
+          output: OUTPUT_DIR,
+          images: IMAGES_DIR
+        }
+      });
+    } catch (error: any) {
+      console.error('Erro ao garantir diretórios:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message || 'Erro ao garantir diretórios'
+      });
+    }
+  });
+  
+  /**
    * Endpoint para visualização de vídeo a partir do caminho do arquivo
    */
   app.get("/api/video/:videoPath(*)", async (req: Request, res: Response) => {
