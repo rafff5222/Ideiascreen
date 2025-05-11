@@ -1,197 +1,152 @@
-import path from 'path';
-import fs from 'fs/promises';
-import crypto from 'crypto';
-import { processAudioToVideo } from './video-processor';
-import * as audioAnalyzer from './audio-analyzer';
-import * as pexelsService from './pexels-service';
-import * as elevenLabsService from './elevenlabs-service';
+/**
+ * Gerador de vídeo de teste
+ * Este módulo gera um vídeo de teste simples com imagens fixas e áudio
+ * Útil para depurar problemas de reprodução de vídeo
+ */
 
-// Flag para modo debug/depuração
-const DEBUG_MODE = true;
-// Função para logs de debug
-function debugLog(...args: any[]) {
-  if (DEBUG_MODE) {
-    console.log('[DEBUG]', ...args);
+import path from 'path';
+import { promises as fs } from 'fs';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
+
+/**
+ * Verifica e cria diretórios necessários
+ */
+async function ensureDirectoriesExist() {
+  const dirs = ['tmp', 'output', 'output/videos', 'output/images', 'output/audio'];
+  for (const dir of dirs) {
+    try {
+      await fs.mkdir(dir, { recursive: true });
+    } catch (error) {
+      console.error(`Erro ao criar diretório ${dir}:`, error);
+    }
   }
 }
 
 /**
- * Função de teste para gerar um vídeo com o processador
- * @returns Caminho do vídeo gerado
+ * Gera uma imagem de teste com cor sólida e texto
+ * @param text Texto a ser exibido na imagem
+ * @param color Cor de fundo (formato hexadecimal, ex: "#FF0000")
+ * @param outputPath Caminho para salvar a imagem
  */
-export async function testeGerarVideo(
-  scriptText: string = 'Este é um teste de geração de vídeo com detecção de silêncio. A pausa entre frases será detectada automaticamente. Isso permite criar vídeos mais naturais e com melhor sincronização.',
-  opcoes: {
-    voz?: string;
-    detectarSilencio?: boolean;
-    topico?: string;
-    transicoes?: string[];
-    resolucao?: string;
-    useDemoMode?: boolean;
-  } = {}
-): Promise<string> {
+async function generateTestImage(
+  text: string,
+  color: string = '#3498db',
+  outputPath: string
+): Promise<void> {
   try {
-    debugLog('Iniciando teste de geração de vídeo com opções:', JSON.stringify(opcoes));
-    console.log('Iniciando teste de geração de vídeo...');
+    const command = `ffmpeg -y -f lavfi -i color=${color.replace('#', '0x')}:s=1280x720 \
+      -vf "drawtext=text='${text}':fontcolor=white:fontsize=60:x=(w-text_w)/2:y=(h-text_h)/2" \
+      -frames:v 1 ${outputPath}`;
     
-    // Gerar ID único para este processamento
-    const processingId = crypto.randomUUID();
-    const tmpAudioPath = path.join(process.cwd(), 'tmp', `audio_test_${processingId}.mp3`);
-    debugLog('ID de processamento gerado:', processingId);
-    debugLog('Caminho de áudio temporário:', tmpAudioPath);
-    
-    // Garantir que o diretório existe
-    const tmpDir = path.join(process.cwd(), 'tmp');
-    try {
-      await fs.access(tmpDir);
-      debugLog('Diretório tmp já existe');
-    } catch (e) {
-      debugLog('Criando diretório tmp');
-      await fs.mkdir(tmpDir, { recursive: true });
-    }
-    
-    // Gerar áudio a partir do texto usando ElevenLabs
-    console.log('Gerando áudio a partir do texto...');
-    debugLog('Script para áudio:', scriptText.substring(0, 100) + '...');
-    
-    const voz = opcoes.voz || 'pt-BR-Female-Professional';
-    debugLog('Voz selecionada:', voz);
-    
-    // Dividir o texto em frases para melhor processamento
-    const frases = scriptText
-      .split(/[.!?]+/)
-      .map(frase => frase.trim())
-      .filter(frase => frase.length > 0);
-    
-    console.log(`Texto dividido em ${frases.length} frases`);
-    debugLog('Primeiras frases:', frases.slice(0, 3));
-    
-    // Verificar se o usuário solicitou explicitamente o modo de demonstração
-    if (opcoes.useDemoMode === true) {
-      debugLog('Modo de demonstração solicitado pelo usuário. Usando gerador de áudio demo.');
-      console.log('Usando modo de demonstração conforme solicitado pelo usuário.');
-      
-      // Importar o gerador de demonstração
-      const { processTextToDemoVideo } = await import('./demo-processor');
-      const demoVideoPath = await processTextToDemoVideo(scriptText);
-      
-      debugLog('Vídeo de demonstração gerado em:', demoVideoPath);
-      return demoVideoPath;
-    }
-    
-    // Gerar o áudio com ElevenLabs
-    debugLog('Iniciando chamada para ElevenLabs');
-    const voiceType = elevenLabsService.VoiceType[voz as keyof typeof elevenLabsService.VoiceType] || elevenLabsService.VoiceType.FEMININO_PROFISSIONAL;
-    debugLog('Tipo de voz mapeado:', voiceType);
-    
-    const audioBuffer = await elevenLabsService.generateElevenLabsAudio(
-      scriptText, 
-      voiceType
-    );
-    
-    if (!audioBuffer) {
-      debugLog('Falha ao gerar áudio - buffer nulo retornado');
-      
-      // Se falhar, informamos que estamos usando o modo de demonstração como fallback
-      console.log('Falha ao gerar áudio com API externa. Usando modo de demonstração como fallback.');
-      debugLog('Usando processador de demonstração como fallback');
-      
-      // Importar o gerador de demonstração
-      const { processTextToDemoVideo } = await import('./demo-processor');
-      const demoVideoPath = await processTextToDemoVideo(scriptText);
-      
-      debugLog('Vídeo de demonstração gerado em:', demoVideoPath);
-      return demoVideoPath;
-    }
-    
-    debugLog('Áudio gerado com sucesso, tamanho do buffer:', audioBuffer.length);
-    
-    // Salvar o áudio no arquivo temporário
-    await fs.writeFile(tmpAudioPath, audioBuffer);
-    console.log(`Áudio gerado e salvo em ${tmpAudioPath}`);
-    
-    // Verificar se o arquivo foi criado corretamente
-    try {
-      const audioStat = await fs.stat(tmpAudioPath);
-      debugLog('Arquivo de áudio verificado, tamanho:', audioStat.size);
-      
-      if (audioStat.size < 1000) {
-        debugLog('ALERTA: Arquivo de áudio parece muito pequeno');
-      }
-    } catch (e) {
-      debugLog('Erro ao verificar arquivo de áudio:', e);
-      throw new Error('Falha ao verificar arquivo de áudio');
-    }
-    
-    // Definir opções para processamento de vídeo
-    const videoOptions = {
-      detectSilence: opcoes.detectarSilencio !== undefined ? opcoes.detectarSilencio : true,
-      silenceThreshold: -35,  // dB, mais sensível para captar pausas naturais
-      topic: opcoes.topico || 'tecnologia digital negócios',
-      transitions: opcoes.transicoes || ['fade'],
-      resolution: opcoes.resolucao || '720p'
-    };
-    
-    debugLog('Opções de vídeo configuradas:', videoOptions);
-    
-    // Realizar busca de imagens relacionadas ao tópico via Pexels
-    console.log(`Buscando imagens para o tópico: ${videoOptions.topic}`);
-    debugLog('Iniciando busca de imagens via Pexels');
-    
-    const imageUrls = await pexelsService.searchImages(videoOptions.topic, 5);
-    debugLog('Imagens retornadas:', imageUrls.length, 'primeira URL:', imageUrls[0]?.substring(0, 50) + '...');
-    
-    // Processar o áudio em vídeo com as imagens e legendas
-    console.log('Processando áudio para vídeo...');
-    debugLog('Iniciando processamento de áudio para vídeo');
-    
-    const videoPath = await processAudioToVideo(
-      tmpAudioPath,
-      imageUrls,
-      frases,
-      videoOptions
-    );
-    
-    debugLog('Processo de vídeo concluído, caminho:', videoPath);
-    console.log(`Vídeo gerado com sucesso: ${videoPath}`);
-    
-    // Verificar se o vídeo foi gerado corretamente
-    try {
-      const videoStat = await fs.stat(videoPath);
-      debugLog('Arquivo de vídeo verificado, tamanho:', videoStat.size);
-      
-      if (videoStat.size < 10000) {
-        debugLog('ALERTA: Arquivo de vídeo parece muito pequeno');
-      }
-    } catch (e) {
-      debugLog('Erro ao verificar arquivo de vídeo:', e);
-      throw new Error('Falha ao verificar arquivo de vídeo');
-    }
-    
-    return videoPath;
-    
-  } catch (err) {
-    const error = err instanceof Error ? err : new Error(String(err));
-    debugLog('ERRO na geração de vídeo:', error.message, error.stack);
-    console.error('Erro no teste de geração de vídeo:', error.message);
+    await execAsync(command);
+    console.log(`Imagem de teste gerada: ${outputPath}`);
+  } catch (error) {
+    console.error('Erro ao gerar imagem de teste:', error);
     throw error;
   }
 }
 
-// Para executar o teste diretamente, importe e chame esta função
-// Não podemos usar require.main em módulos ESM
-// Se você quiser rodar este teste, use:
-// import { testeGerarVideo } from './test-video-generator.js';
-// testeGerarVideo().then(...).catch(...);
-
-// Função auxiliar para executar o teste (não é chamada automaticamente)
-export async function runTest() {
+/**
+ * Gera um áudio de teste com TTS usando ffmpeg
+ * @param text Texto a ser convertido em áudio
+ * @param outputPath Caminho para salvar o áudio
+ */
+async function generateTestAudio(text: string, outputPath: string): Promise<void> {
   try {
-    const videoPath = await testeGerarVideo();
-    console.log(`\nTeste concluído com sucesso! Vídeo disponível em: ${videoPath}`);
-    return videoPath;
+    // Usamos um tom simples para evitar problemas com TTS
+    const command = `ffmpeg -y -f lavfi -i "sine=frequency=440:duration=5" ${outputPath}`;
+    
+    await execAsync(command);
+    console.log(`Áudio de teste gerado: ${outputPath}`);
   } catch (error) {
-    console.error('\nTeste falhou com erro:', error);
+    console.error('Erro ao gerar áudio de teste:', error);
+    throw error;
+  }
+}
+
+/**
+ * Cria um vídeo de teste combinando imagens e áudio
+ * @param imagePaths Lista de caminhos das imagens a serem usadas
+ * @param audioPath Caminho do arquivo de áudio
+ * @param outputPath Caminho para salvar o vídeo
+ */
+async function createTestVideo(
+  imagePaths: string[],
+  audioPath: string,
+  outputPath: string
+): Promise<void> {
+  try {
+    if (imagePaths.length === 0) {
+      throw new Error('Nenhuma imagem fornecida para o vídeo');
+    }
+
+    // Cria um arquivo de texto listando as imagens para o ffmpeg
+    const imageListFile = path.join('tmp', 'image_list.txt');
+    let imageListContent = '';
+    
+    // Cada imagem terá a mesma duração
+    const durationPerImage = 5 / imagePaths.length;
+    
+    for (const imagePath of imagePaths) {
+      imageListContent += `file '${path.resolve(imagePath)}'\n`;
+      imageListContent += `duration ${durationPerImage}\n`;
+    }
+    
+    // Repetir a última imagem sem duração (requerido pelo ffmpeg)
+    imageListContent += `file '${path.resolve(imagePaths[imagePaths.length - 1])}'\n`;
+    
+    await fs.writeFile(imageListFile, imageListContent);
+
+    // Comando para criar o vídeo com ffmpeg
+    const command = `ffmpeg -y -f concat -safe 0 -i ${imageListFile} -i ${audioPath} \
+      -c:v libx264 -pix_fmt yuv420p -preset faster -crf 23 \
+      -c:a aac -strict experimental -shortest \
+      -map 0:v:0 -map 1:a:0 \
+      ${outputPath}`;
+    
+    await execAsync(command);
+    console.log(`Vídeo de teste gerado: ${outputPath}`);
+  } catch (error) {
+    console.error('Erro ao criar vídeo de teste:', error);
+    throw error;
+  }
+}
+
+/**
+ * Gera um vídeo de teste completo
+ * @returns Caminho do vídeo gerado
+ */
+export async function generateTestVideo(): Promise<string> {
+  try {
+    await ensureDirectoriesExist();
+    
+    const timestamp = Date.now();
+    const outputVideoPath = path.join('output', 'videos', `test_video_${timestamp}.mp4`);
+    
+    // Gerar imagens de teste
+    const imageColors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12'];
+    const texts = ['TESTE 1', 'TESTE 2', 'TESTE 3', 'TESTE 4'];
+    const imagePaths: string[] = [];
+    
+    for (let i = 0; i < 4; i++) {
+      const imagePath = path.join('output', 'images', `test_image_${i}_${timestamp}.jpg`);
+      await generateTestImage(texts[i], imageColors[i], imagePath);
+      imagePaths.push(imagePath);
+    }
+    
+    // Gerar áudio de teste
+    const audioPath = path.join('output', 'audio', `test_audio_${timestamp}.aac`);
+    await generateTestAudio('Teste', audioPath);
+    
+    // Criar vídeo de teste
+    await createTestVideo(imagePaths, audioPath, outputVideoPath);
+    
+    return outputVideoPath;
+  } catch (error) {
+    console.error('Erro ao gerar vídeo de teste:', error);
     throw error;
   }
 }

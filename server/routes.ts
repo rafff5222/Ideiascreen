@@ -9,7 +9,7 @@ import fs from "fs";
 import path from "path";
 import { z } from 'zod';
 import { generateVideo as generateAIVideo } from "./ai-service";
-import { testeGerarVideo } from "./test-video-generator";
+import { generateTestVideo } from "./test-video-generator";
 import { nanoid } from 'nanoid';
 
 // Diretórios padrão para armazenamento de arquivos
@@ -2073,6 +2073,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
   /**
    * Endpoint para excluir um vídeo
    */
+  /**
+   * Endpoint para gerar um vídeo de teste
+   * Útil para depuração de problemas de reprodução de vídeo
+   */
+  app.post("/api/generate-test-video", async (req: Request, res: Response) => {
+    try {
+      // Gerar um ID único para a tarefa
+      const taskId = nanoid();
+      
+      // Criar uma nova tarefa
+      const task: ProcessingTask = {
+        id: taskId,
+        status: 'pending',
+        progress: 0,
+        message: 'Iniciando geração de vídeo de teste...',
+        startTime: Date.now(),
+      };
+      
+      // Armazenar a tarefa
+      activeTasks.set(taskId, task);
+      
+      // Iniciar o processamento em segundo plano
+      (async () => {
+        try {
+          // Atualizar progresso
+          updateTaskProgress(taskId, 10, 'Gerando vídeo de teste...', 'processing');
+          
+          // Gerar o vídeo de teste
+          const videoPath = await generateTestVideo();
+          
+          // Extrair apenas o nome do arquivo do caminho completo
+          const fileName = path.basename(videoPath);
+          
+          // Construir o caminho relativo para acesso via API
+          const relativePath = videoPath.includes('output/videos') 
+            ? `videos/${fileName}` 
+            : fileName;
+          
+          // Atualizar a tarefa como concluída
+          updateTaskProgress(
+            taskId, 
+            100, 
+            'Vídeo de teste gerado com sucesso!', 
+            'completed',
+            {
+              videoPath: relativePath,
+              fileName: fileName,
+              fullPath: videoPath
+            }
+          );
+        } catch (error: any) {
+          console.error('Erro ao gerar vídeo de teste:', error);
+          updateTaskProgress(
+            taskId, 
+            0, 
+            'Falha ao gerar vídeo de teste', 
+            'failed', 
+            null, 
+            error.message || 'Erro desconhecido'
+          );
+        }
+      })();
+      
+      // Responder imediatamente com o ID da tarefa
+      res.json({
+        success: true,
+        taskId: taskId,
+        message: 'Geração de vídeo de teste iniciada'
+      });
+    } catch (error: any) {
+      console.error('Erro ao iniciar geração de vídeo de teste:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Erro ao iniciar geração de vídeo de teste'
+      });
+    }
+  });
+
   app.delete("/api/delete-video/:filename", async (req: Request, res: Response) => {
     try {
       const { filename } = req.params;
