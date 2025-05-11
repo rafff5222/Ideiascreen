@@ -64,6 +64,10 @@ export default function VideoLibrary() {
 
   const handlePlay = (video: VideoFile) => {
     setSelectedVideo(video);
+    
+    // Opção alternativa: abrir em uma nova janela
+    const videoUrl = `/api/video-stream/${video.path}`;
+    window.open(`/video-preview?url=${encodeURIComponent(videoUrl)}`, '_blank');
   };
 
   const handleDownload = (video: VideoFile) => {
