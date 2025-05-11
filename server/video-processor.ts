@@ -6,9 +6,9 @@ import util from 'util';
 // Converter exec para Promisify
 const execAsync = util.promisify(exec);
 
-// Caminho para o ffmpeg importado da dependência ffmpeg-static
-const ffmpegStatic = require('ffmpeg-static');
-const ffmpegPath = ffmpegStatic || 'ffmpeg';
+// Caminho para o ffmpeg verificado via endpoint /api/check-ffmpeg
+// O caminho correto para o ffmpeg-static no Replit está em:
+const FFMPEG_PATH = '/home/runner/workspace/node_modules/ffmpeg-static/ffmpeg';
 
 // Caminho para o diretório temporário e de saída
 const TMP_DIR = path.join(process.cwd(), 'tmp');
@@ -143,7 +143,7 @@ export async function processAudioToVideo(
     console.log('Iniciando geração de vídeo com FFmpeg...');
     
     // Comando para criar vídeo com transições
-    const command = `"${ffmpegPath}" -y -f concat -safe 0 -i "${imageListFile}" -i "${audioPath}" -vf "subtitles=${subtitlesFile},fade=t=in:st=0:d=1,fade=t=out:st=${audioDuration-1}:d=1" -c:v libx264 -pix_fmt yuv420p -preset fast -c:a aac -strict experimental -b:a 192k "${outputVideoPath}"`;
+    const command = `"${FFMPEG_PATH}" -y -f concat -safe 0 -i "${imageListFile}" -i "${audioPath}" -vf "subtitles=${subtitlesFile},fade=t=in:st=0:d=1,fade=t=out:st=${audioDuration-1}:d=1" -c:v libx264 -pix_fmt yuv420p -preset fast -c:a aac -strict experimental -b:a 192k "${outputVideoPath}"`;
     
     console.log(`Executando comando: ${command}`);
     

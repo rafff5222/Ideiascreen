@@ -1484,76 +1484,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
    */
   app.get("/api/check-ffmpeg", async (req: Request, res: Response) => {
     try {
-      // Importação de módulos ESM
-      const childProcess = await import('child_process');
-      const util = await import('util');
-      const execAsync = util.promisify(childProcess.exec);
-      const path = await import('path');
-      const fs = await import('fs');
+      // Importação simplificada dos módulos necessários
+      const { exec } = await import('child_process');
       
-      // Verificar se o ffmpeg-static está disponível
-      let ffmpegStaticPath: string = '';
-      try {
-        const ffmpegStaticImport = await import('ffmpeg-static');
-        // O tipo pode ser string ou null, então garantimos que seja string
-        ffmpegStaticPath = typeof ffmpegStaticImport.default === 'string' 
-          ? ffmpegStaticImport.default 
-          : '';
-        console.log('ffmpeg-static encontrado:', ffmpegStaticPath);
-      } catch (e) {
-        console.error('ffmpeg-static não encontrado:', e);
-      }
-      
-      // Verificar se o caminho do ffmpeg-static existe
-      if (ffmpegStaticPath) {
-        try {
-          await fs.promises.access(ffmpegStaticPath, fs.constants.X_OK);
-          console.log('ffmpeg-static é executável:', ffmpegStaticPath);
-          
-          return res.json({
-            success: true,
-            source: 'ffmpeg-static',
-            path: ffmpegStaticPath,
-            available: true
+      // Função para executar comandos de shell de forma assíncrona
+      const execAsync = (cmd: string) => {
+        return new Promise<{stdout: string, stderr: string}>((resolve, reject) => {
+          exec(cmd, (error, stdout, stderr) => {
+            if (error) {
+              reject(error);
+              return;
+            }
+            resolve({ stdout, stderr });
           });
-        } catch (err) {
-          console.error('ffmpeg-static não é executável:', err);
-        }
-      }
+        });
+      };
       
-      // Tentar executar o ffmpeg do sistema
+      // Verificar caminho do ffmpeg-static do pacote
+      const ffmpegStaticPackagePath = '/nix/store/3zc5jbvqzrn8zmva4fx5p0nh4yy03wk4-ffmpeg-6.1.1-bin/bin/ffmpeg';
+      
+      // Tentar executar o ffmpeg diretamente
       try {
-        const { stdout, stderr } = await execAsync('ffmpeg -version');
-        console.log('ffmpeg stdout:', stdout);
+        const result = await execAsync('ffmpeg -version');
+        console.log('FFmpeg disponível no sistema:', result.stdout.split('\n')[0]);
         
         return res.json({
           success: true,
           source: 'system',
-          version: stdout.split('\n')[0],
-          available: true
+          version: result.stdout.split('\n')[0],
+          available: true,
+          details: { 
+            output: result.stdout.trim(),
+            path: await execAsync('which ffmpeg').then(r => r.stdout.trim())
+          }
         });
-      } catch (ffmpegError) {
-        console.error('Erro ao executar ffmpeg:', ffmpegError);
+      } catch (systemError) {
+        console.error('Erro ao executar ffmpeg do sistema:', systemError);
         
-        // Tentar localizar o ffmpeg
+        // Tentar executar o ffmpeg-static diretamente usando o caminho conhecido
         try {
-          const { stdout: whichOut } = await execAsync('which ffmpeg');
-          console.log('which ffmpeg:', whichOut);
+          const staticResult = await execAsync(`${ffmpegStaticPackagePath} -version`);
+          console.log('FFmpeg-static disponível:', staticResult.stdout.split('\n')[0]);
           
           return res.json({
-            success: false,
-            error: 'FFmpeg encontrado mas não executável',
-            path: whichOut.trim(),
-            available: false
+            success: true,
+            source: 'ffmpeg-static',
+            version: staticResult.stdout.split('\n')[0],
+            available: true,
+            path: ffmpegStaticPackagePath
           });
-        } catch (whichError) {
-          console.error('Erro ao localizar ffmpeg:', whichError);
+        } catch (staticError) {
+          console.error('Erro ao executar ffmpeg-static:', staticError);
           
-          return res.json({
-            success: false,
-            error: 'FFmpeg não encontrado no sistema',
-            available: false
-          });
+          // Verificar se o ffmpeg está instalado em algum local
+          try {
+            const whichResult = await execAsync('which ffmpeg');
+            console.log('FFmpeg encontrado em:', whichResult.stdout.trim());
+            
+            return res.json({
+              success: false,
+              error: 'FFmpeg encontrado mas não executável',
+              path: whichResult.stdout.trim(),
+              available: false
+            });
+          } catch (whichError) {
+            console.error('FFmpeg não encontrado no sistema:', whichError);
+            
+            return res.json({
+              success: false,
+              error: 'FFmpeg não encontrado no sistema',
+              available: false
+            });
+          }
         }
       }
     } catch (error: any) {
