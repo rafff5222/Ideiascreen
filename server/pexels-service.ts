@@ -1,125 +1,165 @@
-import { createClient } from 'pexels';
-import axios from 'axios';
-import fs from 'fs/promises';
-import path from 'path';
-import crypto from 'crypto';
+import fetch from 'node-fetch';
 
-// Diretório para armazenar imagens baixadas
-const IMAGES_DIR = path.join(process.cwd(), 'tmp', 'images');
+// Verificar se a API key está definida
+const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
 
-// Garantir que o diretório de imagens exista
-async function ensureImageDirectoryExists() {
-  try {
-    await fs.access(IMAGES_DIR);
-  } catch (e) {
-    // Diretório não existe, criar
-    await fs.mkdir(IMAGES_DIR, { recursive: true });
-  }
+// Interface para imagens retornadas pelo Pexels
+interface PexelsPhoto {
+  id: number;
+  width: number;
+  height: number;
+  url: string;
+  photographer: string;
+  photographer_url: string;
+  photographer_id: number;
+  avg_color: string;
+  src: {
+    original: string;
+    large2x: string;
+    large: string;
+    medium: string;
+    small: string;
+    portrait: string;
+    landscape: string;
+    tiny: string;
+  };
+  liked: boolean;
+  alt: string;
+}
+
+interface PexelsResponse {
+  page: number;
+  per_page: number;
+  photos: PexelsPhoto[];
+  total_results: number;
+  next_page: string;
 }
 
 /**
- * Busca imagens relacionadas a um tópico específico
+ * Busca imagens na API do Pexels com base no tópico fornecido
  * @param topic Tópico para busca de imagens
- * @param count Quantidade de imagens para buscar
- * @returns Lista de URLs das imagens
+ * @param count Número de imagens a serem retornadas
+ * @returns Array com informações das imagens
  */
-export async function searchImages(topic: string, count: number = 5): Promise<string[]> {
-  // Verificar se uma chave API foi fornecida
-  const pexelsApiKey = process.env.PEXELS_API_KEY;
-  
-  // Se não houver chave API, retornar URLs de placeholder
-  if (!pexelsApiKey) {
-    console.log('Chave API do Pexels não encontrada, usando placeholders');
-    return generatePlaceholderImageUrls(topic, count);
+export async function searchImages(topic: string, count: number = 10): Promise<any[]> {
+  if (!PEXELS_API_KEY) {
+    console.error('PEXELS_API_KEY não está definida no ambiente');
+    throw new Error('API key do Pexels não configurada');
   }
-  
+
   try {
-    // Criar cliente do Pexels
-    const client = createClient(pexelsApiKey);
+    const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(topic)}&per_page=${count}&locale=pt-BR`;
     
-    // Buscar fotos relacionadas ao tópico
-    const response: any = await client.photos.search({ 
-      query: topic, 
-      per_page: count,
-      orientation: 'landscape'
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': PEXELS_API_KEY
+      }
     });
+
+    if (!response.ok) {
+      throw new Error(`Erro na API do Pexels: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json() as PexelsResponse;
     
-    // Extrair URLs das imagens em tamanho médio
-    const imageUrls = response.photos.map((photo: any) => photo.src.medium);
-    
-    console.log(`Encontradas ${imageUrls.length} imagens para o tópico "${topic}"`);
-    return imageUrls;
-  } catch (err) {
-    // Converter para objeto de erro padrão
-    const error = err instanceof Error ? err : new Error(String(err));
-    console.error('Erro ao buscar imagens no Pexels:', error.message);
-    // Em caso de erro, retornar placeholder images
-    return generatePlaceholderImageUrls(topic, count);
+    // Mapear os resultados para um formato simplificado
+    return data.photos.map(photo => ({
+      id: photo.id,
+      src: photo.src.large,
+      thumbnail: photo.src.medium,
+      small: photo.src.small,
+      original: photo.src.original,
+      alt: photo.alt || `Imagem relacionada a ${topic}`,
+      source: 'Pexels',
+      photographer: photo.photographer,
+      url: photo.url
+    }));
+  } catch (error: any) {
+    console.error('Erro ao buscar imagens do Pexels:', error);
+    throw new Error(`Falha ao buscar imagens: ${error.message}`);
   }
 }
 
 /**
- * Baixa uma imagem de uma URL e a salva localmente
- * @param imageUrl URL da imagem para baixar
- * @returns Caminho local da imagem baixada
+ * Busca um vídeo aleatório na API do Pexels com base no tópico fornecido
+ * @param topic Tópico para busca de vídeos
+ * @returns Informações do vídeo
  */
-export async function downloadImage(imageUrl: string): Promise<string> {
-  await ensureImageDirectoryExists();
-  
+export async function getRandomVideo(topic: string): Promise<any> {
+  if (!PEXELS_API_KEY) {
+    throw new Error('API key do Pexels não configurada');
+  }
+
   try {
-    // Gerar nome único para a imagem
-    const imageName = `${crypto.randomUUID()}.jpg`;
-    const imagePath = path.join(IMAGES_DIR, imageName);
+    const url = `https://api.pexels.com/videos/search?query=${encodeURIComponent(topic)}&per_page=1&locale=pt-BR`;
     
-    // Baixar a imagem
-    const response = await axios({
-      method: 'GET',
-      url: imageUrl,
-      responseType: 'arraybuffer'
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': PEXELS_API_KEY
+      }
     });
+
+    if (!response.ok) {
+      throw new Error(`Erro na API do Pexels: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
     
-    // Salvar no sistema de arquivos
-    await fs.writeFile(imagePath, response.data);
+    if (!data.videos || data.videos.length === 0) {
+      throw new Error('Nenhum vídeo encontrado');
+    }
     
-    console.log(`Imagem baixada com sucesso: ${imagePath}`);
-    return imagePath;
-  } catch (err) {
-    // Converter para objeto de erro padrão
-    const error = err instanceof Error ? err : new Error(String(err));
-    console.error('Erro ao baixar imagem:', error);
-    throw new Error(`Falha ao baixar imagem de ${imageUrl}: ${error.message}`);
+    return {
+      id: data.videos[0].id,
+      url: data.videos[0].url,
+      image: data.videos[0].image,
+      duration: data.videos[0].duration,
+      videoFiles: data.videos[0].video_files
+    };
+  } catch (error: any) {
+    console.error('Erro ao buscar vídeo do Pexels:', error);
+    throw new Error(`Falha ao buscar vídeo: ${error.message}`);
   }
 }
 
 /**
- * Baixa múltiplas imagens de URLs e retorna os caminhos locais
- * @param imageUrls Lista de URLs de imagens para baixar
- * @returns Lista de caminhos locais das imagens baixadas
+ * Verifica se a API do Pexels está funcionando corretamente
+ * @returns Status da API
  */
-export async function downloadMultipleImages(imageUrls: string[]): Promise<string[]> {
+export async function checkApiStatus(): Promise<{ working: boolean; status: string; }> {
+  if (!PEXELS_API_KEY) {
+    return { 
+      working: false, 
+      status: 'API key do Pexels não configurada'
+    };
+  }
+
   try {
-    // Baixar imagens em paralelo
-    const downloadPromises = imageUrls.map(url => downloadImage(url));
-    const localPaths = await Promise.all(downloadPromises);
+    // Usando uma busca simples para verificar o status
+    const url = 'https://api.pexels.com/v1/search?query=nature&per_page=1';
     
-    return localPaths;
-  } catch (err) {
-    // Converter para objeto de erro padrão
-    const error = err instanceof Error ? err : new Error(String(err));
-    console.error('Erro ao baixar múltiplas imagens:', error.message);
-    throw error;
-  }
-}
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': PEXELS_API_KEY
+      }
+    });
 
-/**
- * Gera URLs de imagens placeholder usando serviços como Picsum
- * @param topic Tópico para incluir como parâmetro de busca
- * @param count Quantidade de URLs a gerar
- * @returns Lista de URLs de imagens placeholder
- */
-function generatePlaceholderImageUrls(topic: string, count: number): string[] {
-  // Usando Lorem Picsum para gerar placeholders
-  return Array.from({ length: count }, (_, i) => 
-    `https://picsum.photos/800/450?random=${i+1}`
-  );
+    if (response.ok) {
+      const data = await response.json() as PexelsResponse;
+      return { 
+        working: true, 
+        status: `API funcionando, ${data.total_results} resultados disponíveis para "nature"` 
+      };
+    } else {
+      return { 
+        working: false, 
+        status: `Erro na API: ${response.status} ${response.statusText}` 
+      };
+    }
+  } catch (error: any) {
+    return { 
+      working: false, 
+      status: `Erro de conexão: ${error.message}` 
+    };
+  }
 }

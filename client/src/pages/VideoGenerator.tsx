@@ -130,7 +130,8 @@ export default function VideoGenerator() {
           detectarSilencio: detectionEnabled,
           transicoes: selectedTransitions,
           resolucao: resolution,
-          useDemoMode: false // Permite usar o modo de demonstração explicitamente
+          useDemoMode: false, // Permite usar o modo de demonstração explicitamente
+          customImages: selectedImages.length > 0 ? selectedImages.map(img => img.url) : undefined
         }
       };
 
@@ -412,12 +413,12 @@ export default function VideoGenerator() {
           <div>
             <ImageGallery 
               initialTopic={topic} 
-              onSelectImages={(selectedImages) => {
-                // Aqui poderíamos armazenar as imagens selecionadas no estado
-                // para usar na geração do vídeo
+              onSelectImages={(images) => {
+                // Armazenar as imagens selecionadas no estado
+                setSelectedImages(images);
                 toast({
                   title: "Imagens selecionadas",
-                  description: `${selectedImages.length} imagens serão usadas no seu vídeo.`,
+                  description: `${images.length} imagens serão usadas no seu vídeo.`,
                 });
               }}
               maxImages={5}

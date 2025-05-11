@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Search, Image, Check, Download, X } from 'lucide-react';
-import { apiRequest } from '@/lib/queryClient';
+import { Separator } from '@/components/ui/separator';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Loader2, Search, Image as ImageIcon } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 
-interface ImageItem {
+// Interface para representar uma imagem
+export interface ImageItem {
   id: string;
   url: string;
   thumbnail: string;
@@ -14,6 +17,7 @@ interface ImageItem {
   source: string;
 }
 
+// Props do componente
 interface ImageGalleryProps {
   onSelectImages: (images: ImageItem[]) => void;
   initialTopic?: string;
@@ -21,217 +25,230 @@ interface ImageGalleryProps {
 }
 
 export default function ImageGallery({ 
-  onSelectImages,
-  initialTopic = '',
-  maxImages = 5
+  onSelectImages, 
+  initialTopic = '', 
+  maxImages = 10 
 }: ImageGalleryProps) {
-  const [searchTerm, setSearchTerm] = useState(initialTopic);
-  const [isSearching, setIsSearching] = useState(false);
+  // Estados
+  const [searchTerm, setSearchTerm] = useState<string>(initialTopic);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
   const [images, setImages] = useState<ImageItem[]>([]);
-  const [selectedImages, setSelectedImages] = useState<ImageItem[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
+  
   const { toast } = useToast();
-
-  // Buscar imagens quando o componente montar se houver um tópico inicial
+  
+  // Efeito para carregar imagens iniciais com o tópico fornecido
   useEffect(() => {
     if (initialTopic) {
-      handleSearch();
+      setSearchTerm(initialTopic);
+      searchImages(initialTopic);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Buscar imagens da API
-  const handleSearch = async () => {
-    if (!searchTerm.trim()) {
+  }, [initialTopic]);
+  
+  // Função para buscar imagens
+  const searchImages = async (topic: string) => {
+    if (!topic.trim()) {
       setError("Digite um tema para buscar imagens");
       return;
     }
-
+    
     setIsSearching(true);
     setError(null);
-
+    
     try {
-      const response = await apiRequest('GET', `/api/search-images?topic=${encodeURIComponent(searchTerm)}&count=12`);
-      const data = await response.json();
-
-      if (data.success) {
-        // Transformar os URLs em objetos de imagem
-        const imageObjects: ImageItem[] = data.imageUrls.map((url: string, index: number) => ({
-          id: `img-${index}-${Date.now()}`,
-          url: url,
-          thumbnail: url,
-          alt: `${searchTerm} imagem ${index + 1}`,
-          source: 'Pexels'
-        }));
-        
-        setImages(imageObjects);
-        
-        if (imageObjects.length === 0) {
-          setError("Nenhuma imagem encontrada para este tema");
-        }
-      } else {
-        setError(data.error || "Erro ao buscar imagens");
+      const response = await fetch(`/api/search-images?topic=${encodeURIComponent(topic)}&count=20`);
+      
+      if (!response.ok) {
+        throw new Error("Falha ao buscar imagens");
       }
-    } catch (err) {
-      console.error('Erro ao buscar imagens:', err);
-      setError("Falha na comunicação com o servidor");
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || "Erro ao buscar imagens");
+      }
+      
+      // Transformar os dados recebidos em objetos ImageItem
+      const imageItems = data.imageUrls.map((item: any, index: number) => ({
+        id: `${item.id || index}`,
+        url: item.src || item.url || item.original || "",
+        thumbnail: item.thumbnail || item.small || item.src || item.url || "",
+        alt: item.alt || item.description || `Imagem para ${topic}`,
+        source: item.source || "Pexels"
+      }));
+      
+      setImages(imageItems);
+      
+      // Se não encontrou imagens
+      if (imageItems.length === 0) {
+        setError("Nenhuma imagem encontrada para este tema");
+      }
+    } catch (err: any) {
+      console.error("Erro ao buscar imagens:", err);
+      setError(err.message || "Erro ao buscar imagens");
+      toast({
+        title: "Erro",
+        description: "Não foi possível buscar imagens. Tente novamente.",
+        variant: "destructive"
+      });
     } finally {
       setIsSearching(false);
     }
   };
-
-  // Selecionar ou deselecionar uma imagem
+  
+  // Manipulador para seleção de imagem
   const toggleImageSelection = (image: ImageItem) => {
-    const isSelected = selectedImages.some(img => img.id === image.id);
+    const newSelectedIds = new Set(selectedIds);
     
-    if (isSelected) {
-      // Remover imagem da seleção
-      setSelectedImages(prev => prev.filter(img => img.id !== image.id));
+    if (newSelectedIds.has(image.id)) {
+      newSelectedIds.delete(image.id);
     } else {
-      // Verificar se já atingiu o limite máximo
-      if (selectedImages.length >= maxImages) {
+      // Verificar se já atingiu o limite de seleção
+      if (newSelectedIds.size >= maxImages) {
         toast({
-          title: 'Limite atingido',
-          description: `Você já selecionou ${maxImages} imagens, que é o máximo permitido.`,
-          variant: 'destructive',
+          title: "Limite atingido",
+          description: `Você pode selecionar no máximo ${maxImages} imagens.`,
+          variant: "destructive"
         });
         return;
       }
-      
-      // Adicionar imagem à seleção
-      setSelectedImages(prev => [...prev, image]);
+      newSelectedIds.add(image.id);
     }
-  };
-
-  // Confirmar a seleção de imagens
-  const confirmSelection = () => {
+    
+    setSelectedIds(newSelectedIds);
+    
+    // Passar as imagens selecionadas para o callback
+    const selectedImages = images.filter(img => newSelectedIds.has(img.id));
     onSelectImages(selectedImages);
-    toast({
-      title: 'Imagens selecionadas',
-      description: `${selectedImages.length} imagens foram adicionadas ao seu vídeo.`,
-    });
   };
-
-  // Limpar seleção
-  const clearSelection = () => {
-    setSelectedImages([]);
+  
+  // Manipulador para busca
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    searchImages(searchTerm);
   };
-
+  
   return (
     <Card className="w-full">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Image className="h-5 w-5 text-primary" />
-          Galeria de Imagens
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <ImageIcon className="h-5 w-5" />
+          Banco de Imagens
         </CardTitle>
         <CardDescription>
           Busque e selecione imagens para seu vídeo
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Busca */}
-        <div className="flex gap-2">
+      
+      <CardContent>
+        {/* Formulário de busca */}
+        <form onSubmit={handleSearch} className="flex gap-2 mb-4">
           <Input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Digite um tema para buscar imagens..."
             className="flex-1"
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           />
-          <Button 
-            onClick={handleSearch} 
-            disabled={isSearching}
-            variant="outline"
-          >
-            {isSearching ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Search className="h-4 w-4" />
-            )}
+          <Button type="submit" disabled={isSearching}>
+            {isSearching ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Search className="h-4 w-4 mr-2" />}
+            Buscar
           </Button>
+        </form>
+        
+        {/* Status de seleção */}
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-sm text-muted-foreground">
+            {selectedIds.size > 0 
+              ? `${selectedIds.size} ${selectedIds.size === 1 ? 'imagem selecionada' : 'imagens selecionadas'}`
+              : 'Selecione as imagens para seu vídeo'}
+          </p>
+          {selectedIds.size > 0 && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                setSelectedIds(new Set());
+                onSelectImages([]);
+              }}
+            >
+              Limpar seleção
+            </Button>
+          )}
         </div>
-
+        
+        <Separator className="my-2" />
+        
         {/* Mensagem de erro */}
         {error && (
-          <div className="text-red-500 text-sm flex items-center gap-1.5">
-            <X className="h-4 w-4" />
-            <span>{error}</span>
+          <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-md mb-3">
+            <p className="text-sm">{error}</p>
           </div>
         )}
-
-        {/* Contador de seleção */}
-        {selectedImages.length > 0 && (
-          <div className="bg-primary/10 text-primary text-sm rounded-md p-2 flex justify-between items-center">
-            <span>
-              {selectedImages.length} de {maxImages} imagens selecionadas
-            </span>
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearSelection}
-              >
-                Limpar
-              </Button>
-              <Button
-                size="sm"
-                onClick={confirmSelection}
-              >
-                Confirmar
-              </Button>
-            </div>
-          </div>
-        )}
-
+        
         {/* Grid de imagens */}
-        {images.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-            {images.map((image) => {
-              const isSelected = selectedImages.some(img => img.id === image.id);
-              
-              return (
-                <div
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
+          {isSearching ? (
+            // Estado de carregamento
+            <>
+              {[1, 2, 3, 4, 5, 6].map(num => (
+                <div 
+                  key={num} 
+                  className="aspect-video bg-muted animate-pulse rounded-md"
+                />
+              ))}
+            </>
+          ) : (
+            // Exibir imagens carregadas
+            <>
+              {images.map(image => (
+                <div 
                   key={image.id}
-                  className={`relative aspect-video rounded-md overflow-hidden cursor-pointer transition-all border-2 ${
-                    isSelected ? 'border-primary ring-2 ring-primary/20' : 'border-transparent hover:border-gray-300'
-                  }`}
+                  className={`
+                    relative aspect-video rounded-md overflow-hidden border-2
+                    ${selectedIds.has(image.id) 
+                      ? 'border-primary ring-2 ring-primary ring-opacity-50' 
+                      : 'border-transparent hover:border-gray-300'}
+                    transition-all cursor-pointer
+                  `}
                   onClick={() => toggleImageSelection(image)}
                 >
-                  <img
-                    src={image.thumbnail}
+                  {/* Imagem */}
+                  <img 
+                    src={image.thumbnail} 
                     alt={image.alt}
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
-                  {isSelected && (
-                    <div className="absolute top-1 right-1 bg-primary text-white rounded-full p-1">
-                      <Check className="h-3.5 w-3.5" />
-                    </div>
-                  )}
+                  
+                  {/* Checkbox de seleção */}
+                  <div className="absolute top-2 left-2">
+                    <Checkbox 
+                      checked={selectedIds.has(image.id)}
+                      className="h-5 w-5 bg-white/90 border-primary"
+                    />
+                  </div>
+                  
+                  {/* Badge da fonte */}
+                  <Badge 
+                    variant="secondary" 
+                    className="absolute bottom-2 right-2 bg-black/60 text-white text-xs"
+                  >
+                    {image.source}
+                  </Badge>
                 </div>
-              );
-            })}
-          </div>
-        ) : !isSearching && !error ? (
-          <div className="bg-gray-50 rounded-md p-6 text-center text-gray-500">
-            <Image className="h-10 w-10 mx-auto mb-2 text-gray-300" />
-            <p>
-              Busque por um tema para encontrar imagens
+              ))}
+            </>
+          )}
+        </div>
+        
+        {/* Mensagem de resultado vazio */}
+        {!isSearching && images.length === 0 && !error && (
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <ImageIcon className="h-12 w-12 text-muted-foreground mb-2" />
+            <p className="text-muted-foreground">
+              Busque um tema para encontrar imagens
             </p>
-            <p className="text-xs mt-1">
-              Imagens fornecidas pela API Pexels
-            </p>
-          </div>
-        ) : null}
-
-        {/* Estado de carregamento */}
-        {isSearching && (
-          <div className="flex justify-center py-8">
-            <div className="flex flex-col items-center">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="mt-2 text-sm text-gray-500">
-                Buscando imagens relacionadas a "{searchTerm}"...
-              </p>
-            </div>
           </div>
         )}
       </CardContent>
