@@ -9,7 +9,13 @@ import fs from "fs";
 import path from "path";
 import { z } from 'zod';
 import { generateVideo as generateAIVideo } from "./ai-service";
+import { testeGerarVideo } from "./test-video-generator";
 import { nanoid } from 'nanoid';
+
+// Diretórios padrão para armazenamento de arquivos
+const TMP_DIR = path.join(process.cwd(), 'tmp');
+const OUTPUT_DIR = path.join(process.cwd(), 'output');
+const IMAGES_DIR = path.join(TMP_DIR, 'images');
 
 // Armazenamento temporário de progresso dos processamentos
 interface ProcessingTask {
@@ -1146,6 +1152,162 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         error: error.message || 'Erro interno ao testar conexão com API'
       });
+    }
+  });
+  
+  /**
+   * Endpoint para testar a geração de vídeo com processador aprimorado e detecção de silêncio
+   */
+  app.post("/api/test-video-generator", async (req: Request, res: Response) => {
+    try {
+      const { script, options } = req.body;
+      
+      if (!script || typeof script !== 'string') {
+        return res.status(400).json({
+          success: false,
+          error: 'O script é obrigatório e deve ser uma string'
+        });
+      }
+      
+      // Criar uma nova tarefa
+      const taskId = nanoid();
+      
+      // Registrar a tarefa
+      activeTasks.set(taskId, {
+        id: taskId,
+        status: 'pending',
+        progress: 0,
+        message: 'Inicializando geração de vídeo de teste',
+        startTime: Date.now()
+      });
+      
+      // Iniciar processamento assíncrono
+      setTimeout(async () => {
+        try {
+          // Atualizar status para processando
+          updateTaskProgress(taskId, 10, 'Gerando vídeo de teste...', 'processing');
+          
+          // Processar o vídeo com as opções fornecidas
+          const videoPath = await testeGerarVideo(script, {
+            voz: options?.voz,
+            detectarSilencio: options?.detectarSilencio,
+            topico: options?.topico,
+            transicoes: options?.transicoes,
+            resolucao: options?.resolucao
+          });
+          
+          // Preparar resultado com estatísticas básicas
+          // Usar o fs nativo para obter estatísticas do arquivo
+          const fsSync = require('fs');
+          const fileStats = fsSync.statSync(videoPath);
+          
+          // Atualizar status para concluído
+          updateTaskProgress(
+            taskId, 
+            100, 
+            'Vídeo gerado com sucesso!', 
+            'completed',
+            {
+              videoPath,
+              size: fileStats.size,
+              duration: 'N/A', // Poderia ser obtido com FFmpeg
+              createdAt: new Date().toISOString()
+            }
+          );
+        } catch (err) {
+          const error = err instanceof Error ? err : new Error(String(err));
+          console.error('Erro na geração de vídeo de teste:', error);
+          
+          // Atualizar status para falha
+          updateTaskProgress(
+            taskId,
+            0,
+            `Falha ao gerar vídeo: ${error.message}`,
+            'failed',
+            null,
+            error.message
+          );
+        }
+      }, 0);
+      
+      // Retornar o ID da tarefa para que o cliente possa consultar o status
+      return res.json({
+        success: true,
+        taskId,
+        message: 'Geração de vídeo iniciada'
+      });
+      
+    } catch (error: any) {
+      console.error('Erro ao processar solicitação de teste de vídeo:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message || 'Erro interno ao processar solicitação'
+      });
+    }
+  });
+  
+  /**
+   * Endpoint para visualização de vídeo a partir do caminho do arquivo
+   */
+  app.get("/api/video/:videoPath(*)", async (req: Request, res: Response) => {
+    try {
+      const videoPath = req.params.videoPath;
+      
+      if (!videoPath) {
+        return res.status(400).send('Caminho do vídeo não especificado');
+      }
+      
+      // Por segurança, garantir que o caminho está dentro dos diretórios permitidos
+      const absolutePath = path.resolve(videoPath);
+      const outputDir = path.resolve('output');
+      const tmpDir = path.resolve('tmp');
+      
+      if (!absolutePath.startsWith(outputDir) && !absolutePath.startsWith(tmpDir)) {
+        return res.status(403).send('Acesso negado ao arquivo');
+      }
+      
+      // Verificar se o arquivo existe
+      try {
+        const fsSync = require('fs');
+        await fs.access(absolutePath);
+        
+        // Streaming do vídeo
+        const stat = fsSync.statSync(absolutePath);
+        const fileSize = stat.size;
+        const range = req.headers.range;
+        
+        if (range) {
+          const parts = range.replace(/bytes=/, '').split('-');
+          const start = parseInt(parts[0], 10);
+          const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+          const chunksize = (end - start) + 1;
+          const file = fsSync.createReadStream(absolutePath, { start, end });
+          
+          const head = {
+            'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+            'Accept-Ranges': 'bytes',
+            'Content-Length': chunksize,
+            'Content-Type': 'video/mp4',
+          };
+          
+          res.writeHead(206, head);
+          file.pipe(res);
+        } else {
+          const head = {
+            'Content-Length': fileSize,
+            'Content-Type': 'video/mp4',
+          };
+          
+          res.writeHead(200, head);
+          fsSync.createReadStream(absolutePath).pipe(res);
+        }
+      } catch (error) {
+        console.error('Erro ao acessar arquivo de vídeo:', error);
+        return res.status(404).send('Arquivo de vídeo não encontrado');
+      }
+    } catch (error) {
+      console.error('Erro ao processar requisição de vídeo:', error);
+      return res.status(500).send('Erro ao processar vídeo');
     }
   });
   
