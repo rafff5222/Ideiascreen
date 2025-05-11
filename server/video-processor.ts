@@ -77,7 +77,7 @@ export async function processAudioToVideo(
       if (stats.size < 100) {
         throw new Error('Arquivo de áudio muito pequeno, possivelmente corrompido');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao acessar arquivo de áudio:', error);
       throw new Error('Falha ao verificar arquivo de áudio: ' + error.message);
     }
@@ -163,7 +163,7 @@ export async function processAudioToVideo(
         const { stdout, stderr } = await execAsync(simpleCommand);
         console.log('FFmpeg simples stdout:', stdout);
         console.log('FFmpeg simples stderr:', stderr);
-      } catch (fallbackError) {
+      } catch (fallbackError: any) {
         console.error('Erro no comando alternativo de FFmpeg:', fallbackError);
         throw new Error('Falha ao gerar vídeo: ' + fallbackError.message);
       }
@@ -178,7 +178,7 @@ export async function processAudioToVideo(
       if (stats.size < 1000) {
         throw new Error('Arquivo de vídeo muito pequeno, possivelmente corrompido');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao verificar arquivo de vídeo:', error);
       throw new Error('Falha ao verificar arquivo de vídeo gerado: ' + error.message);
     }

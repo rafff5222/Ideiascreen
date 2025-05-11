@@ -1429,6 +1429,114 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  /**
+   * Endpoint para testar a geração de vídeo diretamente
+   * Útil para diagnóstico e depuração
+   */
+  app.post("/api/test-video-generation", async (req: Request, res: Response) => {
+    try {
+      const { audioData, imageUrls, subtitles } = req.body;
+      
+      if (!audioData || !imageUrls || !subtitles) {
+        return res.status(400).json({
+          success: false,
+          error: 'Todos os parâmetros são obrigatórios: audioData, imageUrls, subtitles'
+        });
+      }
+      
+      // Importar o módulo de processamento de vídeo
+      const { processAudioToVideo } = await import('./video-processor');
+      
+      // Gerar o vídeo
+      console.log('Iniciando teste de geração de vídeo...');
+      const videoPath = await processAudioToVideo(audioData, imageUrls, subtitles);
+      
+      // Verificar se o arquivo existe
+      const fs = require('fs');
+      if (!fs.existsSync(videoPath)) {
+        throw new Error(`Arquivo de vídeo não encontrado no caminho: ${videoPath}`);
+      }
+      
+      const stats = fs.statSync(videoPath);
+      console.log(`Vídeo gerado com sucesso: ${videoPath} (${stats.size} bytes)`);
+      
+      // Retornar o caminho do vídeo e URL para streaming
+      res.json({
+        success: true,
+        videoPath,
+        videoUrl: `/video-stream/${require('path').basename(videoPath)}`,
+        fileSize: stats.size
+      });
+      
+    } catch (error) {
+      console.error('Erro ao testar geração de vídeo:', error);
+      res.status(500).json({
+        success: false,
+        error: `Erro ao gerar vídeo: ${error.message}`
+      });
+    }
+  });
+  
+  /**
+   * Endpoint para verificar disponibilidade do ffmpeg
+   */
+  app.get("/api/check-ffmpeg", async (req: Request, res: Response) => {
+    try {
+      const { exec } = require('child_process');
+      const util = require('util');
+      const execAsync = util.promisify(exec);
+      
+      // Verificar se o ffmpeg-static está disponível
+      try {
+        const ffmpegStatic = require('ffmpeg-static');
+        console.log('ffmpeg-static encontrado:', ffmpegStatic);
+      } catch (e) {
+        console.error('ffmpeg-static não encontrado:', e);
+      }
+      
+      // Tentar executar o ffmpeg
+      try {
+        const { stdout, stderr } = await execAsync('ffmpeg -version');
+        console.log('ffmpeg stdout:', stdout);
+        
+        return res.json({
+          success: true,
+          version: stdout.split('\n')[0],
+          available: true
+        });
+      } catch (ffmpegError) {
+        console.error('Erro ao executar ffmpeg:', ffmpegError);
+        
+        // Tentar localizar o ffmpeg
+        try {
+          const { stdout: whichOut } = await execAsync('which ffmpeg');
+          console.log('which ffmpeg:', whichOut);
+          
+          return res.json({
+            success: false,
+            error: 'FFmpeg encontrado mas não executável',
+            path: whichOut.trim(),
+            available: false
+          });
+        } catch (whichError) {
+          console.error('Erro ao localizar ffmpeg:', whichError);
+          
+          return res.json({
+            success: false,
+            error: 'FFmpeg não encontrado no sistema',
+            available: false
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao verificar ffmpeg:', error);
+      res.status(500).json({
+        success: false,
+        error: `Erro ao verificar ffmpeg: ${error.message}`
+      });
+    }
+  });
+  
   // Retornar o servidor HTTP
   return httpServer;
 }
