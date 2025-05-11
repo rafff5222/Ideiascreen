@@ -17,7 +17,7 @@ const OUTPUT_DIR = path.join(process.cwd(), 'output');
 /**
  * Garante que o diretório existe
  */
-async function ensureDirectoryExists(directory: string): Promise<void> {
+export async function ensureDirectoryExists(directory: string): Promise<void> {
   try {
     await fs.access(directory);
   } catch (e) {

@@ -1435,23 +1435,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
    */
   app.post("/api/test-video-generation", async (req: Request, res: Response) => {
     try {
-      const { audioData, imageUrls, subtitles } = req.body;
+      const { script, voice, speed, transitions, outputFormat } = req.body;
       
-      if (!audioData || !imageUrls || !subtitles) {
+      if (!script) {
         return res.status(400).json({
           success: false,
-          error: 'Todos os parâmetros são obrigatórios: audioData, imageUrls, subtitles'
+          error: 'O script é obrigatório para a geração do vídeo de teste'
         });
       }
       
       // Importar os módulos necessários
-      const { processAudioToVideo } = await import('./video-processor');
+      const { processAudioToVideo, ensureDirectoryExists } = await import('./video-processor');
       const fs = await import('fs/promises');
       const fsSync = await import('fs');
       const path = await import('path');
+      const crypto = await import('crypto');
+      
+      // Diretórios para os arquivos temporários e de saída
+      const TMP_DIR = path.join(process.cwd(), 'tmp');
+      const OUTPUT_DIR = path.join(process.cwd(), 'output');
+      
+      // Garantir que os diretórios existam
+      await ensureDirectoryExists(TMP_DIR);
+      await ensureDirectoryExists(OUTPUT_DIR);
+      
+      // Criar ID único para o teste
+      const testId = crypto.randomUUID();
+      console.log(`Iniciando teste de geração de vídeo (ID: ${testId})...`);
+      
+      // Usar arquivo de áudio existente de teste para simplificar
+      const audioPath = path.join(process.cwd(), 'test_audio.mp3');
+      
+      // Verificar se o arquivo de áudio de teste existe
+      try {
+        await fs.access(audioPath);
+      } catch (err) {
+        return res.status(500).json({
+          success: false,
+          error: 'Arquivo de áudio de teste não encontrado. Por favor, certifique-se de que test_audio.mp3 existe na raiz do projeto.'
+        });
+      }
+      
+      // Ler o arquivo de áudio em buffer
+      const audioBuffer = await fs.readFile(audioPath);
+      
+      // Converter buffer para base64
+      const audioData = audioBuffer.toString('base64');
+      
+      // Gerar URLs de imagens simuladas (usando path para test_video.mp4 como placeholder)
+      const imageUrls = [
+        '/placeholder-image-1.jpg',
+        '/placeholder-image-2.jpg',
+        '/placeholder-image-3.jpg'
+      ];
+      
+      // Gerar legendas simuladas a partir do script
+      const segmentos = script.split(/[.!?]/)
+        .filter((segmento: string) => segmento.trim().length > 0)
+        .map((segmento: string) => segmento.trim());
+      
+      const subtitles = segmentos.map((segmento: string, index: number) => {
+        return `${index + 1}\n00:0${index}:00,000 --> 00:0${index + 1}:00,000\n${segmento}`;
+      }).join('\n\n');
       
       // Gerar o vídeo
-      console.log('Iniciando teste de geração de vídeo...');
+      console.log('Processando áudio para vídeo...');
       const videoPath = await processAudioToVideo(audioData, imageUrls, subtitles);
       
       // Verificar se o arquivo existe
@@ -1465,7 +1513,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           success: true,
           videoPath,
           videoUrl: `/video-stream/${path.basename(videoPath)}`,
-          fileSize: stats.size
+          fileSize: stats.size,
+          testId,
+          message: 'Vídeo gerado com sucesso usando o arquivo de áudio de teste'
         });
       } catch (fileError: any) {
         throw new Error(`Arquivo de vídeo não encontrado ou inacessível: ${videoPath} - ${fileError.message}`);
