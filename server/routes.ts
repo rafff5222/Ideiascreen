@@ -2415,6 +2415,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   /**
+   * Endpoint para buscar imagens através da API do Pexels
+   */
+  app.get("/api/search-images", async (req: Request, res: Response) => {
+    try {
+      const topic = req.query.topic as string;
+      const count = parseInt(req.query.count as string) || 10;
+      
+      if (!topic) {
+        return res.status(400).json({
+          success: false, 
+          error: 'O parâmetro "topic" é obrigatório'
+        });
+      }
+      
+      // Importar o serviço do Pexels
+      const pexelsService = await import('./pexels-service');
+      
+      // Buscar imagens relacionadas ao tópico
+      const imageUrls = await pexelsService.searchImages(topic, count);
+      
+      return res.json({
+        success: true,
+        imageUrls,
+        topic,
+        count: imageUrls.length
+      });
+    } catch (error: any) {
+      console.error('Erro ao buscar imagens:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message || 'Erro interno ao buscar imagens'
+      });
+    }
+  });
+
+  /**
    * Endpoint para verificar disponibilidade do ffmpeg
    */
   app.get("/api/check-ffmpeg", async (req: Request, res: Response) => {

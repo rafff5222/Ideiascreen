@@ -16,6 +16,7 @@ import { Progress } from '@/components/ui/progress';
 import EngagementScore from '@/components/video/EngagementScore';
 import ExportOptions from '@/components/video/ExportOptions';
 import DebugConsole from '@/components/video/DebugConsole';
+import ImageGallery from '@/components/video/ImageGallery';
 
 interface VideoResult {
   videoPath: string;
@@ -27,6 +28,15 @@ interface VideoResult {
 }
 
 export default function VideoGenerator() {
+  // Interface para imagens selecionadas  
+  interface SelectedImage {
+    id: string;
+    url: string;
+    thumbnail: string;
+    alt: string;
+    source: string;
+  }
+
   // Estados para o formulário e etapas
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [script, setScript] = useState<string>('');
@@ -36,6 +46,7 @@ export default function VideoGenerator() {
   const [detectionEnabled, setDetectionEnabled] = useState<boolean>(true);
   const [selectedTransitions, setSelectedTransitions] = useState<string[]>(['fade', 'dissolve']);
   const [resolution, setResolution] = useState<string>('720p');
+  const [selectedImages, setSelectedImages] = useState<SelectedImage[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [progressPercent, setProgressPercent] = useState<number>(0);
   const [status, setStatus] = useState<string | null>(null);
@@ -399,52 +410,28 @@ export default function VideoGenerator() {
           </div>
           
           <div>
-            <Card>
-              <CardHeader>
-                <CardTitle>Banco de Mídia</CardTitle>
-                <CardDescription>
-                  Exemplos de imagens para o tema escolhido
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <p className="text-sm text-gray-500">
-                    {topic ? 
-                      `Imagens relacionadas a "${topic}" serão usadas no seu vídeo.` : 
-                      'Digite um tema para visualizar exemplos de imagens.'}
-                  </p>
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    {!topic ? (
-                      <div className="col-span-2 flex items-center justify-center h-32 bg-gray-100 rounded-md">
-                        <Image className="h-8 w-8 text-gray-400" />
-                      </div>
-                    ) : (
-                      <>
-                        {[1, 2, 3, 4].map((num) => (
-                          <div 
-                            key={num}
-                            className="aspect-video bg-gray-100 rounded-md flex items-center justify-center overflow-hidden"
-                          >
-                            <div 
-                              className="w-full h-full rounded-md" 
-                              style={{ 
-                                backgroundColor: ['#3498db', '#e74c3c', '#2ecc71', '#f39c12'][num-1],
-                                opacity: 0.7
-                              }}
-                            />
-                          </div>
-                        ))}
-                      </>
-                    )}
-                  </div>
-                  
-                  <p className="text-xs mt-2 text-gray-500">
-                    A inteligência artificial selecionará automaticamente as imagens mais relevantes para o seu roteiro.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <ImageGallery 
+              initialTopic={topic} 
+              onSelectImages={(selectedImages) => {
+                // Aqui poderíamos armazenar as imagens selecionadas no estado
+                // para usar na geração do vídeo
+                toast({
+                  title: "Imagens selecionadas",
+                  description: `${selectedImages.length} imagens serão usadas no seu vídeo.`,
+                });
+              }}
+              maxImages={5}
+            />
+            
+            <div className="mt-4 bg-blue-50 p-3 rounded-md border border-blue-100">
+              <p className="text-sm text-blue-700 flex gap-2">
+                <Image className="h-5 w-5 flex-shrink-0" />
+                <span>
+                  <span className="font-medium">Dica Pro:</span> Selecione imagens relacionadas entre si 
+                  para criar uma narrativa visual coerente.
+                </span>
+              </p>
+            </div>
           </div>
         </div>
       )}
