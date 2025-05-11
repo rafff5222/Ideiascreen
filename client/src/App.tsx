@@ -11,6 +11,7 @@ import Demo from "@/pages/demo";
 import GenerationDemo from "@/pages/GenerationDemo";
 import VideoDemo from "@/pages/VideoDemo";
 import VideoTester from "@/pages/VideoTester";
+import VideoLibrary from "@/pages/VideoLibrary";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ExitPopup from "@/components/ui/exit-popup";
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/generation-demo" component={GenerationDemo} />
       <Route path="/video-demo" component={VideoDemo} />
       <Route path="/video-tester" component={VideoTester} />
+      <Route path="/video-library" component={VideoLibrary} />
       <Route component={NotFound} />
     </Switch>
   );

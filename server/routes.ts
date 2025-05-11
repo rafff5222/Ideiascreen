@@ -1869,6 +1869,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   /**
+   * Endpoint para listar todos os vídeos disponíveis
+   */
+  app.get("/api/list-videos", async (req: Request, res: Response) => {
+    try {
+      const outputDir = path.join(process.cwd(), 'output');
+      const files = await fs.promises.readdir(outputDir);
+      
+      // Filtrar apenas arquivos de vídeo (mp4)
+      const videoFiles = files.filter(file => file.endsWith('.mp4'));
+      
+      // Obter informações adicionais sobre cada arquivo
+      const videoDetails = await Promise.all(
+        videoFiles.map(async (fileName) => {
+          const filePath = path.join(outputDir, fileName);
+          const stats = await fs.promises.stat(filePath);
+          
+          return {
+            name: fileName,
+            path: fileName,  // Caminho relativo para acesso via API
+            size: stats.size,
+            createdAt: stats.mtime.toISOString(),
+            // Duration seria obtida com ffprobe, omitida por simplicidade
+          };
+        })
+      );
+      
+      // Ordenar por data de criação (mais recente primeiro)
+      const sortedVideos = videoDetails.sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      
+      res.json({
+        success: true,
+        videos: sortedVideos
+      });
+    } catch (error: any) {
+      console.error('Erro ao listar vídeos:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Erro ao listar vídeos'
+      });
+    }
+  });
+  
+  /**
+   * Endpoint para excluir um vídeo
+   */
+  app.delete("/api/delete-video/:filename", async (req: Request, res: Response) => {
+    try {
+      const { filename } = req.params;
+      
+      // Verificar se o nome do arquivo é seguro (não permite navegação para diretórios superiores)
+      if (filename.includes('..') || filename.includes('/')) {
+        return res.status(400).json({
+          success: false,
+          error: 'Nome de arquivo inválido'
+        });
+      }
+      
+      const filePath = path.join(process.cwd(), 'output', filename);
+      
+      // Verificar se o arquivo existe
+      try {
+        await fs.promises.access(filePath);
+      } catch (err) {
+        return res.status(404).json({
+          success: false,
+          error: 'Arquivo não encontrado'
+        });
+      }
+      
+      // Excluir o arquivo
+      await fs.promises.unlink(filePath);
+      
+      res.json({
+        success: true,
+        message: 'Vídeo excluído com sucesso'
+      });
+    } catch (error: any) {
+      console.error('Erro ao excluir vídeo:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Erro ao excluir vídeo'
+      });
+    }
+  });
+
+  /**
    * Endpoint para verificar disponibilidade do ffmpeg
    */
   app.get("/api/check-ffmpeg", async (req: Request, res: Response) => {

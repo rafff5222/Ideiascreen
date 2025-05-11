@@ -1,0 +1,82 @@
+python
+from elevenlabs import generate, play
+audio = generate(text="Teste de narração.", voice="Rachel")
+play(audio)  # Ou salve em um arquivo: with open("narracao.mp3", "wb") as f: f.write(audio)
+Se estiver usando gTTS (Google TTS):
+
+python
+from gtts import gTTS
+tts = gTTS("Texto de teste", lang="pt-br")
+tts.save("narracao.mp3")
+2. Imagens Paradas (Sem Transição/Animação)
+Se as imagens estão estáticas, o código não está aplicando transições ou definindo uma duração para cada cena.
+
+Solução:
+
+Use moviepy para criar slideshows com transições:
+
+python
+from moviepy.editor import ImageSequenceClip, concatenate_videoclips
+from moviepy.video.fx.all import fadein, fadeout
+
+# Lista de imagens (caminhos dos arquivos)
+imagens = ["img1.jpg", "img2.jpg", "img3.jpg"]
+
+# Define duração por imagem (em segundos)
+clips = [ImageSequenceClip([img], durations=[3]) for img in imagens]  # 3s por imagem
+
+# Adiciona efeito de fade entre clips
+final_clip = concatenate_videoclips([clip.fx(fadein, 1).fx(fadeout, 1) for clip in clips])
+final_clip.write_videofile("video_com_transicoes.mp4", fps=24)
+3. Áudio Não Vinculado ao Vídeo
+O áudio pode ter sido gerado, mas não foi mesclado ao vídeo.
+
+Solução:
+
+Use moviepy para combinar áudio e vídeo:
+
+python
+from moviepy.editor import VideoFileClip, AudioFileClip
+
+video = VideoFileClip("video_sem_audio.mp4")
+audio = AudioFileClip("narracao.mp3")
+
+# Sincroniza áudio com vídeo
+final_video = video.set_audio(audio)
+final_video.write_videofile("video_final.mp4")
+4. Formato de Arquivo Incompatível
+Se o áudio está em formato não suportado (ex.: .ogg), o moviepy pode não reconhecê-lo.
+
+Solução:
+
+Converta o áudio para .mp3 ou .wav antes de usar:
+
+python
+from pydub import AudioSegment
+
+audio = AudioSegment.from_file("narracao.ogg")
+audio.export("narracao.mp3", format="mp3")
+🛠 Código Completo Corrigido (Exemplo)
+python
+from moviepy.editor import ImageSequenceClip, AudioFileClip, concatenate_videoclips
+from gtts import gTTS
+import os
+
+# 1. Gera narração
+tts = gTTS("Olá, este é um teste de narração para seu vídeo.", lang="pt-br")
+tts.save("narracao.mp3")
+
+# 2. Cria vídeo com imagens (3 segundos por imagem)
+imagens = ["img1.jpg", "img2.jpg", "img3.jpg"]
+clips = [ImageSequenceClip([img], durations=[3]) for img in imagens]
+video = concatenate_videoclips(clips)
+
+# 3. Adiciona áudio ao vídeo
+audio = AudioFileClip("narracao.mp3")
+video_final = video.set_audio(audio)
+
+# 4. Exporta
+video_final.write_videofile("video_pronto.mp4", fps=24)
+
+# Limpa arquivos temporários (opcional)
+os.remove("narracao.mp3")
