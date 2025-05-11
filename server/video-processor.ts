@@ -2,6 +2,11 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { exec } from 'child_process';
 import util from 'util';
+import crypto from 'crypto';
+
+// Importar serviços auxiliares
+import * as pexelsService from './pexels-service';
+import * as audioAnalyzer from './audio-analyzer';
 
 // Converter exec para Promisify
 const execAsync = util.promisify(exec);
@@ -13,6 +18,15 @@ const FFMPEG_PATH = '/nix/store/3zc5jbvqzrn8zmva4fx5p0nh4yy03wk4-ffmpeg-6.1.1-bi
 // Caminho para o diretório temporário e de saída
 const TMP_DIR = path.join(process.cwd(), 'tmp');
 const OUTPUT_DIR = path.join(process.cwd(), 'output');
+const IMAGES_DIR = path.join(TMP_DIR, 'images');
+
+// Resoluções de vídeo predefinidas
+const VIDEO_RESOLUTIONS = {
+  '1080p': { width: 1920, height: 1080 },
+  '720p': { width: 1280, height: 720 },
+  '480p': { width: 854, height: 480 },
+  '360p': { width: 640, height: 360 }
+};
 
 /**
  * Garante que o diretório existe
@@ -31,12 +45,20 @@ export async function ensureDirectoryExists(directory: string): Promise<void> {
  * @param audioData Base64 ou caminho para o arquivo de áudio
  * @param imageUrls URLs das imagens a serem usadas
  * @param subtitles Legendas para o vídeo
+ * @param options Opções adicionais para processamento
  * @returns Caminho para o vídeo gerado
  */
 export async function processAudioToVideo(
   audioData: string,
   imageUrls: string[],
-  subtitles: string[] | string
+  subtitles: string[] | string,
+  options: {
+    topic?: string;           // Tópico para buscar imagens caso imageUrls esteja vazio
+    detectSilence?: boolean;  // Se deve detectar silêncio para cortes automáticos
+    silenceThreshold?: number; // Limite de detecção de silêncio em dB
+    transitions?: string[];   // Tipos de transição a serem aplicados
+    resolution?: string;      // Resolução do vídeo (ex: "1080p", "720p")
+  } = {}
 ): Promise<string> {
   // Garantir que os diretórios existem
   await ensureDirectoryExists(TMP_DIR);

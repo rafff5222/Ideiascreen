@@ -49,8 +49,10 @@ export async function searchImages(topic: string, count: number = 5): Promise<st
     
     console.log(`Encontradas ${imageUrls.length} imagens para o tópico "${topic}"`);
     return imageUrls;
-  } catch (error) {
-    console.error('Erro ao buscar imagens no Pexels:', error);
+  } catch (err) {
+    // Converter para objeto de erro padrão
+    const error = err instanceof Error ? err : new Error(String(err));
+    console.error('Erro ao buscar imagens no Pexels:', error.message);
     // Em caso de erro, retornar placeholder images
     return generatePlaceholderImageUrls(topic, count);
   }
@@ -81,7 +83,9 @@ export async function downloadImage(imageUrl: string): Promise<string> {
     
     console.log(`Imagem baixada com sucesso: ${imagePath}`);
     return imagePath;
-  } catch (error) {
+  } catch (err) {
+    // Converter para objeto de erro padrão
+    const error = err instanceof Error ? err : new Error(String(err));
     console.error('Erro ao baixar imagem:', error);
     throw new Error(`Falha ao baixar imagem de ${imageUrl}: ${error.message}`);
   }
@@ -99,8 +103,10 @@ export async function downloadMultipleImages(imageUrls: string[]): Promise<strin
     const localPaths = await Promise.all(downloadPromises);
     
     return localPaths;
-  } catch (error) {
-    console.error('Erro ao baixar múltiplas imagens:', error);
+  } catch (err) {
+    // Converter para objeto de erro padrão
+    const error = err instanceof Error ? err : new Error(String(err));
+    console.error('Erro ao baixar múltiplas imagens:', error.message);
     throw error;
   }
 }
