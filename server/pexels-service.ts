@@ -35,6 +35,34 @@ interface PexelsResponse {
   next_page: string;
 }
 
+// Interface para respostas de vídeo da API Pexels
+interface PexelsVideoResponse {
+  page: number;
+  per_page: number;
+  total_results: number;
+  videos: {
+    id: number;
+    width: number;
+    height: number;
+    url: string;
+    image: string;
+    duration: number;
+    user: {
+      id: number;
+      name: string;
+      url: string;
+    };
+    video_files: {
+      id: number;
+      quality: string;
+      file_type: string;
+      width: number;
+      height: number;
+      link: string;
+    }[];
+  }[];
+}
+
 /**
  * Busca imagens na API do Pexels com base no tópico fornecido
  * @param topic Tópico para busca de imagens
@@ -103,7 +131,7 @@ export async function getRandomVideo(topic: string): Promise<any> {
       throw new Error(`Erro na API do Pexels: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as PexelsVideoResponse;
     
     if (!data.videos || data.videos.length === 0) {
       throw new Error('Nenhum vídeo encontrado');

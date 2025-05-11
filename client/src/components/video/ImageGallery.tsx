@@ -204,13 +204,11 @@ export default function ImageGallery({
               {images.map(image => (
                 <div 
                   key={image.id}
-                  className={`
-                    relative aspect-video rounded-md overflow-hidden border-2
+                  className={`relative aspect-video rounded-md overflow-hidden border-2 
                     ${selectedIds.has(image.id) 
                       ? 'border-primary ring-2 ring-primary ring-opacity-50' 
-                      : 'border-transparent hover:border-gray-300'}
-                    transition-all cursor-pointer
-                  `}
+                      : 'border-transparent hover:border-gray-300'} 
+                    transition-all cursor-pointer`}
                   onClick={() => toggleImageSelection(image)}
                 >
                   {/* Imagem */}
