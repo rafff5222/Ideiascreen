@@ -7,8 +7,8 @@ import util from 'util';
 const execAsync = util.promisify(exec);
 
 // Caminho para o ffmpeg verificado via endpoint /api/check-ffmpeg
-// O caminho correto para o ffmpeg-static no Replit está em:
-const FFMPEG_PATH = '/home/runner/workspace/node_modules/ffmpeg-static/ffmpeg';
+// O caminho correto para o ffmpeg do sistema no Replit está em:
+const FFMPEG_PATH = '/nix/store/3zc5jbvqzrn8zmva4fx5p0nh4yy03wk4-ffmpeg-6.1.1-bin/bin/ffmpeg';
 
 // Caminho para o diretório temporário e de saída
 const TMP_DIR = path.join(process.cwd(), 'tmp');
@@ -157,7 +157,7 @@ export async function processAudioToVideo(
       // Se o comando principal falhar, tentar uma versão mais simples
       console.log('Tentando comando alternativo de FFmpeg mais simples...');
       
-      const simpleCommand = `"${ffmpegPath}" -y -loop 1 -i "${localImagePaths[0]}" -i "${audioPath}" -c:v libx264 -pix_fmt yuv420p -preset fast -c:a aac -strict experimental -b:a 192k -shortest "${outputVideoPath}"`;
+      const simpleCommand = `"${FFMPEG_PATH}" -y -loop 1 -i "${localImagePaths[0]}" -i "${audioPath}" -c:v libx264 -pix_fmt yuv420p -preset fast -c:a aac -strict experimental -b:a 192k -shortest "${outputVideoPath}"`;
       
       try {
         const { stdout, stderr } = await execAsync(simpleCommand);
@@ -211,7 +211,7 @@ export async function processAudioToVideo(
  */
 async function getAudioDuration(audioPath: string): Promise<number> {
   try {
-    const command = `"${ffmpegPath}" -i "${audioPath}" 2>&1 | grep "Duration"`;
+    const command = `"${FFMPEG_PATH}" -i "${audioPath}" 2>&1 | grep "Duration"`;
     const { stdout } = await execAsync(command);
     
     // Extrair a duração do formato HH:MM:SS.ms
@@ -231,7 +231,7 @@ async function getAudioDuration(audioPath: string): Promise<number> {
     
     // Tentar um método alternativo
     try {
-      const command = `"${ffmpegPath}" -i "${audioPath}" -f null -`;
+      const command = `"${FFMPEG_PATH}" -i "${audioPath}" -f null -`;
       const { stderr } = await execAsync(command);
       
       // Extrair a duração de outro formato possível
@@ -284,7 +284,7 @@ export async function convertVideo(
   }
   
   // Comando para converter vídeo
-  const command = `"${ffmpegPath}" -y -i "${inputPath}" ${resolutionParam} -c:v libx264 -preset fast -c:a aac -strict experimental -b:a 192k "${outputPath}"`;
+  const command = `"${FFMPEG_PATH}" -y -i "${inputPath}" ${resolutionParam} -c:v libx264 -preset fast -c:a aac -strict experimental -b:a 192k "${outputPath}"`;
   
   console.log(`Executando conversão de vídeo: ${command}`);
   
