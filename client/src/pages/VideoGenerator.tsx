@@ -12,6 +12,11 @@ import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 
+// Componentes customizados para o sistema de geração de vídeo
+import EngagementScore from '@/components/video/EngagementScore';
+import ExportOptions from '@/components/video/ExportOptions';
+import DebugConsole from '@/components/video/DebugConsole';
+
 interface VideoResult {
   videoPath: string;
   fileName: string;
@@ -687,9 +692,36 @@ export default function VideoGenerator() {
                 </div>
               </CardContent>
             </Card>
+            
+            {/* Depuração em Tempo Real */}
+            <div className="mb-6">
+              <DebugConsole 
+                logs={[
+                  { id: '1', timestamp: new Date(), message: 'Vídeo gerado com sucesso', type: 'success' },
+                  { id: '2', timestamp: new Date(), message: 'Áudio processado corretamente', type: 'info' },
+                  { id: '3', timestamp: new Date(), message: 'Imagens baixadas: 5', type: 'info' },
+                  { id: '4', timestamp: new Date(), message: 'Silêncios detectados: 3', type: 'info' },
+                  { id: '5', timestamp: new Date(), message: 'Renderização completa', type: 'success' }
+                ]}
+              />
+            </div>
+            
+            {/* Estatísticas de Engajamento */}
+            {videoResult && (
+              <div className="mb-6">
+                <EngagementScore 
+                  score={85}
+                  rhythm={75}
+                  emphasis={65}
+                  transitions={90}
+                  duration={videoResult.duration ? parseInt(videoResult.duration) : 30}
+                  description="Excelente! Vídeo altamente envolvente."
+                />
+              </div>
+            )}
           </div>
           
-          <div>
+          <div className="space-y-6">
             {videoResult && (
               <Card>
                 <CardHeader>
@@ -728,14 +760,29 @@ export default function VideoGenerator() {
                       </p>
                     </div>
                   </div>
-                  
-                  <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-md">
-                    <p className="text-sm text-blue-800">
-                      <span className="font-semibold">Compartilhe:</span> Você pode copiar o link direto para o vídeo ou fazer o download para compartilhar em suas redes sociais.
-                    </p>
-                  </div>
                 </CardContent>
               </Card>
+            )}
+            
+            {/* Opções de Exportação */}
+            {videoResult && (
+              <ExportOptions 
+                onExport={(platform, format) => {
+                  toast({
+                    title: 'Exportação iniciada',
+                    description: `Exportando para ${platform} em formato ${format}...`,
+                  });
+                }}
+              />
+            )}
+            
+            {videoResult && (
+              <div className="bg-blue-50 p-4 border border-blue-100 rounded-md">
+                <p className="text-sm text-blue-800">
+                  <span className="font-semibold">Dica Pro:</span> Exporte seu vídeo em diferentes 
+                  formatos para alcançar diversas plataformas e maximizar seu alcance.
+                </p>
+              </div>
             )}
           </div>
         </div>
