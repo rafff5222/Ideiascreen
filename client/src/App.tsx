@@ -14,6 +14,7 @@ import VideoTester from "@/pages/VideoTester";
 import VideoLibrary from "@/pages/VideoLibrary";
 import VideoPreview from "@/pages/VideoPreview";
 import TestVideoPlayer from "@/pages/TestVideoPlayer";
+import VideoTest from "@/pages/VideoTest";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ExitPopup from "@/components/ui/exit-popup";
@@ -46,6 +47,7 @@ function Router() {
       <Route path="/video-library" component={VideoLibrary} />
       <Route path="/video-preview" component={VideoPreview} />
       <Route path="/test-video" component={TestVideoPlayer} />
+      <Route path="/video-test" component={VideoTest} />
       <Route component={NotFound} />
     </Switch>
   );

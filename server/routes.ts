@@ -10,6 +10,7 @@ import path from "path";
 import { z } from 'zod';
 import { generateVideo as generateAIVideo } from "./ai-service";
 import { generateTestVideo } from "./test-video-generator";
+import { generateCompatibleVideo, generateSimpleVideo, fixExistingVideo } from "./video-fix";
 import { nanoid } from 'nanoid';
 
 // Diretórios padrão para armazenamento de arquivos
@@ -1230,28 +1231,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           let videoPath = null;
           
           try {
-            // Primeiro tenta usar o gerador normal com APIs externas
-            videoPath = await testeGerarVideo(script, {
-              voz: options?.voz,
-              detectarSilencio: options?.detectarSilencio,
-              topico: options?.topico,
-              transicoes: options?.transicoes,
-              resolucao: options?.resolucao,
-              useDemoMode: options?.useDemoMode
-            });
-          } catch (apiError) {
-            // Se falhar, tenta usar o modo de demonstração
-            console.error('Falha ao gerar vídeo usando APIs:', apiError);
-            updateTaskProgress(taskId, 20, 'Usando modo de demonstração (fallback)', 'processing');
+            // Gerar um vídeo simples de teste
+            console.log('Gerando vídeo de teste...');
+            videoPath = await generateTestVideo();
+            console.log('Vídeo de teste gerado com sucesso:', videoPath);
+          } catch (error) {
+            // Se falhar, tenta usar o modo alternativo
+            console.error('Falha ao gerar vídeo de teste:', error);
+            updateTaskProgress(taskId, 20, 'Tentando método alternativo...', 'processing');
             
             try {
-              // Importar dinamicamente o processador de demonstração
-              const demoProcessor = await import('./demo-processor.js');
-              videoPath = await demoProcessor.processTextToDemoVideo(script);
-              console.log('Vídeo gerado com sucesso no modo de demonstração:', videoPath);
-            } catch (demoError) {
-              console.error('Falha também no modo de demonstração:', demoError);
-              throw demoError; // Propagar o erro
+              // Usar o gerador de vídeo simples como fallback
+              videoPath = await generateSimpleVideo();
+              console.log('Vídeo simples gerado com sucesso:', videoPath);
+            } catch (fallbackError) {
+              console.error('Falha também no método alternativo:', fallbackError);
+              throw fallbackError; // Propagar o erro
             }
           }
           
@@ -2147,6 +2142,234 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         error: error.message || 'Erro ao iniciar geração de vídeo de teste'
+      });
+    }
+  });
+
+  /**
+   * Endpoint para gerar um vídeo compatível com todos os navegadores
+   */
+  app.post("/api/generate-compatible-video", async (req: Request, res: Response) => {
+    try {
+      // Gerar um ID único para a tarefa
+      const taskId = nanoid();
+      
+      // Criar uma nova tarefa
+      const task: ProcessingTask = {
+        id: taskId,
+        status: 'pending',
+        progress: 0,
+        message: 'Iniciando geração de vídeo compatível...',
+        startTime: Date.now(),
+      };
+      
+      // Armazenar a tarefa
+      activeTasks.set(taskId, task);
+      
+      // Iniciar o processamento em segundo plano
+      (async () => {
+        try {
+          // Atualizar progresso
+          updateTaskProgress(taskId, 10, 'Gerando vídeo compatível...', 'processing');
+          
+          // Gerar o vídeo usando o método compatível
+          const videoPath = await generateCompatibleVideo();
+          
+          // Extrair apenas o nome do arquivo do caminho completo
+          const fileName = path.basename(videoPath);
+          
+          // Atualizar a tarefa como concluída
+          updateTaskProgress(
+            taskId, 
+            100, 
+            'Vídeo compatível gerado com sucesso!', 
+            'completed',
+            {
+              videoPath: fileName, // Neste caso, o arquivo está diretamente na pasta output
+              fileName: fileName,
+              fullPath: videoPath
+            }
+          );
+        } catch (error: any) {
+          console.error('Erro ao gerar vídeo compatível:', error);
+          updateTaskProgress(
+            taskId, 
+            0, 
+            'Falha ao gerar vídeo compatível', 
+            'failed', 
+            null, 
+            error.message || 'Erro desconhecido'
+          );
+        }
+      })();
+      
+      // Responder imediatamente com o ID da tarefa
+      res.json({
+        success: true,
+        taskId: taskId,
+        message: 'Geração de vídeo compatível iniciada'
+      });
+    } catch (error: any) {
+      console.error('Erro ao iniciar geração de vídeo compatível:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Erro ao iniciar geração de vídeo compatível'
+      });
+    }
+  });
+
+  /**
+   * Endpoint para gerar um vídeo simples com áudio
+   */
+  app.post("/api/generate-simple-video", async (req: Request, res: Response) => {
+    try {
+      // Gerar um ID único para a tarefa
+      const taskId = nanoid();
+      
+      // Criar uma nova tarefa
+      const task: ProcessingTask = {
+        id: taskId,
+        status: 'pending',
+        progress: 0,
+        message: 'Iniciando geração de vídeo simples...',
+        startTime: Date.now(),
+      };
+      
+      // Armazenar a tarefa
+      activeTasks.set(taskId, task);
+      
+      // Iniciar o processamento em segundo plano
+      (async () => {
+        try {
+          // Atualizar progresso
+          updateTaskProgress(taskId, 10, 'Gerando vídeo simples...', 'processing');
+          
+          // Gerar o vídeo simples
+          const videoPath = await generateSimpleVideo();
+          
+          // Extrair apenas o nome do arquivo do caminho completo
+          const fileName = path.basename(videoPath);
+          
+          // Atualizar a tarefa como concluída
+          updateTaskProgress(
+            taskId, 
+            100, 
+            'Vídeo simples gerado com sucesso!', 
+            'completed',
+            {
+              videoPath: fileName, // Neste caso, o arquivo está diretamente na pasta output
+              fileName: fileName,
+              fullPath: videoPath
+            }
+          );
+        } catch (error: any) {
+          console.error('Erro ao gerar vídeo simples:', error);
+          updateTaskProgress(
+            taskId, 
+            0, 
+            'Falha ao gerar vídeo simples', 
+            'failed', 
+            null, 
+            error.message || 'Erro desconhecido'
+          );
+        }
+      })();
+      
+      // Responder imediatamente com o ID da tarefa
+      res.json({
+        success: true,
+        taskId: taskId,
+        message: 'Geração de vídeo simples iniciada'
+      });
+    } catch (error: any) {
+      console.error('Erro ao iniciar geração de vídeo simples:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Erro ao iniciar geração de vídeo simples'
+      });
+    }
+  });
+
+  /**
+   * Endpoint para corrigir um vídeo existente
+   */
+  app.post("/api/fix-video", async (req: Request, res: Response) => {
+    try {
+      const { videoPath } = req.body;
+      
+      if (!videoPath) {
+        return res.status(400).json({
+          success: false,
+          error: 'Caminho do vídeo não fornecido'
+        });
+      }
+      
+      // Gerar um ID único para a tarefa
+      const taskId = nanoid();
+      
+      // Criar uma nova tarefa
+      const task: ProcessingTask = {
+        id: taskId,
+        status: 'pending',
+        progress: 0,
+        message: 'Iniciando correção de vídeo...',
+        startTime: Date.now(),
+      };
+      
+      // Armazenar a tarefa
+      activeTasks.set(taskId, task);
+      
+      // Iniciar o processamento em segundo plano
+      (async () => {
+        try {
+          // Atualizar progresso
+          updateTaskProgress(taskId, 10, 'Corrigindo vídeo...', 'processing');
+          
+          // Caminho completo do vídeo de entrada
+          const inputFullPath = path.join(process.cwd(), 'output', videoPath);
+          
+          // Corrigir o vídeo
+          const fixedVideoPath = await fixExistingVideo(inputFullPath);
+          
+          // Extrair apenas o nome do arquivo do caminho completo
+          const fileName = path.basename(fixedVideoPath);
+          
+          // Atualizar a tarefa como concluída
+          updateTaskProgress(
+            taskId, 
+            100, 
+            'Vídeo corrigido com sucesso!', 
+            'completed',
+            {
+              videoPath: fileName,
+              fileName: fileName,
+              fullPath: fixedVideoPath
+            }
+          );
+        } catch (error: any) {
+          console.error('Erro ao corrigir vídeo:', error);
+          updateTaskProgress(
+            taskId, 
+            0, 
+            'Falha ao corrigir vídeo', 
+            'failed', 
+            null, 
+            error.message || 'Erro desconhecido'
+          );
+        }
+      })();
+      
+      // Responder imediatamente com o ID da tarefa
+      res.json({
+        success: true,
+        taskId: taskId,
+        message: 'Correção de vídeo iniciada'
+      });
+    } catch (error: any) {
+      console.error('Erro ao iniciar correção de vídeo:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Erro ao iniciar correção de vídeo'
       });
     }
   });
