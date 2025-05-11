@@ -1422,6 +1422,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/video-stream/:filePath(*)", async (req: Request, res: Response) => {
     try {
       const { filePath } = req.params;
+      const sessionId = req.headers['x-session-id'] as string || 'unknown';
+      const userId = req.isAuthenticated ? req.user?.id : undefined;
       
       // Verificar se o nome do arquivo é seguro (não permite navegação para diretórios superiores)
       if (filePath.includes('..')) {
