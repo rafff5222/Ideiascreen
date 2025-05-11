@@ -1384,12 +1384,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Garantir que os diretórios necessários existem
       const ensureDir = async (dir: string) => {
         try {
-          // Usar o pacote fs-extra que tem suporte a promessas
-          const fsPromises = require('fs').promises;
+          // Usar o pacote fs interno do Node.js que já tem suporte a promessas
           try {
-            await fsPromises.access(dir);
+            await fs.promises.access(dir);
           } catch (e) {
-            await fsPromises.mkdir(dir, { recursive: true });
+            await fs.promises.mkdir(dir, { recursive: true });
           }
         } catch (err) {
           console.error(`Erro ao manipular diretório ${dir}:`, err);
@@ -1874,31 +1873,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/list-videos", async (req: Request, res: Response) => {
     try {
       const outputDir = path.join(process.cwd(), 'output');
-      const files = await fs.promises.readdir(outputDir);
+      const outputVideosDir = path.join(outputDir, 'videos');
+      let allVideoDetails = [];
       
-      // Filtrar apenas arquivos de vídeo (mp4)
-      const videoFiles = files.filter(file => file.endsWith('.mp4'));
+      // Lista vídeos da pasta output/
+      try {
+        const files = await fs.promises.readdir(outputDir);
+        
+        // Filtrar apenas arquivos de vídeo (mp4)
+        const videoFiles = files.filter(file => file.endsWith('.mp4'));
+        
+        // Obter informações adicionais sobre cada arquivo
+        const videoDetails = await Promise.all(
+          videoFiles.map(async (fileName) => {
+            const filePath = path.join(outputDir, fileName);
+            // Verificar se é um arquivo (não uma pasta)
+            const stats = await fs.promises.stat(filePath);
+            
+            if (stats.isFile()) {
+              return {
+                name: fileName,
+                path: fileName,  // Caminho relativo para acesso via API
+                size: stats.size,
+                createdAt: stats.mtime.toISOString(),
+                location: 'root'
+              };
+            }
+            return null;
+          })
+        );
+        
+        allVideoDetails = videoDetails.filter(item => item !== null);
+      } catch (err) {
+        console.warn('Aviso ao listar vídeos da pasta principal:', err.message);
+      }
       
-      // Obter informações adicionais sobre cada arquivo
-      const videoDetails = await Promise.all(
-        videoFiles.map(async (fileName) => {
-          const filePath = path.join(outputDir, fileName);
-          const stats = await fs.promises.stat(filePath);
+      // Lista vídeos da pasta output/videos/
+      try {
+        const videosExist = await fs.promises.access(outputVideosDir)
+          .then(() => true)
+          .catch(() => false);
           
-          return {
-            name: fileName,
-            path: fileName,  // Caminho relativo para acesso via API
-            size: stats.size,
-            createdAt: stats.mtime.toISOString(),
-            // Duration seria obtida com ffprobe, omitida por simplicidade
-          };
-        })
-      );
+        if (videosExist) {
+          const files = await fs.promises.readdir(outputVideosDir);
+          
+          // Filtrar apenas arquivos de vídeo (mp4)
+          const videoFiles = files.filter(file => file.endsWith('.mp4'));
+          
+          // Obter informações adicionais sobre cada arquivo
+          const videoDetails = await Promise.all(
+            videoFiles.map(async (fileName) => {
+              const filePath = path.join(outputVideosDir, fileName);
+              const stats = await fs.promises.stat(filePath);
+              
+              return {
+                name: fileName,
+                path: 'videos/' + fileName,  // Caminho relativo com subpasta
+                size: stats.size,
+                createdAt: stats.mtime.toISOString(),
+                location: 'videos'
+              };
+            })
+          );
+          
+          allVideoDetails = [...allVideoDetails, ...videoDetails];
+        }
+      } catch (err) {
+        console.warn('Aviso ao listar vídeos da pasta videos:', err.message);
+      }
       
       // Ordenar por data de criação (mais recente primeiro)
-      const sortedVideos = videoDetails.sort((a, b) => 
+      const sortedVideos = allVideoDetails.sort((a, b) => 
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
+      
+      console.log('Listagem de vídeos bem-sucedida, encontrados:', sortedVideos.length);
       
       res.json({
         success: true,

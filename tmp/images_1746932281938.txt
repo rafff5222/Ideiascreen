@@ -1,0 +1,5 @@
+file '/home/runner/workspace/tmp/images/image_1746932281938_0.jpg'
+duration 0
+file '/home/runner/workspace/tmp/images/image_1746932281938_1.jpg'
+duration 21.42
+file '/home/runner/workspace/tmp/images/image_1746932281938_4.jpg'
