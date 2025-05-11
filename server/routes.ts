@@ -1494,13 +1494,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .filter((segmento: string) => segmento.trim().length > 0)
         .map((segmento: string) => segmento.trim());
       
-      const subtitles = segmentos.map((segmento: string, index: number) => {
+      // Criar legendas em formato SRT
+      const subtitlesArray = segmentos.map((segmento: string, index: number) => {
         return `${index + 1}\n00:0${index}:00,000 --> 00:0${index + 1}:00,000\n${segmento}`;
-      }).join('\n\n');
+      });
       
       // Gerar o vídeo
       console.log('Processando áudio para vídeo...');
-      const videoPath = await processAudioToVideo(audioData, imageUrls, subtitles);
+      const videoPath = await processAudioToVideo(audioData, imageUrls, subtitlesArray);
       
       // Verificar se o arquivo existe
       try {

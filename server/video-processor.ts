@@ -36,7 +36,7 @@ export async function ensureDirectoryExists(directory: string): Promise<void> {
 export async function processAudioToVideo(
   audioData: string,
   imageUrls: string[],
-  subtitles: string[]
+  subtitles: string[] | string
 ): Promise<string> {
   // Garantir que os diretórios existem
   await ensureDirectoryExists(TMP_DIR);
@@ -127,13 +127,20 @@ export async function processAudioToVideo(
     
     // Passo 4: Gerar arquivo de legendas SRT
     let srtContent = '';
-    let duration = 0;
-    for (let i = 0; i < subtitles.length; i++) {
-      const startTime = formatSrtTime(duration);
-      duration += imageDuration; // Ou ajustar conforme necessário para sincronização
-      const endTime = formatSrtTime(duration);
-      
-      srtContent += `${i + 1}\n${startTime} --> ${endTime}\n${subtitles[i]}\n\n`;
+    
+    // Verificar se subtitles é um array ou string
+    if (Array.isArray(subtitles)) {
+      let duration = 0;
+      for (let i = 0; i < subtitles.length; i++) {
+        const startTime = formatSrtTime(duration);
+        duration += imageDuration; // Ou ajustar conforme necessário para sincronização
+        const endTime = formatSrtTime(duration);
+        
+        srtContent += `${i + 1}\n${startTime} --> ${endTime}\n${subtitles[i]}\n\n`;
+      }
+    } else {
+      // Se for string, assumir que já está no formato SRT
+      srtContent = subtitles;
     }
     
     await fs.writeFile(subtitlesFile, srtContent);
