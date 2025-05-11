@@ -104,31 +104,41 @@ export default function VideoTester() {
           const data = await response.json();
           
           if (data.success) {
-            setProgress(data.task.progress);
-            setStatus(data.task.status);
+            // A API retorna o objeto task dentro do objeto data
+            setProgress(data.progress);
+            setStatus(data.status);
             
-            if (data.task.error) {
-              setError(data.task.error);
+            if (data.error) {
+              setError(data.error);
             }
             
-            if (data.task.result) {
-              setResult(data.task.result);
+            if (data.result) {
+              setResult(data.result);
+            }
+            
+            // Se o processamento usou modo de demonstração, mostrar alerta
+            if (data.message && data.message.includes('demonstração')) {
+              toast({
+                title: "Modo de Demonstração",
+                description: "O vídeo está sendo gerado em modo de demonstração devido à indisponibilidade das APIs externas.",
+                variant: "warning",
+              });
             }
             
             // Se o processamento terminou, limpar o intervalo
-            if (data.task.status === 'completed' || data.task.status === 'failed') {
+            if (data.status === 'completed' || data.status === 'failed') {
               clearInterval(interval);
               
-              if (data.task.status === 'completed') {
+              if (data.status === 'completed') {
                 toast({
                   title: "Vídeo gerado com sucesso!",
                   description: "Seu vídeo foi processado e está pronto para visualização.",
                   variant: "default",
                 });
-              } else if (data.task.status === 'failed') {
+              } else if (data.status === 'failed') {
                 toast({
                   title: "Falha na geração do vídeo",
-                  description: data.task.error || "Ocorreu um erro durante o processamento.",
+                  description: data.error || "Ocorreu um erro durante o processamento.",
                   variant: "destructive",
                 });
               }
