@@ -22,6 +22,7 @@ export default function VideoTester() {
   const [voice, setVoice] = useState<string>('FEMININO_PROFISSIONAL');
   const [topic, setTopic] = useState<string>('tecnologia digital business');
   const [detectSilence, setDetectSilence] = useState<boolean>(true);
+  const [useDemoMode, setUseDemoMode] = useState<boolean>(false);
   const [selectedTransitions, setSelectedTransitions] = useState<string[]>(['fade', 'zoom']);
   const [resolution, setResolution] = useState<string>('720p');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -121,7 +122,7 @@ export default function VideoTester() {
               toast({
                 title: "Modo de Demonstração",
                 description: "O vídeo está sendo gerado em modo de demonstração devido à indisponibilidade das APIs externas.",
-                variant: "warning",
+                variant: "default",
               });
             }
             
@@ -189,7 +190,8 @@ export default function VideoTester() {
           topico: topic,
           detectarSilencio: detectSilence,
           transicoes: selectedTransitions,
-          resolucao: resolution
+          resolucao: resolution,
+          useDemoMode: useDemoMode
         }
       });
       
@@ -352,6 +354,20 @@ export default function VideoTester() {
                   />
                   <Label htmlFor="detectSilence">
                     Usar detecção de silêncio para cortes automáticos
+                  </Label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="useDemoMode" 
+                    checked={useDemoMode}
+                    onCheckedChange={(checked) => setUseDemoMode(checked as boolean)}
+                  />
+                  <Label htmlFor="useDemoMode" className="flex items-center">
+                    <span>Usar modo de demonstração</span>
+                    <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                      Teste
+                    </span>
                   </Label>
                 </div>
                 
