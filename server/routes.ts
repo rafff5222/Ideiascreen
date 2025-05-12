@@ -8,6 +8,7 @@ import { storage } from "./storage";
 import fs from "fs";
 import path from "path";
 import { z } from 'zod';
+import { checkAllServices } from './service-status';
 import { generateVideo as generateAIVideo } from "./ai-service";
 import { generateTestVideo } from "./test-video-generator";
 import { generateCompatibleVideo, generateSimpleVideo, fixExistingVideo } from "./video-fix";
@@ -2659,6 +2660,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         error: `Erro ao verificar ffmpeg: ${error.message}`
+      });
+    }
+  });
+  
+  /**
+   * Verificação completa de todos os serviços, incluindo alternativas gratuitas
+   * Esta rota verifica o status de todas as APIs e serviços, tanto pagos quanto gratuitos
+   */
+  app.get("/api/check-all-services", async (req: Request, res: Response) => {
+    try {
+      const results = await checkAllServices();
+      
+      res.json({
+        success: true,
+        timestamp: Date.now(),
+        services: {
+          paid: results.paid,
+          free: results.free,
+          system: {
+            ffmpeg: results.ffmpeg
+          }
+        },
+        recommendation: results.recommendation
+      });
+    } catch (error: any) {
+      console.error("Erro ao verificar serviços:", error);
+      res.status(500).json({
+        success: false,
+        error: `Erro ao verificar serviços: ${error.message}`
       });
     }
   });

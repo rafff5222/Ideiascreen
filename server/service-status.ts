@@ -23,21 +23,21 @@ export interface ServiceStatus {
  */
 export async function checkFFmpeg(): Promise<ServiceStatus> {
   return new Promise((resolve) => {
-    const ffmpegPath = process.env.FFMPEG_PATH || 'ffmpeg';
-    const process = spawn(ffmpegPath, ['-version']);
+    const ffmpegPath: string = process.env.FFMPEG_PATH || 'ffmpeg';
+    const childProcess = spawn(ffmpegPath, ['-version']);
     
     let output = '';
     let errorOutput = '';
     
-    process.stdout.on('data', (data) => {
+    childProcess.stdout.on('data', (data: Buffer) => {
       output += data.toString();
     });
     
-    process.stderr.on('data', (data) => {
+    childProcess.stderr.on('data', (data: Buffer) => {
       errorOutput += data.toString();
     });
     
-    process.on('error', (err) => {
+    childProcess.on('error', (err: Error) => {
       resolve({
         working: false,
         status: 'not_found',
@@ -45,7 +45,7 @@ export async function checkFFmpeg(): Promise<ServiceStatus> {
       });
     });
     
-    process.on('close', (code) => {
+    childProcess.on('close', (code: number) => {
       if (code === 0) {
         const version = output.split('\n')[0].trim();
         resolve({
@@ -165,20 +165,20 @@ export async function checkElevenLabs(): Promise<ServiceStatus> {
  */
 export async function checkEdgeTTS(): Promise<ServiceStatus> {
   return new Promise((resolve) => {
-    const process = spawn('edge-tts', ['--version']);
+    const childProcess = spawn('edge-tts', ['--version']);
     
     let output = '';
     let errorOutput = '';
     
-    process.stdout.on('data', (data) => {
+    childProcess.stdout.on('data', (data: Buffer) => {
       output += data.toString();
     });
     
-    process.stderr.on('data', (data) => {
+    childProcess.stderr.on('data', (data: Buffer) => {
       errorOutput += data.toString();
     });
     
-    process.on('error', () => {
+    childProcess.on('error', () => {
       resolve({
         working: false,
         status: 'not_installed',
@@ -187,7 +187,7 @@ export async function checkEdgeTTS(): Promise<ServiceStatus> {
       });
     });
     
-    process.on('close', (code) => {
+    childProcess.on('close', (code: number) => {
       if (code === 0) {
         resolve({
           working: true,
@@ -389,20 +389,20 @@ export async function checkHuggingFace(): Promise<ServiceStatus> {
  */
 export async function checkOllama(): Promise<ServiceStatus> {
   return new Promise((resolve) => {
-    const process = spawn('ollama', ['list']);
+    const childProcess = spawn('ollama', ['list']);
     
     let output = '';
     let errorOutput = '';
     
-    process.stdout.on('data', (data) => {
+    childProcess.stdout.on('data', (data: Buffer) => {
       output += data.toString();
     });
     
-    process.stderr.on('data', (data) => {
+    childProcess.stderr.on('data', (data: Buffer) => {
       errorOutput += data.toString();
     });
     
-    process.on('error', () => {
+    childProcess.on('error', () => {
       resolve({
         working: false,
         status: 'not_installed',
@@ -411,7 +411,7 @@ export async function checkOllama(): Promise<ServiceStatus> {
       });
     });
     
-    process.on('close', (code) => {
+    childProcess.on('close', (code: number) => {
       if (code === 0) {
         const models = output.trim().split('\n').filter(Boolean);
         resolve({
