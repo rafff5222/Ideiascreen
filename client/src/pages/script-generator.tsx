@@ -314,10 +314,10 @@ export default function ScriptGenerator() {
                 <div className="pt-4">
                   <Button 
                     onClick={handleGenerate}
-                    className="w-full py-6 text-lg bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700"
+                    className="w-full py-6 text-lg bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 btn-pulsante pulse shadow-lg"
                     disabled={!prompt}
                   >
-                    Gerar Roteiro Profissional
+                    <span className="mr-2">✨</span> Criar Minha Obra-Prima
                   </Button>
                 </div>
               </div>

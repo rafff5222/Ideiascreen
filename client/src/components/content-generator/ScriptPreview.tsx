@@ -120,13 +120,13 @@ export default function ScriptPreview({
 
   return (
     <div className="bg-white border rounded-xl shadow-sm my-6 overflow-hidden">
-      <div className="p-4 bg-gray-50 border-b flex justify-between items-center">
+      <div className="p-4 bg-gray-900 text-white border-b border-amber-500/30 flex justify-between items-center">
         <div>
-          <h3 className="text-lg font-medium">Roteiro gerado para: <span className="text-primary">{prompt}</span></h3>
-          <p className="text-sm text-gray-500">
-            Tipo: {scriptType} • 
-            {metadata?.modelUsed && ` Modelo: ${metadata.modelUsed} • `}
-            Gerado em: {new Date(metadata?.generatedAt || Date.now()).toLocaleString()}
+          <h3 className="text-lg font-medium">Roteiro: <span className="text-amber-500 font-bold">{prompt}</span></h3>
+          <p className="text-sm text-gray-400">
+            <span className="text-blue-400">Tipo:</span> {scriptType} • 
+            {metadata?.modelUsed && <><span className="text-blue-400"> Modelo:</span> {metadata.modelUsed} • </>}
+            <span className="text-blue-400">Gerado em:</span> {new Date(metadata?.generatedAt || Date.now()).toLocaleString()}
           </p>
         </div>
         <div className="flex gap-2">
@@ -168,22 +168,57 @@ export default function ScriptPreview({
           </div>
         ) : (
           <div className="prose prose-sm max-w-none">
-            <pre id="texto-gerado" className="whitespace-pre-line bg-gray-50 p-4 rounded-lg border text-sm overflow-auto max-h-[500px] script-content mobile-optimized">
-              {script}
-            </pre>
+            <div 
+              id="texto-gerado" 
+              className="script-storyboard whitespace-pre-line bg-gray-900 text-white p-6 rounded-lg border border-amber-500/20 text-sm overflow-auto max-h-[600px] script-content mobile-optimized"
+            >
+              {script.split('\n\n').map((block, index) => {
+                // Identificar cabeçalhos e cenas
+                if (block.toUpperCase() === block && block.includes('CENA')) {
+                  return (
+                    <div key={index} className="scene-heading my-4 font-bold text-amber-500 border-b border-amber-500/30 pb-1">
+                      {block}
+                    </div>
+                  );
+                }
+                
+                // Identificar diálogos de personagens (linhas que são apenas um nome em maiúsculas)
+                if (/^[A-Z\s]+\([a-z\s,]+\)$/.test(block) || /^[A-Z\s]+$/.test(block)) {
+                  return (
+                    <div key={index} className="character-name my-2 font-semibold text-blue-400">
+                      {block}
+                    </div>
+                  );
+                }
+                
+                // Identificar direções de cena (texto entre colchetes)
+                if (block.startsWith('[') && block.endsWith(']')) {
+                  return (
+                    <div key={index} className="scene-direction my-2 text-gray-400 italic">
+                      {block}
+                    </div>
+                  );
+                }
+                
+                // Texto normal
+                return <p key={index} className="my-2">{block}</p>;
+              })}
+            </div>
           </div>
         )}
       </div>
       
-      <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 border-t">
+      <div className="p-4 bg-gradient-to-r from-gray-900 to-gray-800 border-t border-amber-500/30">
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-500">
-            {!error && `${script.length} caracteres • Aproximadamente ${Math.ceil(script.length / 1000)} minuto(s) de leitura`}
+          <p className="text-sm text-gray-400">
+            {!error && <>
+              <span className="text-amber-500">{script.length}</span> caracteres • Aproximadamente <span className="text-amber-500">{Math.ceil(script.length / 1000)}</span> minuto(s) de leitura
+            </>}
           </p>
           <Button 
             variant="ghost" 
             size="sm"
-            className="flex items-center gap-1"
+            className="flex items-center gap-1 text-blue-400 hover:text-blue-300 hover:bg-gray-800"
             onClick={() => {
               toast({
                 title: "Link copiado",

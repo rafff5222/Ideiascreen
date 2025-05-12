@@ -26,10 +26,14 @@ export async function generateScript(req: Request, res: Response) {
     const systemPrompt = `Você é um roteirista profissional especializado em criar ${scriptType}s detalhados e formatados. 
 Siga estas diretrizes:
 - Crie diálogos naturais e envolventes
+- Inclua pelo menos 2-3 personagens com nomes específicos, idades e motivações únicas
+- Evite usar termos genéricos como "o protagonista" ou "um grupo"
 - Inclua descrições claras de cenas e ambientes
 - Adicione direções para câmera e atores quando apropriado
 - Formate corretamente como um roteiro profissional
-- Use formatação adequada ao tipo de conteúdo`;
+- Crie histórias com estrutura clara (introdução, desenvolvimento, conclusão)
+- Use formatação adequada ao tipo de conteúdo
+- Para cada personagem, mencione pelo menos uma característica física ou de personalidade`;
 
     const formattedPrompt = `${systemPrompt}
 

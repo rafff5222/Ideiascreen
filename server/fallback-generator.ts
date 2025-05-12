@@ -113,67 +113,84 @@ EXT. PAISAGEM ABERTA - DIA
 NARRADOR (V.O.)
 Em um mundo onde tudo parecia comum, algo extraordinário estava prestes a acontecer.
 
-[A câmera se move lentamente, revelando um personagem solitário caminhando à distância]
+[A câmera se move lentamente, revelando uma figura solitária caminhando à distância]
 
-CENA 1 - INT. CASA DO PROTAGONISTA - MANHÃ
+CENA 1 - INT. CASA DE MARINA - MANHÃ
 
-[Close no rosto do PROTAGONISTA, expressão pensativa enquanto olha pela janela]
+[Close no rosto de MARINA (32, arqueóloga, determinada e com olhos atentos), expressão pensativa enquanto olha pela janela]
 
-PROTAGONISTA
-(sussurrando para si mesmo)
-Hoje é o dia. Não posso mais adiar.
+MARINA
+(sussurrando para si mesma)
+Hoje é o dia. Não posso mais adiar esta expedição.
 
-[O PROTAGONISTA caminha pelo cômodo, pegando alguns objetos pessoais e colocando em uma mochila]
+[MARINA caminha pelo cômodo, pegando equipamentos de arqueologia e colocando em uma mochila desgastada]
+
+[A porta se abre e entra CARLOS (45, assistente nervoso mas leal, usando óculos redondos)]
+
+CARLOS
+Tem certeza que quer fazer isso sozinha? As lendas sobre aquele lugar não são nada amigáveis.
+
+MARINA
+(sorrindo confiante)
+Lendas são apenas histórias esperando para serem desmistificadas, Carlos.
 
 CENA 2 - EXT. INÍCIO DA JORNADA - POUCO DEPOIS
 
-[O PROTAGONISTA para diante de uma bifurcação no caminho. Hesita, olhando para ambas as direções]
+[MARINA para diante de uma bifurcação no caminho. Hesita, consultando um mapa antigo e olhando para ambas as direções]
 
-PROTAGONISTA
-(determinado)
+MARINA
+(determinada)
 Às vezes precisamos seguir o caminho menos percorrido.
 
-[Escolhe a trilha da direita, mais densa e escura]
+[Escolhe a trilha da direita, mais densa e escura. Sua expressão mostra coragem apesar do medo]
 
 CENA 3 - EXT. ENCONTRO INESPERADO - TARDE
 
-[PROTAGONISTA caminha com dificuldade pela trilha quando ouve um ruído]
+[MARINA caminha com dificuldade pela trilha quando ouve um ruído]
 
-OUTRO PERSONAGEM (O.C.)
-Quem está aí?
+VOZ MISTERIOSA (O.C.)
+Quem se atreve a entrar no território proibido?
 
-[PROTAGONISTA congela. A câmera revela lentamente o OUTRO PERSONAGEM emergindo entre as árvores]
+[MARINA congela. A câmera revela lentamente RAFAEL (50, nativo da região, cicatriz no rosto, guardião do local) emergindo entre as árvores]
 
-PROTAGONISTA
-(surpreso)
-Não esperava encontrar alguém aqui.
+MARINA
+(surpresa mas firme)
+Sou Dra. Marina Santos, arqueóloga. Estou pesquisando artefatos da civilização antiga.
 
-OUTRO PERSONAGEM
+RAFAEL
 (sorrindo misteriosamente)
-Às vezes encontramos exatamente o que precisamos, não o que esperamos.
+Muitos vieram buscar tesouros, mas encontraram apenas o que já carregavam dentro de si.
 
 CENA 4 - CLÍMAX DA HISTÓRIA - ANOITECER
 
-[Os personagens chegam a um local especial, iluminado por uma luz incomum]
+[MARINA e RAFAEL chegam a um templo antigo escondido, iluminado por estranhos cristais bioluminescentes]
 
-OUTRO PERSONAGEM
+RAFAEL
 (revelando uma verdade importante)
-Agora você entende por que foi trazido aqui?
+Este lugar não guarda ouro ou joias, mas algo muito mais valioso: conhecimento. É isso que você realmente busca, não é?
 
-[Close no rosto do PROTAGONISTA enquanto uma revelação transforma sua expressão]
+[Close no rosto de MARINA enquanto uma revelação transforma sua expressão]
 
-PROTAGONISTA
+MARINA
 (com voz embargada)
-Tudo faz sentido agora...
+Minha vida inteira pesquisando... e a verdadeira descoberta estava onde menos esperava.
 
 CENA 5 - RESOLUÇÃO - NASCER DO SOL
 
-[PROTAGONISTA retornando, transformado pela experiência]
+[MARINA retornando à vila, transformada pela experiência, CARLOS a esperando ansiosamente]
 
 NARRADOR (V.O.)
-E assim, com uma nova compreensão do mundo e de si mesmo, nosso herói retorna - não o mesmo que partiu, mas alguém muito mais sábio.
+E assim, com uma nova compreensão do mundo e de si mesma, Marina retorna - não a mesma que partiu, mas alguém muito mais sábia.
 
-[A câmera se afasta, mostrando o PROTAGONISTA caminhando em direção ao horizonte]
+CARLOS
+(preocupado)
+Encontrou o que estava procurando?
+
+MARINA
+(sorrindo serenamente)
+Encontrei algo muito melhor, Carlos. Encontrei respostas para perguntas que eu nem sabia que tinha.
+
+[A câmera se afasta, mostrando MARINA e CARLOS caminhando juntos em direção ao horizonte]
 
 FADE OUT.
 
