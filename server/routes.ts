@@ -122,6 +122,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     return res.json(stats);
   });
+  
+  /**
+   * Endpoint para pré-carregamento do modelo de IA
+   * Otimiza a experiência do usuário iniciando o carregamento do modelo em background
+   */
+  app.post("/api/preload-model", async (req: Request, res: Response) => {
+    try {
+      const { modelType } = req.body;
+      
+      console.log(`Iniciando pré-carregamento do modelo: ${modelType || 'default'}`);
+      
+      // Aqui podemos iniciar o carregamento do modelo em segundo plano
+      // Por exemplo, fazendo uma chamada leve à API do HuggingFace
+      
+      // Responder imediatamente ao cliente para não bloquear
+      res.status(200).json({ success: true, message: 'Pré-carregamento iniciado' });
+      
+      // Simulação de pré-carregamento assíncrono (em produção, seria uma chamada real à API)
+      if (process.env.HUGGINGFACE_API_KEY) {
+        // Esta é uma solicitação muito pequena apenas para "aquecer" a API
+        fetch(`https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            inputs: "Olá",
+            parameters: { 
+              max_new_tokens: 5,
+              return_full_text: false
+            }
+          })
+        }).catch(err => {
+          console.log('Erro no pré-aquecimento do modelo (não crítico):', err.message);
+        });
+      }
+    } catch (err) {
+      console.error("Erro ao pré-carregar modelo:", err);
+      // Não retornamos erro ao cliente, pois isso é apenas uma otimização
+      res.status(200).json({ success: true });
+    }
+  });
+
+  /**
+   * Endpoint para registro de erros do cliente
+   * Centraliza o monitoramento de erros da aplicação
+   */
+  app.post("/api/error-log", async (req: Request, res: Response) => {
+    try {
+      const errorData = req.body;
+      
+      // Registra o erro no console do servidor (para desenvolvimento)
+      console.error("Erro reportado pelo cliente:", errorData);
+      
+      // Em produção, enviaria para um serviço de monitoramento como Sentry ou similar
+      // ou armazenaria em um banco de dados para análise posterior
+      
+      // Log para arquivo (mínimo em produção)
+      const logDir = path.join(process.cwd(), 'logs');
+      if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir, { recursive: true });
+      }
+      
+      // Formato do log: data_hora | tipo | mensagem | detalhes
+      const logEntry = `${new Date().toISOString()} | ${errorData.type || 'error'} | ${errorData.message || 'Erro desconhecido'} | ${JSON.stringify(errorData)}\n`;
+      
+      // Append ao arquivo de log
+      fs.appendFileSync(
+        path.join(logDir, 'client-errors.log'), 
+        logEntry, 
+        { encoding: 'utf8' }
+      );
+      
+      return res.status(200).json({ success: true });
+    } catch (err) {
+      console.error("Erro ao processar log de erro:", err);
+      return res.status(500).json({ success: false });
+    }
+  });
 
   // Criar HTTP server
   const httpServer = createServer(app);
