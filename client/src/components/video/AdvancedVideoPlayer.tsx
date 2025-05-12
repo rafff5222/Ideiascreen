@@ -533,32 +533,6 @@ export default function AdvancedVideoPlayer({
             {selectedQuality}
           </Badge>
           
-          {/* Velocidade de reprodução */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                size="sm"
-                variant="ghost" 
-                className="text-white hover:bg-white/10 ml-1"
-              >
-                {playbackRate}x
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Velocidade</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {PLAYBACK_RATES.map((rate) => (
-                <DropdownMenuItem 
-                  key={rate.value} 
-                  onClick={() => handlePlaybackRateChange(rate.value)}
-                  className={playbackRate === rate.value ? "bg-accent" : ""}
-                >
-                  {rate.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          
           {/* Download */}
           <Tooltip>
             <TooltipTrigger asChild>
@@ -571,7 +545,7 @@ export default function AdvancedVideoPlayer({
                 <DownloadCloud className="h-5 w-5" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Baixar</TooltipContent>
+            <TooltipContent>Download</TooltipContent>
           </Tooltip>
           
           {/* Compartilhar */}
@@ -601,15 +575,43 @@ export default function AdvancedVideoPlayer({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Qualidade</DropdownMenuLabel>
+              <DropdownMenuLabel>Configurações</DropdownMenuLabel>
+              
               <DropdownMenuSeparator />
-              {QUALITY_OPTIONS.map((option) => (
+              
+              <DropdownMenuLabel className="text-xs text-muted-foreground">Velocidade</DropdownMenuLabel>
+              {PLAYBACK_RATES.map((rate) => (
                 <DropdownMenuItem 
-                  key={option.value} 
-                  onClick={() => handleQualityChange(option.value)}
-                  className={selectedQuality === option.value ? "bg-accent" : ""}
+                  key={rate.value}
+                  className={cn(
+                    "flex justify-between",
+                    playbackRate === rate.value && "bg-secondary"
+                  )}
+                  onClick={() => handlePlaybackRateChange(rate.value)}
                 >
-                  {option.label}
+                  {rate.label}
+                  {playbackRate === rate.value && (
+                    <span className="text-primary">✓</span>
+                  )}
+                </DropdownMenuItem>
+              ))}
+              
+              <DropdownMenuSeparator />
+              
+              <DropdownMenuLabel className="text-xs text-muted-foreground">Qualidade</DropdownMenuLabel>
+              {QUALITY_OPTIONS.map((quality) => (
+                <DropdownMenuItem 
+                  key={quality.value}
+                  className={cn(
+                    "flex justify-between",
+                    selectedQuality === quality.value && "bg-secondary"
+                  )}
+                  onClick={() => handleQualityChange(quality.value)}
+                >
+                  {quality.label}
+                  {selectedQuality === quality.value && (
+                    <span className="text-primary">✓</span>
+                  )}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -621,13 +623,13 @@ export default function AdvancedVideoPlayer({
               <Button 
                 size="icon" 
                 variant="ghost" 
-                className="text-white hover:bg-white/10 ml-1"
+                className="text-white hover:bg-white/10"
                 onClick={toggleFullscreen}
               >
                 <Maximize className="h-5 w-5" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>{isFullscreen ? 'Sair da tela cheia' : 'Tela cheia'}</TooltipContent>
+            <TooltipContent>Tela cheia</TooltipContent>
           </Tooltip>
         </div>
       </div>

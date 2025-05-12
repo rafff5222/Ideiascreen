@@ -1,141 +1,230 @@
-import fs from 'fs';
-import path from 'path';
-import { Request, Response } from 'express';
-import { promisify } from 'util';
-import { exec } from 'child_process';
-
-const execPromise = promisify(exec);
-
-// Constantes para cache e streaming
-const CACHE_MAX_AGE = 86400; // 1 dia em segundos
-const DEFAULT_CHUNK_SIZE = 1024 * 1024; // 1MB
-
 /**
  * Serviço de streaming de vídeo otimizado
- * - Suporte para Range Requests
- * - Cabeçalhos de cache otimizados
- * - Suporte para diferentes formatos
+ * Suporta range requests, caching e controle de qualidade
  */
-export class VideoStreamService {
-  private videoFolders: string[];
 
-  constructor(videoFolders: string[] = ['output/videos', 'videos']) {
-    this.videoFolders = videoFolders;
-  }
+import { Request, Response } from 'express';
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
 
+interface StreamOptions {
+  start?: number;
+  end?: number;
+  quality?: string;
+  cacheControl?: string;
+}
+
+// Cache de vídeos em memória para vídeos populares
+const videoCache = new Map<string, {
+  buffer: Buffer, 
+  lastAccessed: number,
+  hits: number
+}>();
+
+// Tamanho máximo do cache (100MB)
+const MAX_CACHE_SIZE = 100 * 1024 * 1024;
+// Tempo máximo de cache (1 hora)
+const MAX_CACHE_AGE = 60 * 60 * 1000;
+// Tamanho atual do cache
+let currentCacheSize = 0;
+
+/**
+ * Classe para gerenciar streaming de vídeo
+ */
+class VideoStreamService {
   /**
-   * Localiza um vídeo em todos os diretórios configurados
+   * Stream um vídeo para o cliente com suporte a range requests
+   * @param req Request HTTP
+   * @param res Response HTTP
+   * @param filePath Caminho para o arquivo de vídeo
+   * @param options Opções de streaming
    */
-  async findVideo(fileName: string): Promise<string | null> {
-    for (const folder of this.videoFolders) {
-      const filePath = path.join(folder, fileName);
-      try {
-        await fs.promises.access(filePath, fs.constants.F_OK);
-        return filePath;
-      } catch (err) {
-        // Arquivo não encontrado neste diretório, continua procurando
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Obtém informações básicas sobre o vídeo usando ffprobe
-   */
-  async getVideoInfo(filePath: string): Promise<{ 
-    duration: number;
-    width: number;
-    height: number;
-    bitrate: number;
-    format: string;
-  } | null> {
+  async streamVideo(
+    req: Request, 
+    res: Response, 
+    filePath: string, 
+    options: StreamOptions = {}
+  ): Promise<void> {
     try {
-      const { stdout } = await execPromise(
-        `ffprobe -v error -select_streams v:0 -show_entries stream=width,height,duration,bit_rate:format=format_name -of json "${filePath}"`
-      );
-      
-      const info = JSON.parse(stdout);
-      const stream = info.streams[0];
-      
-      return {
-        duration: parseFloat(stream.duration || '0'),
-        width: stream.width || 0,
-        height: stream.height || 0,
-        bitrate: parseInt(stream.bit_rate || '0', 10),
-        format: info.format?.format_name || 'unknown'
-      };
-    } catch (error) {
-      console.error('Erro ao obter informações do vídeo:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Gera uma thumbnail para o vídeo
-   */
-  async generateThumbnail(videoPath: string, outputPath?: string): Promise<string | null> {
-    try {
-      // Define um local para salvar se não for especificado
-      if (!outputPath) {
-        const dir = path.dirname(videoPath);
-        const baseName = path.basename(videoPath, path.extname(videoPath));
-        outputPath = path.join(dir, `${baseName}_thumb.jpg`);
+      // Verifica se o arquivo existe
+      if (!fs.existsSync(filePath)) {
+        res.status(404).send('Arquivo não encontrado');
+        return;
       }
 
-      // Posição para captura (1 segundo)
-      const position = '00:00:01';
+      // Calcular hash do arquivo para identificação no cache
+      const fileKey = crypto.createHash('md5').update(filePath).digest('hex');
       
-      await execPromise(
-        `ffmpeg -y -i "${videoPath}" -ss ${position} -vframes 1 -q:v 2 "${outputPath}"`
-      );
+      // Informações do arquivo
+      const stat = await fs.promises.stat(filePath);
+      const fileSize = stat.size;
+
+      // Determinar se é um range request
+      const range = req.headers.range;
       
-      return outputPath;
+      // Configurar headers comuns
+      const contentType = this.getContentType(filePath);
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Accept-Ranges', 'bytes');
+      
+      // Adicionar headers de cache conforme necessário
+      if (options.cacheControl) {
+        res.setHeader('Cache-Control', options.cacheControl);
+      } else {
+        // Por padrão, permitir cache por 1 hora para vídeos
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+      }
+
+      // Verificar se é um range request
+      if (range) {
+        // Parse do range request
+        const parts = range.replace(/bytes=/, "").split("-");
+        const start = parseInt(parts[0], 10);
+        const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+        const chunksize = (end - start) + 1;
+
+        // Verificar se o range é válido
+        if (start >= fileSize || end >= fileSize) {
+          res.status(416).send('Range Not Satisfiable');
+          return;
+        }
+
+        // Configurar headers para resposta parcial
+        res.setHeader('Content-Range', `bytes ${start}-${end}/${fileSize}`);
+        res.setHeader('Content-Length', chunksize);
+        res.status(206);
+
+        // Tentar usar cache se for um arquivo pequeno e frequentemente acessado
+        if (fileSize < 10 * 1024 * 1024 && this.shouldUseCache(fileKey, fileSize)) {
+          await this.streamFromCache(res, fileKey, filePath, start, end);
+        } else {
+          // Stream direto do arquivo
+          const fileStream = fs.createReadStream(filePath, { start, end });
+          fileStream.pipe(res);
+        }
+      } else {
+        // Resposta completa
+        res.setHeader('Content-Length', fileSize);
+        res.status(200);
+        
+        // Para arquivos pequenos, considerar cache
+        if (fileSize < 10 * 1024 * 1024 && this.shouldUseCache(fileKey, fileSize)) {
+          await this.streamFromCache(res, fileKey, filePath, 0, fileSize - 1);
+        } else {
+          // Stream direto do arquivo
+          const fileStream = fs.createReadStream(filePath);
+          fileStream.pipe(res);
+        }
+      }
     } catch (error) {
-      console.error('Erro ao gerar thumbnail:', error);
-      return null;
+      console.error('Erro ao streamar vídeo:', error);
+      res.status(500).send('Erro interno ao processar vídeo');
     }
   }
 
   /**
-   * Handler de streaming otimizado para Express
+   * Verifica se deve usar cache para um arquivo
    */
-  streamVideo(req: Request, res: Response, filePath: string): void {
-    const stat = fs.statSync(filePath);
-    const fileSize = stat.size;
-    const range = req.headers.range;
+  private shouldUseCache(fileKey: string, fileSize: number): boolean {
+    // Se o arquivo já está em cache, use-o
+    if (videoCache.has(fileKey)) {
+      const cacheEntry = videoCache.get(fileKey)!;
+      cacheEntry.lastAccessed = Date.now();
+      cacheEntry.hits++;
+      return true;
+    }
 
-    // Configurações de cache
-    res.setHeader('Cache-Control', `public, max-age=${CACHE_MAX_AGE}`);
-    res.setHeader('Content-Type', this.getContentType(filePath));
+    // Se o arquivo é muito grande ou o cache está cheio, não use cache
+    if (fileSize > MAX_CACHE_SIZE * 0.2 || currentCacheSize + fileSize > MAX_CACHE_SIZE) {
+      return false;
+    }
 
-    // Processamento de range requests (streaming parcial)
-    if (range) {
-      const parts = range.replace(/bytes=/, '').split('-');
-      const start = parseInt(parts[0], 10);
-      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-      const chunkSize = (end - start) + 1;
-      const file = fs.createReadStream(filePath, { start, end });
+    // Por padrão, considere colocar em cache
+    return true;
+  }
 
-      res.writeHead(206, {
-        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-        'Accept-Ranges': 'bytes',
-        'Content-Length': chunkSize,
-      });
-
-      file.pipe(res);
+  /**
+   * Stream a partir do cache ou carrega o arquivo no cache
+   */
+  private async streamFromCache(
+    res: Response, 
+    fileKey: string, 
+    filePath: string, 
+    start: number, 
+    end: number
+  ): Promise<void> {
+    let buffer: Buffer;
+    
+    // Verificar se o arquivo já está em cache
+    if (videoCache.has(fileKey)) {
+      const cacheEntry = videoCache.get(fileKey)!;
+      buffer = cacheEntry.buffer;
+      cacheEntry.lastAccessed = Date.now();
+      cacheEntry.hits++;
     } else {
-      // Streaming completo se não houver range request
-      res.writeHead(200, {
-        'Content-Length': fileSize,
-        'Accept-Ranges': 'bytes',
+      // Se não estiver em cache, ler o arquivo
+      buffer = await fs.promises.readFile(filePath);
+      
+      // Limpar cache se necessário
+      this.cleanupCache();
+      
+      // Adicionar ao cache
+      videoCache.set(fileKey, {
+        buffer,
+        lastAccessed: Date.now(),
+        hits: 1
       });
       
-      fs.createReadStream(filePath).pipe(res);
+      // Atualizar tamanho do cache
+      currentCacheSize += buffer.length;
+    }
+    
+    // Enviar parte do buffer
+    const chunk = buffer.slice(start, end + 1);
+    res.write(chunk);
+    res.end();
+  }
+
+  /**
+   * Limpa entradas antigas do cache
+   */
+  private cleanupCache(): void {
+    if (currentCacheSize < MAX_CACHE_SIZE * 0.9) {
+      return; // Não precisa limpar ainda
+    }
+
+    // Ordenar por último acesso e hits
+    const entries = Array.from(videoCache.entries())
+      .sort((a, b) => {
+        // Priorizar manutenção de entradas com mais hits
+        const hitsDiff = b[1].hits - a[1].hits;
+        if (hitsDiff !== 0) return hitsDiff;
+        
+        // Se hits são iguais, remover as mais antigas
+        return a[1].lastAccessed - b[1].lastAccessed;
+      });
+
+    // Remover entradas até liberar 20% do espaço
+    let targetSize = MAX_CACHE_SIZE * 0.8;
+    for (const [key, entry] of entries) {
+      // Não remover entradas recentes ou muito populares
+      const isRecent = Date.now() - entry.lastAccessed < MAX_CACHE_AGE / 2;
+      const isPopular = entry.hits > 10;
+      
+      if (!isRecent && !isPopular) {
+        videoCache.delete(key);
+        currentCacheSize -= entry.buffer.length;
+        
+        if (currentCacheSize <= targetSize) {
+          break;
+        }
+      }
     }
   }
 
   /**
-   * Determina o Content-Type com base na extensão do arquivo
+   * Retorna o content-type baseado na extensão do arquivo
    */
   private getContentType(filePath: string): string {
     const ext = path.extname(filePath).toLowerCase();
@@ -149,60 +238,20 @@ export class VideoStreamService {
         return 'video/ogg';
       case '.mov':
         return 'video/quicktime';
-      case '.m3u8':
-        return 'application/x-mpegURL';
-      case '.ts':
-        return 'video/MP2T';
+      case '.m4v':
+        return 'video/x-m4v';
+      case '.avi':
+        return 'video/x-msvideo';
+      case '.wmv':
+        return 'video/x-ms-wmv';
+      case '.mpg':
+      case '.mpeg':
+        return 'video/mpeg';
       default:
         return 'application/octet-stream';
     }
   }
-
-  /**
-   * Converte vídeo para formato HLS (streaming adaptativo)
-   * Retorna o caminho do arquivo de playlist (m3u8)
-   */
-  async convertToHLS(videoPath: string, outputDir?: string): Promise<string | null> {
-    try {
-      // Define diretório de saída se não especificado
-      if (!outputDir) {
-        const dir = path.dirname(videoPath);
-        const baseName = path.basename(videoPath, path.extname(videoPath));
-        outputDir = path.join(dir, `${baseName}_hls`);
-      }
-
-      // Cria o diretório se não existir
-      await fs.promises.mkdir(outputDir, { recursive: true });
-
-      const playlistPath = path.join(outputDir, 'playlist.m3u8');
-      
-      // Converte para diferentes qualidades
-      await execPromise(
-        `ffmpeg -y -i "${videoPath}" \
-        -filter_complex "split=3[v1][v2][v3]; \
-        [v1]scale=-2:720[v1out]; \
-        [v2]scale=-2:480[v2out]; \
-        [v3]scale=-2:360[v3out]" \
-        -map "[v1out]" -c:v:0 libx264 -b:v:0 2800k \
-        -map "[v2out]" -c:v:1 libx264 -b:v:1 1400k \
-        -map "[v3out]" -c:v:2 libx264 -b:v:2 800k \
-        -map a:0 -c:a aac -b:a:0 128k -ac 2 \
-        -map a:0 -c:a aac -b:a:1 96k -ac 2 \
-        -map a:0 -c:a aac -b:a:2 48k -ac 2 \
-        -var_stream_map "v:0,a:0 v:1,a:1 v:2,a:2" \
-        -master_pl_name master.m3u8 \
-        -f hls -hls_time 4 -hls_playlist_type vod \
-        -hls_segment_filename "${outputDir}/segment_%v_%03d.ts" \
-        "${outputDir}/stream_%v.m3u8"`
-      );
-      
-      return path.join(outputDir, 'master.m3u8');
-    } catch (error) {
-      console.error('Erro ao converter para HLS:', error);
-      return null;
-    }
-  }
 }
 
-// Exportar uma instância singleton do serviço
+// Exportar instância singleton
 export const videoStreamService = new VideoStreamService();

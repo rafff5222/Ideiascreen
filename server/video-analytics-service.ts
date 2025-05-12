@@ -1,313 +1,363 @@
+/**
+ * Serviço de analytics para vídeos
+ * Rastreia visualizações, interações e métricas de desempenho
+ */
+
 import fs from 'fs';
 import path from 'path';
-import { promisify } from 'util';
 
-// Estrutura para estatísticas gerais
-interface VideoStats {
-  views: number;
-  completions: number;
-  averageWatchTime: number;
-  popularSegments: { start: number; end: number; viewCount: number }[];
-  shareCount: number;
-  downloadCount: number;
+// Tipos para eventos de analytics
+export type VideoEventType = 'play' | 'pause' | 'seek' | 'buffer' | 'error' | 'complete' | 'quality_change';
+
+export interface VideoEvent {
+  videoId: string;
+  eventType: VideoEventType;
+  sessionId?: string;
+  userId?: string | number;
+  timestamp?: number;
+  eventData?: Record<string, any>;
 }
 
-// Estrutura para registro de visualização
-interface ViewRecord {
+export interface VideoView {
   videoId: string;
-  userId?: string;
-  sessionId: string;
-  timestamp: number;
+  sessionId?: string;
+  userId?: string | number;
+  timestamp?: number;
   watchTime: number;
   completed: boolean;
-  segments: { start: number; end: number }[];
+  segments?: Array<{ start: number; end: number }>;
   playbackRate: number;
-  device: string;
-  quality: string;
+  device?: string;
+  quality?: string;
 }
 
-// Estrutura para registro de evento
-interface EventRecord {
-  videoId: string;
-  userId?: string;
-  sessionId: string;
-  timestamp: number;
-  eventType: 'play' | 'pause' | 'seek' | 'volumeChange' | 'qualityChange' | 'download' | 'share' | 'error';
-  eventData: any;
-}
-
-/**
- * Serviço para rastreamento e análise de métricas de vídeo
- */
-export class VideoAnalyticsService {
-  private storagePath: string;
-  private viewsCache: Map<string, ViewRecord[]> = new Map();
-  private eventsCache: Map<string, EventRecord[]> = new Map();
+class VideoAnalyticsService {
+  private events: VideoEvent[] = [];
+  private views: VideoView[] = [];
+  // Estatísticas em memória indexadas por videoId
+  private videoStats: Map<string, {
+    totalViews: number;
+    uniqueViewers: Set<string>;
+    totalWatchTime: number;
+    completionRate: number;
+    completions: number;
+    averageWatchTime: number;
+    popularSegments: Array<{ start: number; end: number; count: number }>;
+    lastUpdated: number;
+  }> = new Map();
   
-  constructor(storagePath: string = 'data/analytics') {
-    this.storagePath = storagePath;
-    this.ensureDirectoryExists();
+  private readonly FLUSH_INTERVAL = 5 * 60 * 1000; // 5 minutos
+  private readonly MAX_EVENTS_BEFORE_FLUSH = 1000;
+  private flushTimeout: NodeJS.Timeout | null = null;
+  private analyticsDir = path.join(process.cwd(), 'logs', 'analytics');
+  
+  constructor() {
+    this.initializeAnalytics();
   }
   
   /**
-   * Garante que o diretório de armazenamento exista
+   * Inicializa o serviço de analytics
    */
-  private async ensureDirectoryExists(): Promise<void> {
+  private async initializeAnalytics() {
+    // Garantir que o diretório de analytics existe
     try {
-      await fs.promises.mkdir(this.storagePath, { recursive: true });
-    } catch (err) {
-      console.error('Erro ao criar diretório de analytics:', err);
-    }
-  }
-  
-  /**
-   * Registra uma visualização de vídeo
-   */
-  async recordView(record: Omit<ViewRecord, 'timestamp'>): Promise<void> {
-    const videoId = record.videoId;
-    const timestamp = Date.now();
-    
-    try {
-      // Obter registros atuais
-      let views = this.viewsCache.get(videoId) || [];
+      if (!fs.existsSync(this.analyticsDir)) {
+        fs.mkdirSync(this.analyticsDir, { recursive: true });
+      }
       
-      // Adicionar novo registro
-      views.push({
-        ...record,
-        timestamp
-      });
+      // Carregar estatísticas anteriores, se existirem
+      await this.loadStats();
       
-      // Atualizar cache
-      this.viewsCache.set(videoId, views);
-      
-      // Salvar de forma assíncrona
-      this.persistData(videoId, 'views');
-    } catch (err) {
-      console.error('Erro ao registrar visualização:', err);
+      // Iniciar o timer para flush periódico
+      this.scheduleFlush();
+    } catch (error) {
+      console.error('Erro ao inicializar analytics de vídeo:', error);
     }
   }
   
   /**
    * Registra um evento de vídeo
    */
-  async recordEvent(record: Omit<EventRecord, 'timestamp'>): Promise<void> {
-    const videoId = record.videoId;
-    const timestamp = Date.now();
+  recordEvent(event: VideoEvent): void {
+    // Adicionar timestamp se não fornecido
+    if (!event.timestamp) {
+      event.timestamp = Date.now();
+    }
+    
+    // Adicionar à lista de eventos
+    this.events.push(event);
+    
+    // Auto-flush se atingir o limite
+    if (this.events.length >= this.MAX_EVENTS_BEFORE_FLUSH) {
+      this.flushEvents();
+    }
+  }
+  
+  /**
+   * Registra uma visualização de vídeo
+   */
+  recordView(view: VideoView): void {
+    // Adicionar timestamp se não fornecido
+    if (!view.timestamp) {
+      view.timestamp = Date.now();
+    }
+    
+    // Adicionar à lista de visualizações
+    this.views.push(view);
+    
+    // Atualizar estatísticas em memória
+    this.updateStats(view);
+    
+    // Auto-flush se atingir o limite
+    if (this.views.length >= this.MAX_EVENTS_BEFORE_FLUSH / 10) {
+      this.flushViews();
+    }
+  }
+  
+  /**
+   * Atualiza métricas para um vídeo específico
+   */
+  private updateStats(view: VideoView): void {
+    const { videoId, sessionId, userId, watchTime, completed, segments } = view;
+    const viewerId = userId?.toString() || sessionId || 'anonymous';
+    
+    // Obter ou criar estatísticas para este vídeo
+    if (!this.videoStats.has(videoId)) {
+      this.videoStats.set(videoId, {
+        totalViews: 0,
+        uniqueViewers: new Set<string>(),
+        totalWatchTime: 0,
+        completionRate: 0,
+        completions: 0,
+        averageWatchTime: 0,
+        popularSegments: [],
+        lastUpdated: Date.now()
+      });
+    }
+    
+    const stats = this.videoStats.get(videoId)!;
+    
+    // Incrementar contadores
+    stats.totalViews++;
+    stats.uniqueViewers.add(viewerId);
+    stats.totalWatchTime += watchTime;
+    
+    if (completed) {
+      stats.completions++;
+    }
+    
+    // Recalcular médias
+    stats.completionRate = stats.completions / stats.totalViews;
+    stats.averageWatchTime = stats.totalWatchTime / stats.totalViews;
+    
+    // Atualizar segmentos populares
+    if (segments && segments.length > 0) {
+      for (const segment of segments) {
+        const existingSegment = stats.popularSegments.find(
+          s => s.start === segment.start && s.end === segment.end
+        );
+        
+        if (existingSegment) {
+          existingSegment.count++;
+        } else {
+          stats.popularSegments.push({
+            ...segment,
+            count: 1
+          });
+        }
+      }
+      
+      // Ordenar por contagem
+      stats.popularSegments.sort((a, b) => b.count - a.count);
+      
+      // Limitar a 10 segmentos
+      if (stats.popularSegments.length > 10) {
+        stats.popularSegments = stats.popularSegments.slice(0, 10);
+      }
+    }
+    
+    stats.lastUpdated = Date.now();
+  }
+  
+  /**
+   * Agenda o próximo flush de dados
+   */
+  private scheduleFlush(): void {
+    if (this.flushTimeout) {
+      clearTimeout(this.flushTimeout);
+    }
+    
+    this.flushTimeout = setTimeout(() => {
+      this.flushAll();
+      this.scheduleFlush();
+    }, this.FLUSH_INTERVAL);
+  }
+  
+  /**
+   * Salva todos os dados pendentes
+   */
+  async flushAll(): Promise<void> {
+    try {
+      await Promise.all([
+        this.flushEvents(),
+        this.flushViews(),
+        this.flushStats()
+      ]);
+    } catch (error) {
+      console.error('Erro ao persistir analytics de vídeo:', error);
+    }
+  }
+  
+  /**
+   * Salva eventos em arquivo
+   */
+  private async flushEvents(): Promise<void> {
+    if (this.events.length === 0) return;
     
     try {
-      // Obter eventos atuais
-      let events = this.eventsCache.get(videoId) || [];
+      const eventsToSave = [...this.events];
+      this.events = [];
       
-      // Adicionar novo evento
-      events.push({
-        ...record,
-        timestamp
-      });
+      const filename = path.join(
+        this.analyticsDir,
+        `events_${new Date().toISOString().replace(/:/g, '-')}.json`
+      );
       
-      // Atualizar cache
-      this.eventsCache.set(videoId, events);
-      
-      // Salvar de forma assíncrona
-      this.persistData(videoId, 'events');
-      
-      // Atualizar contadores específicos
-      if (record.eventType === 'download') {
-        this.incrementCounter(videoId, 'downloads');
-      } else if (record.eventType === 'share') {
-        this.incrementCounter(videoId, 'shares');
-      }
-    } catch (err) {
-      console.error('Erro ao registrar evento:', err);
+      await fs.promises.writeFile(
+        filename,
+        JSON.stringify(eventsToSave, null, 2)
+      );
+    } catch (error) {
+      console.error('Erro ao persistir eventos de vídeo:', error);
+      // Restaurar eventos não salvos
+      this.events = [...this.events];
     }
   }
   
   /**
-   * Persiste os dados no sistema de arquivos
+   * Salva visualizações em arquivo
    */
-  private async persistData(videoId: string, dataType: 'views' | 'events'): Promise<void> {
+  private async flushViews(): Promise<void> {
+    if (this.views.length === 0) return;
+    
     try {
-      const data = dataType === 'views' 
-        ? this.viewsCache.get(videoId) 
-        : this.eventsCache.get(videoId);
+      const viewsToSave = [...this.views];
+      this.views = [];
       
-      if (!data || data.length === 0) return;
+      const filename = path.join(
+        this.analyticsDir,
+        `views_${new Date().toISOString().replace(/:/g, '-')}.json`
+      );
       
-      const filePath = path.join(this.storagePath, `${videoId}_${dataType}.json`);
-      await fs.promises.writeFile(filePath, JSON.stringify(data, null, 2));
-    } catch (err) {
-      console.error(`Erro ao persistir dados de ${dataType}:`, err);
+      await fs.promises.writeFile(
+        filename,
+        JSON.stringify(viewsToSave, null, 2)
+      );
+    } catch (error) {
+      console.error('Erro ao persistir visualizações de vídeo:', error);
+      // Restaurar visualizações não salvas
+      this.views = [...this.views];
     }
   }
   
   /**
-   * Incrementa um contador específico
+   * Salva estatísticas agregadas em arquivo
    */
-  private async incrementCounter(videoId: string, counterType: 'views' | 'downloads' | 'shares'): Promise<void> {
+  private async flushStats(): Promise<void> {
+    if (this.videoStats.size === 0) return;
+    
     try {
-      const counterPath = path.join(this.storagePath, `${videoId}_counters.json`);
-      let counters: Record<string, number> = {};
+      const statsToSave: Record<string, any> = {};
       
-      try {
-        const data = await fs.promises.readFile(counterPath, 'utf-8');
-        counters = JSON.parse(data);
-      } catch {
-        // Arquivo não existe, usar objeto vazio
+      // Converter Map para objeto serializável
+      for (const [videoId, stats] of this.videoStats.entries()) {
+        statsToSave[videoId] = {
+          ...stats,
+          uniqueViewers: Array.from(stats.uniqueViewers).length
+        };
       }
       
-      // Incrementar contador
-      counters[counterType] = (counters[counterType] || 0) + 1;
+      const filename = path.join(
+        this.analyticsDir,
+        'video_stats.json'
+      );
       
-      // Salvar
-      await fs.promises.writeFile(counterPath, JSON.stringify(counters));
-    } catch (err) {
-      console.error('Erro ao incrementar contador:', err);
+      await fs.promises.writeFile(
+        filename,
+        JSON.stringify(statsToSave, null, 2)
+      );
+    } catch (error) {
+      console.error('Erro ao persistir estatísticas de vídeo:', error);
+    }
+  }
+  
+  /**
+   * Carrega estatísticas de arquivo
+   */
+  private async loadStats(): Promise<void> {
+    try {
+      const statsFile = path.join(this.analyticsDir, 'video_stats.json');
+      
+      if (fs.existsSync(statsFile)) {
+        const statsData = await fs.promises.readFile(statsFile, 'utf-8');
+        const stats = JSON.parse(statsData);
+        
+        // Converter objeto para Map com Sets
+        for (const [videoId, videoStats] of Object.entries(stats)) {
+          const uniqueViewersCount = (videoStats as any).uniqueViewers;
+          (videoStats as any).uniqueViewers = new Set(
+            Array(uniqueViewersCount).fill(null).map((_, i) => `legacy-viewer-${i}`)
+          );
+          
+          this.videoStats.set(videoId, videoStats as any);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar estatísticas de vídeo:', error);
     }
   }
   
   /**
    * Obtém estatísticas para um vídeo específico
    */
-  async getVideoStats(videoId: string): Promise<VideoStats | null> {
-    try {
-      // Carregar dados se necessário
-      await this.loadDataIfNeeded(videoId);
-      
-      // Obter registros
-      const views = this.viewsCache.get(videoId) || [];
-      const events = this.eventsCache.get(videoId) || [];
-      
-      // Calcular estatísticas
-      const totalViews = views.length;
-      const completions = views.filter(v => v.completed).length;
-      const averageWatchTime = totalViews > 0
-        ? views.reduce((sum, v) => sum + v.watchTime, 0) / totalViews
-        : 0;
-      
-      // Obter segmentos populares
-      const segmentMap = new Map<string, number>();
-      for (const view of views) {
-        for (const segment of view.segments) {
-          const key = `${segment.start}-${segment.end}`;
-          segmentMap.set(key, (segmentMap.get(key) || 0) + 1);
-        }
-      }
-      
-      // Converter para formato de retorno
-      const popularSegments = Array.from(segmentMap.entries())
-        .map(([key, count]) => {
-          const [start, end] = key.split('-').map(Number);
-          return { start, end, viewCount: count };
-        })
-        .sort((a, b) => b.viewCount - a.viewCount)
-        .slice(0, 5);
-      
-      // Contar compartilhamentos e downloads
-      const shareCount = events.filter(e => e.eventType === 'share').length;
-      const downloadCount = events.filter(e => e.eventType === 'download').length;
-      
+  getVideoStats(videoId: string): any {
+    const stats = this.videoStats.get(videoId);
+    
+    if (!stats) {
       return {
-        views: totalViews,
-        completions,
-        averageWatchTime,
-        popularSegments,
-        shareCount,
-        downloadCount
+        totalViews: 0,
+        uniqueViewers: 0,
+        totalWatchTime: 0,
+        completionRate: 0,
+        completions: 0,
+        averageWatchTime: 0,
+        popularSegments: []
       };
-    } catch (err) {
-      console.error('Erro ao obter estatísticas do vídeo:', err);
-      return null;
-    }
-  }
-  
-  /**
-   * Carrega os dados do sistema de arquivos se não estiverem em cache
-   */
-  private async loadDataIfNeeded(videoId: string): Promise<void> {
-    if (!this.viewsCache.has(videoId)) {
-      try {
-        const viewsPath = path.join(this.storagePath, `${videoId}_views.json`);
-        const data = await fs.promises.readFile(viewsPath, 'utf-8');
-        this.viewsCache.set(videoId, JSON.parse(data));
-      } catch {
-        // Arquivo não existe, usar array vazio
-        this.viewsCache.set(videoId, []);
-      }
     }
     
-    if (!this.eventsCache.has(videoId)) {
-      try {
-        const eventsPath = path.join(this.storagePath, `${videoId}_events.json`);
-        const data = await fs.promises.readFile(eventsPath, 'utf-8');
-        this.eventsCache.set(videoId, JSON.parse(data));
-      } catch {
-        // Arquivo não existe, usar array vazio
-        this.eventsCache.set(videoId, []);
-      }
-    }
+    // Converter Set para número para retorno
+    return {
+      ...stats,
+      uniqueViewers: stats.uniqueViewers.size
+    };
   }
   
   /**
-   * Obtém o número total de visualizações para um vídeo
+   * Obtém estatísticas para todos os vídeos
    */
-  async getViewCount(videoId: string): Promise<number> {
-    try {
-      // Tentar obter do contador
-      const counterPath = path.join(this.storagePath, `${videoId}_counters.json`);
-      try {
-        const data = await fs.promises.readFile(counterPath, 'utf-8');
-        const counters = JSON.parse(data);
-        return counters.views || 0;
-      } catch {
-        // Se não existir, calcular a partir dos registros
-        await this.loadDataIfNeeded(videoId);
-        const views = this.viewsCache.get(videoId) || [];
-        return views.length;
-      }
-    } catch (err) {
-      console.error('Erro ao obter contagem de visualizações:', err);
-      return 0;
-    }
-  }
-  
-  /**
-   * Obtém dados para painel de administração/resumo
-   */
-  async getAnalyticsDashboardData(): Promise<any> {
-    try {
-      const files = await fs.promises.readdir(this.storagePath);
-      const counterFiles = files.filter(f => f.endsWith('_counters.json'));
-      
-      const videoData = await Promise.all(
-        counterFiles.map(async (file) => {
-          const videoId = file.replace('_counters.json', '');
-          const stats = await this.getVideoStats(videoId);
-          return {
-            videoId,
-            stats
-          };
-        })
-      );
-      
-      // Ordenar por popularidade (visualizações)
-      videoData.sort((a, b) => (b.stats?.views || 0) - (a.stats?.views || 0));
-      
-      return {
-        totalVideos: videoData.length,
-        totalViews: videoData.reduce((sum, v) => sum + (v.stats?.views || 0), 0),
-        totalCompletions: videoData.reduce((sum, v) => sum + (v.stats?.completions || 0), 0),
-        videos: videoData
-      };
-    } catch (err) {
-      console.error('Erro ao obter dados do painel:', err);
-      return {
-        totalVideos: 0,
-        totalViews: 0,
-        totalCompletions: 0,
-        videos: []
+  getAllStats(): Record<string, any> {
+    const result: Record<string, any> = {};
+    
+    for (const [videoId, stats] of this.videoStats.entries()) {
+      result[videoId] = {
+        ...stats,
+        uniqueViewers: stats.uniqueViewers.size
       };
     }
+    
+    return result;
   }
 }
 
-// Exportar uma instância singleton
+// Exportar instância singleton
 export const videoAnalytics = new VideoAnalyticsService();
