@@ -64,6 +64,9 @@ export default function Navbar() {
               <Link href="/video-library">
                 <div className="font-medium hover:text-primary transition cursor-pointer">Biblioteca</div>
               </Link>
+              <Link href="/settings">
+                <div className="font-medium hover:text-primary transition cursor-pointer">Configurações</div>
+              </Link>
             </>
           )}
         </div>
