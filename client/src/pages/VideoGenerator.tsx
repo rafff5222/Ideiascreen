@@ -17,6 +17,7 @@ import EngagementScore from '@/components/video/EngagementScore';
 import ExportOptions from '@/components/video/ExportOptions';
 import DebugConsole from '@/components/video/DebugConsole';
 import ImageGallery from '@/components/video/ImageGallery';
+import { ServiceStatusDisplay } from '@/components/ui/service-status-display';
 
 interface VideoResult {
   videoPath: string;
