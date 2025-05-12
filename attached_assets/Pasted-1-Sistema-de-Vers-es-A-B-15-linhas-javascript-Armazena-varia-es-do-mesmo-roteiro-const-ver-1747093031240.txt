@@ -1,0 +1,86 @@
+1. Sistema de Versões A/B (15 linhas)
+javascript
+// Armazena variações do mesmo roteiro
+const versionamento = {
+  salvarVersao: (roteiro, prompt) => {
+    const versao = {
+      timestamp: Date.now(),
+      hash: CryptoJS.SHA256(roteiro).toString(),
+      prompt
+    };
+    localStorage.setItem(`v_${versao.hash}`, JSON.stringify(versao));
+  }
+};
+
+// Recupera versão anterior
+document.getElementById('versao-anterior').addEventListener('click', () => {
+  const hash = localStorage.getItem('ultimo_hash');
+  carregarVersao(hash);
+});
+2. Otimização para Redes Sociais
+html
+<!-- Meta tags dinâmicas -->
+<meta property="og:title" content="Roteiro: {{TITULO_GERADO}}">
+<meta property="og:description" content="{{PRIMEIRA_FRASE_DO_ROTEIRO}}...">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://seu-site.com/og-image.png?title={{TITULO_URLENCODED}}">
+3. Micro-interações Profissionais
+css
+/* Feedback de geração */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 137, 6, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 137, 6, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 137, 6, 0); }
+}
+
+.gerando {
+  animation: pulse 1.5s infinite;
+}
+
+/* Transição suave */
+.roteiro-gerado {
+  view-transition-name: roteiro-transicao;
+}
+💎 FEATURES REVOLUCIONÁRIAS (diferenciação absoluta)
+1. MODO "CRÍTICO DE CINEMA"
+python
+# Novo endpoint na API:
+def analise_critica(roteiro):
+    prompt = f"""
+    Atue como crítico de cinema premiado. Analise:
+    - FORÇAS: 3 pontos narrativos destacáveis
+    - FALHAS: 2 elementos que precisam de refinamento
+    - COMPARAÇÃO: "Parece uma mistura de [FILME A] com [OBRA B]"
+    Roteiro: {roteiro}
+    """
+    return gerar_resposta_ia(prompt)
+2. TIMELINE INTERATIVA
+javascript
+// Usando Chart.js
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: ['Ato 1', 'Plot Twist', 'Clímax', 'Resolução'],
+    datasets: [{
+      label: 'Tensão Narrativa',
+      data: [30, 85, 100, 40],
+      borderColor: '#ff8906'
+    }]
+  }
+});
+3. INTEGRAÇÃO COM MIDJOURNEY
+bash
+curl -X POST \
+  -H "Authorization: Bearer $MJ_KEY" \
+  -d '{
+    "prompt": "Poster de filme estilo anos 80: {TITULO_GERADO}",
+    "aspect_ratio": "3:4"
+  }' \
+  https://api.midjourney.com/v1/generate
+📊 Dados de Performance (Otimizações Urgentes)
+Métrica	Atual	Meta	Solução
+LCP	2.1s	<1.5s	Otimizar imagens com ?width=800&format=webp
+CLS	0.25	<0.1	Definir height: intrinsic nos containers
+Bounce Rate	58%	<40%	Adicionar "Roteiros Populares" acima do fold

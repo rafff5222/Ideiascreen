@@ -12,6 +12,7 @@ import { fallbackScriptGeneration } from './fallback-generator';
 import { generateVideo as generateAIVideo } from "./ai-service";
 import { generateTestVideo } from "./test-video-generator";
 import { generateCompatibleVideo, generateSimpleVideo, fixExistingVideo } from "./video-fix";
+import { analyzeAsCritic } from "./critics-analysis";
 import { nanoid } from 'nanoid';
 
 // Diretórios padrão para armazenamento de arquivos
@@ -100,6 +101,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Rota alternativa que usa o gerador de fallback (sem depender de APIs externas)
   app.post('/api/generate-script/fallback', fallbackScriptGeneration);
+  
+  // Rota para análise de roteiro por crítico de cinema
+  app.post('/api/analyze-script', analyzeAsCritic);
   
   /**
    * Endpoint para estatísticas do servidor - utilizado para monitoramento e debugging
