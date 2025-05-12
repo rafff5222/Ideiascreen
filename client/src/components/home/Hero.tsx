@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
-import VideoMockup from "./VideoMockup";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import DynamicCta from "@/components/conversion/DynamicCta";
-import MagicButton from "@/components/conversion/MagicButton";
 import SocialProof from "@/components/conversion/SocialProof";
+import ScriptGeneratorButton from "./ScriptGeneratorButton";
 
 export default function Hero() {
   return (
@@ -14,20 +13,20 @@ export default function Hero() {
           <div className="max-w-xl">
             <div className="inline-flex items-center px-3 py-1 text-sm rounded-full bg-primary/10 text-primary mb-5">
               <Sparkles size={16} className="mr-2" />
-              <span>Novo: Geração de Reels em 1-clique</span>
+              <span>Novo: Gerador de Roteiros Profissionais</span>
             </div>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-              Crie conteúdo viral com IA
+              Roteiros Profissionais com IA
             </h1>
             
             <p className="text-lg md:text-xl text-gray-700 mb-6">
-              Deixe a inteligência artificial gerar seus scripts, legendas e ideias para vídeos. Cresça no Instagram e TikTok sem esforço.
+              Crie roteiros perfeitos para seus vídeos, podcasts e apresentações em segundos com ajuda da inteligência artificial. Ideal para criadores de conteúdo e profissionais.
             </p>
             
             <div className="flex flex-wrap items-center gap-4 mb-8">
-              {/* Magic Button com IA para reconhecimento de nicho */}
-              <MagicButton />
+              {/* Botão para o gerador de roteiros */}
+              <ScriptGeneratorButton />
               
               <div className="text-sm text-gray-500 flex items-center">
                 <svg 
@@ -69,9 +68,55 @@ export default function Hero() {
             </div>
           </div>
           
-          {/* Mockup de vídeo interativo */}
+          {/* Ilustração de roteiro */}
           <div className="lg:ml-auto">
-            <VideoMockup />
+            <div className="bg-white rounded-lg shadow-xl p-6 border border-gray-200">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-3">
+                  <Sparkles size={20} />
+                </div>
+                <h3 className="font-bold text-xl">Exemplo de Roteiro</h3>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-3 bg-gray-200 rounded"></div>
+                <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+                <div className="h-3 bg-gray-200 rounded w-4/5"></div>
+                <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                
+                <div className="pt-2">
+                  <div className="h-3 bg-primary/20 rounded w-full"></div>
+                  <div className="h-3 bg-primary/20 rounded w-full mt-2"></div>
+                </div>
+                
+                <div className="pt-2">
+                  <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-200 rounded w-5/6 mt-2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-4/5 mt-2"></div>
+                </div>
+                
+                <div className="pt-2">
+                  <div className="h-3 bg-primary/20 rounded w-full"></div>
+                  <div className="h-3 bg-primary/20 rounded w-full mt-2"></div>
+                </div>
+              </div>
+              
+              <div className="mt-8 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-gray-200"></div>
+                  <div className="h-3 bg-gray-200 rounded w-20"></div>
+                </div>
+                <div className="flex gap-2">
+                  <div className="h-8 bg-primary/20 rounded-md w-16"></div>
+                  <div className="h-8 bg-primary rounded-md w-16"></div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Decoração de fundo */}
+            <div className="absolute -z-10 -bottom-6 -right-6 w-full h-full bg-gradient-to-br from-purple-200 to-primary/20 rounded-lg"></div>
+            <div className="absolute -z-20 -bottom-12 -right-12 w-full h-full bg-gradient-to-br from-primary/5 to-purple-100 rounded-lg"></div>
           </div>
         </div>
       </div>
