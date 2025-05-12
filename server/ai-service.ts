@@ -2,11 +2,20 @@
 import OpenAI from "openai";
 import path from "path";
 import { promises as fs } from "fs";
+import { generateEdgeTTSBuffer, EdgeTTSVoiceType } from "./edge-tts-service";
+import { generateAIText } from "./huggingface-service";
+import { searchImages } from "./free-image-service";
 
-// Configuração das APIs de IA
-const openai = new OpenAI({
+// Configuração das APIs de IA (com fallback para alternativas gratuitas)
+// A preferência de serviço pode ser configurada no .env
+const AI_SERVICE = process.env.AI_SERVICE_PROVIDER || 'openai';
+const VOICE_SERVICE = process.env.VOICE_SERVICE_PROVIDER || 'elevenlabs';
+const IMAGE_SERVICE = process.env.IMAGE_SERVICE_PROVIDER || 'pexels';
+
+// Inicializar OpenAI apenas se for usar
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
-});
+}) : null;
 
 interface GenerationConfig {
   script: string;
@@ -136,11 +145,11 @@ function processSubtitles(segments: string[]): string[] {
 
 import { generateElevenLabsAudio, VoiceType } from './elevenlabs-service';
 
-// Gerar áudio a partir do roteiro usando ElevenLabs ou fallback para OpenAI TTS
+// Gerar áudio a partir do roteiro usando serviço preferencial com fallback automático
 async function generateAudio(script: string, voiceType: string): Promise<Buffer | null> {
   try {
     // Mapeia os tipos de voz para as vozes disponíveis no ElevenLabs
-    const voiceMapping: { [key: string]: VoiceType } = {
+    const elevenlabsVoiceMapping: { [key: string]: VoiceType } = {
       'feminino-profissional': VoiceType.FEMININO_PROFISSIONAL,
       'masculino-profissional': VoiceType.MASCULINO_PROFISSIONAL,
       'feminino-jovem': VoiceType.FEMININO_JOVEM,
@@ -148,29 +157,14 @@ async function generateAudio(script: string, voiceType: string): Promise<Buffer 
       'neutro': VoiceType.NEUTRO
     };
     
-    const selectedVoice = voiceMapping[voiceType] || VoiceType.FEMININO_PROFISSIONAL;
-    
-    // Tenta primeiro com ElevenLabs (vozes em PT-BR mais naturais)
-    if (process.env.ELEVENLABS_API_KEY) {
-      console.log(`Tentando gerar áudio com ElevenLabs usando voz ${selectedVoice}...`);
-      const elevenLabsBuffer = await generateElevenLabsAudio(script, selectedVoice);
-      
-      if (elevenLabsBuffer) {
-        console.log('Áudio gerado com sucesso via ElevenLabs!');
-        return elevenLabsBuffer;
-      }
-      
-      console.log('Falha na geração via ElevenLabs, tentando OpenAI como fallback...');
-    }
-    
-    // Fallback para OpenAI TTS
-    // Verificações adicionais para a chave da API OpenAI
-    if (!process.env.OPENAI_API_KEY || 
-        process.env.OPENAI_API_KEY.trim() === '' || 
-        !process.env.OPENAI_API_KEY.startsWith('sk-')) {
-      console.log('Chave API OpenAI inválida ou mal formatada');
-      return null; // Retorna null quando não tem API key válida
-    }
+    // Mapeia os tipos de voz para as vozes disponíveis no Edge TTS (gratuito)
+    const edgeTTSVoiceMapping: { [key: string]: EdgeTTSVoiceType } = {
+      'feminino-profissional': EdgeTTSVoiceType.FEMININO_PROFISSIONAL,
+      'masculino-profissional': EdgeTTSVoiceType.MASCULINO_PROFISSIONAL,
+      'feminino-jovem': EdgeTTSVoiceType.FEMININO_JOVEM,
+      'masculino-jovem': EdgeTTSVoiceType.MASCULINO_JOVEM,
+      'neutro': EdgeTTSVoiceType.NEUTRO
+    };
     
     // Mapeia os tipos de voz para as vozes disponíveis na OpenAI
     const openaiVoiceMapping: { [key: string]: string } = {
@@ -181,69 +175,255 @@ async function generateAudio(script: string, voiceType: string): Promise<Buffer 
       'neutro': 'shimmer'
     };
     
+    const elevenlabsSelectedVoice = elevenlabsVoiceMapping[voiceType] || VoiceType.FEMININO_PROFISSIONAL;
+    const edgeTTSSelectedVoice = edgeTTSVoiceMapping[voiceType] || EdgeTTSVoiceType.FEMININO_PROFISSIONAL;
     const openaiSelectedVoice = openaiVoiceMapping[voiceType] || 'nova';
     
-    console.log(`Gerando áudio com OpenAI usando voz ${openaiSelectedVoice}...`);
+    // TENTATIVA 1: Service preferido pelo usuário (configurado no .env)
+    if (VOICE_SERVICE === 'elevenlabs' && process.env.ELEVENLABS_API_KEY) {
+      console.log(`Tentando gerar áudio com ElevenLabs (serviço preferido) usando voz ${elevenlabsSelectedVoice}...`);
+      try {
+        const elevenLabsBuffer = await generateElevenLabsAudio(script, elevenlabsSelectedVoice);
+        
+        if (elevenLabsBuffer) {
+          console.log('Áudio gerado com sucesso via ElevenLabs!');
+          return elevenLabsBuffer;
+        }
+      } catch (elevenLabsError: any) {
+        console.log('Falha na geração via ElevenLabs:', elevenLabsError.message);
+      }
+    } 
+    else if (VOICE_SERVICE === 'edge-tts') {
+      // Usuário configurou explicitamente para usar Edge TTS (gratuito)
+      console.log(`Tentando gerar áudio com Edge TTS (gratuito) usando voz ${edgeTTSSelectedVoice}...`);
+      try {
+        const edgeTTSBuffer = await generateEdgeTTSBuffer(script, edgeTTSSelectedVoice);
+        
+        if (edgeTTSBuffer) {
+          console.log('Áudio gerado com sucesso via Edge TTS (gratuito)!');
+          return edgeTTSBuffer;
+        }
+      } catch (edgeTTSError: any) {
+        console.log('Falha na geração via Edge TTS:', edgeTTSError.message);
+      }
+    }
+    
+    // TENTATIVA 2: Se o serviço preferido falhou, tentar com Edge TTS (gratuito)
+    if (VOICE_SERVICE !== 'edge-tts') {
+      console.log(`Tentando com alternativa gratuita: Edge TTS usando voz ${edgeTTSSelectedVoice}...`);
+      try {
+        const edgeTTSBuffer = await generateEdgeTTSBuffer(script, edgeTTSSelectedVoice);
+        
+        if (edgeTTSBuffer) {
+          console.log('Áudio gerado com sucesso via Edge TTS (gratuito)!');
+          return edgeTTSBuffer;
+        }
+      } catch (edgeTTSError: any) {
+        console.log('Falha na geração via Edge TTS:', edgeTTSError.message);
+      }
+    }
+    
+    // TENTATIVA 3: Se ainda não temos áudio, tentar com ElevenLabs (se não foi a primeira escolha)
+    if (VOICE_SERVICE !== 'elevenlabs' && process.env.ELEVENLABS_API_KEY) {
+      console.log(`Tentando gerar áudio com ElevenLabs usando voz ${elevenlabsSelectedVoice}...`);
+      try {
+        const elevenLabsBuffer = await generateElevenLabsAudio(script, elevenlabsSelectedVoice);
+        
+        if (elevenLabsBuffer) {
+          console.log('Áudio gerado com sucesso via ElevenLabs!');
+          return elevenLabsBuffer;
+        }
+      } catch (elevenLabsError: any) {
+        console.log('Falha na geração via ElevenLabs:', elevenLabsError.message);
+      }
+    }
+    
+    // TENTATIVA 4: Último recurso - OpenAI TTS
+    if (openai && process.env.OPENAI_API_KEY) {
+      console.log(`Tentando com último recurso: OpenAI TTS usando voz ${openaiSelectedVoice}...`);
+      
+      try {
+        const mp3 = await openai.audio.speech.create({
+          model: "tts-1",
+          voice: openaiSelectedVoice,
+          input: script,
+        });
+        
+        // Converter para buffer
+        const buffer = Buffer.from(await mp3.arrayBuffer());
+        console.log('Áudio gerado com sucesso via OpenAI!');
+        return buffer;
+      } catch (apiError: any) {
+        // Log específico para erros da API OpenAI
+        console.error('Erro específico da API OpenAI:', apiError.message);
+        if (apiError.status === 401) {
+          console.error('Erro de autenticação: Chave API inválida');
+        }
+      }
+    }
+    
+    // TENTATIVA 5: Modo de demonstração como último recurso
+    console.log('Todos os serviços falharam. Usando modo de demo como último recurso...');
     
     try {
-      const mp3 = await openai.audio.speech.create({
-        model: "tts-1",
-        voice: openaiSelectedVoice,
-        input: script,
-      });
-      
-      // Converter para buffer
-      const buffer = Buffer.from(await mp3.arrayBuffer());
-      console.log('Áudio gerado com sucesso via OpenAI!');
+      // Importar o gerador de áudio de demonstração dinamicamente
+      const { generateDemoAudio } = await import('./demo-processor');
+      const audioPath = await generateDemoAudio(script);
+      const buffer = await fs.readFile(audioPath);
+      console.log('Áudio de demonstração gerado com sucesso!');
       return buffer;
-    } catch (apiError: any) {
-      // Log específico para erros da API OpenAI
-      console.error('Erro específico da API OpenAI:', apiError.message);
-      if (apiError.status === 401) {
-        console.error('Erro de autenticação: Chave API inválida');
-      }
+    } catch (demoError: any) {
+      console.error('Falha no modo de demonstração:', demoError.message);
       return null;
     }
   } catch (error: any) {
-    console.error('Erro ao gerar áudio:', error.message);
+    console.error('Erro geral ao gerar áudio:', error.message);
     return null;
   }
 }
 
-// Gerar/selecionar imagens para o vídeo
+// Gerar/selecionar imagens para o vídeo usando serviços de imagens
 async function generateImages(segments: string[]): Promise<string[]> {
   // Se tiver menos de 2 segmentos, força pelo menos 2 imagens
   const imageCount = Math.max(Math.ceil(segments.length / 2), 2);
   
   try {
-    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.trim() === '') {
-      // Fallback para imagens de exemplo quando não tem API key
+    // Análise dos segmentos para extrair temas para as imagens
+    const imagePrompts = [];
+    
+    // Para cada segmento, extrair um tema para busca de imagem
+    for (let i = 0; i < imageCount; i++) {
+      const startSegment = i * 2;
+      const segmentsToConsider = segments.slice(startSegment, startSegment + 2).join(' ');
+      
+      if (segmentsToConsider.trim().length > 10) {
+        // Tentar extrair keywords mais específicas usando IA
+        if (AI_SERVICE === 'openai' && openai && process.env.OPENAI_API_KEY) {
+          console.log(`Extraindo keywords para imagem de: "${segmentsToConsider.substring(0, 30)}..."`);
+          try {
+            // Usa OpenAI para extrair keywords de busca
+            const prompt = `Extract 2-3 descriptive keywords from this text for image search. Reply with just the keywords: "${segmentsToConsider}"`;
+            
+            const completion = await openai.chat.completions.create({
+              model: "gpt-3.5-turbo",
+              messages: [{ role: "user", content: prompt }],
+              max_tokens: 30
+            });
+            
+            const keywords = completion.choices[0]?.message?.content?.trim();
+            if (keywords && keywords.length > 0) {
+              console.log(`Keywords extraídas: "${keywords}"`);
+              imagePrompts.push(keywords);
+            } else {
+              // Se falhar, usar as primeiras palavras do segmento
+              const simpleKeywords = segmentsToConsider.split(' ').slice(0, 3).join(' ');
+              console.log(`Usando palavras diretas: "${simpleKeywords}"`);
+              imagePrompts.push(simpleKeywords);
+            }
+          } catch (error) {
+            console.error('Erro na extração de keywords:', error);
+            imagePrompts.push(segmentsToConsider.split(' ').slice(0, 3).join(' '));
+          }
+        } else {
+          // Sem OpenAI, tentar com HuggingFace se disponível
+          try {
+            if (process.env.HUGGINGFACE_API_KEY) {
+              const prompt = `Extract 2-3 descriptive keywords from this text for image search. Reply with just the keywords: "${segmentsToConsider}"`;
+              const keywords = await generateAIText(prompt, { 
+                maxTokens: 30,
+                apiKey: process.env.HUGGINGFACE_API_KEY
+              });
+              
+              if (keywords && keywords.length > 0 && keywords.split(' ').length <= 5) {
+                console.log(`Keywords extraídas via HuggingFace: "${keywords}"`);
+                imagePrompts.push(keywords);
+              } else {
+                const simpleKeywords = segmentsToConsider.split(' ').slice(0, 3).join(' ');
+                console.log(`Usando palavras diretas: "${simpleKeywords}"`);
+                imagePrompts.push(simpleKeywords);
+              }
+            } else {
+              // Sem IA disponível, usar diretamente
+              const simpleKeywords = segmentsToConsider.split(' ').slice(0, 3).join(' ');
+              console.log(`Usando palavras diretas: "${simpleKeywords}"`);
+              imagePrompts.push(simpleKeywords);
+            }
+          } catch (error) {
+            console.error('Erro na extração alternativa de keywords:', error);
+            imagePrompts.push(segmentsToConsider.split(' ').slice(0, 3).join(' '));
+          }
+        }
+      } else {
+        // Segmento muito curto, usar termos genéricos
+        const genericTerms = [
+          "content creator working", 
+          "social media marketing", 
+          "digital content creation",
+          "video production", 
+          "content strategy"
+        ];
+        const randomTerm = genericTerms[Math.floor(Math.random() * genericTerms.length)];
+        console.log(`Usando termo genérico: "${randomTerm}"`);
+        imagePrompts.push(randomTerm);
+      }
+    }
+    
+    console.log('Todos os termos de busca de imagens:', imagePrompts);
+    
+    // Buscar imagens usando os serviços configurados
+    const imageUrls = [];
+    
+    // Escolher o serviço de imagem baseado na configuração
+    let hasPexelsKey = !!process.env.PEXELS_API_KEY;
+    let hasPixabayKey = !!process.env.PIXABAY_API_KEY;
+    let hasUnsplashKey = !!process.env.UNSPLASH_API_KEY;
+    
+    // Se não tiver nenhuma API key, usar placeholders
+    if (!hasPexelsKey && !hasPixabayKey && !hasUnsplashKey) {
+      console.log('Nenhuma API de imagem configurada, usando placeholders');
       return Array.from({ length: imageCount }, (_, i) => 
         `https://picsum.photos/800/450?random=${i + 1}`
       );
     }
     
-    // Análise dos segmentos para extrair temas para as imagens
-    const imagePrompts = [];
-    for (let i = 0; i < imageCount; i++) {
-      const startSegment = i * 2;
-      const segmentsToConsider = segments.slice(startSegment, startSegment + 2).join(' ');
-      
-      // Usa OpenAI para gerar a sugestão de imagem baseada nos segmentos
-      const prompt = segmentsToConsider.length > 10 
-        ? segmentsToConsider 
-        : "Criador de conteúdo trabalhando em um vídeo";
-      
-      imagePrompts.push(prompt);
+    // Buscar cada imagem usando o serviço preferido
+    for (const prompt of imagePrompts) {
+      try {
+        console.log(`Buscando imagem para: "${prompt}" via ${IMAGE_SERVICE}`);
+        
+        // Usar o serviço de imagens com fallback automático
+        const results = await searchImages({
+          query: prompt,
+          count: 1,
+          pexelsApiKey: process.env.PEXELS_API_KEY,
+          unsplashApiKey: process.env.UNSPLASH_API_KEY,
+          pixabayApiKey: process.env.PIXABAY_API_KEY,
+          preferredService: IMAGE_SERVICE as any // Cast para o tipo esperado
+        });
+        
+        if (results && results.length > 0) {
+          // Extrair URL da imagem encontrada
+          const imageUrl = results[0].previewUrl || results[0].originalUrl || results[0].url;
+          console.log(`Imagem encontrada via ${results[0].source} para "${prompt}"`);
+          imageUrls.push(imageUrl);
+        } else {
+          console.log(`Nenhuma imagem encontrada para "${prompt}", usando placeholder`);
+          imageUrls.push(`https://picsum.photos/800/450?text=${encodeURIComponent(prompt)}`);
+        }
+      } catch (error) {
+        console.error(`Erro ao buscar imagem para "${prompt}":`, error);
+        imageUrls.push(`https://picsum.photos/800/450?text=${encodeURIComponent(prompt)}`);
+      }
     }
     
-    // Aqui implementariamos a geração real com DALL-E ou similar
-    // Por enquanto, apenas retornamos URLs de placeholder
-    return Array.from({ length: imageCount }, (_, i) => 
-      `https://picsum.photos/800/450?random=${i + 1}`
-    );
+    // Complementar com placeholders se necessário
+    while (imageUrls.length < imageCount) {
+      imageUrls.push(`https://picsum.photos/800/450?random=${imageUrls.length + 1}`);
+    }
+    
+    return imageUrls;
   } catch (error) {
-    console.error('Erro ao gerar imagens:', error);
+    console.error('Erro geral ao gerar imagens:', error);
     
     // Fallback para imagens genéricas
     return Array.from({ length: imageCount }, (_, i) => 
