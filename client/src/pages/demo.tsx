@@ -1085,10 +1085,10 @@ export default function DemoPage() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
-            Transforme <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">Roteiros em Vídeos</span> Automaticamente
+            Transforme <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">Ideias em Roteiros</span> Profissionais
           </h1>
           <p className="text-lg text-gray-700 max-w-2xl mx-auto">
-            Nosso recurso exclusivo transforma seu roteiro em um vídeo completo com edição profissional em apenas alguns segundos.
+            Nossa tecnologia exclusiva transforma suas ideias em roteiros com estrutura cinematográfica profissional em apenas alguns segundos.
           </p>
         </div>
 
@@ -1289,22 +1289,22 @@ export default function DemoPage() {
                     </>
                   ) : (
                     <>
-                      <span className="flex items-center"><FaMagic className="mr-2" /> 🚀 Transformar em Vídeo <FaArrowRight className="ml-2" /></span>
-                      <small className="text-xs mt-1 opacity-90">Pronto em 30 segundos, sem esperas!</small>
+                      <span className="flex items-center"><FaMagic className="mr-2" /> 🚀 Analisar Roteiro <FaArrowRight className="ml-2" /></span>
+                      <small className="text-xs mt-1 opacity-90">Análise profissional em segundos!</small>
                     </>
                   )}
                 </button>
                 
                 <div className="mt-3 text-center text-xs text-gray-500">
-                  <span className="font-medium text-green-600">💰 Custo:</span> Menos de R$ 0,50 por vídeo | 
-                  <span className="font-medium text-green-600"> ⏱️ Tempo:</span> Pronto em 30 segundos
+                  <span className="font-medium text-green-600">🎯 Precisão:</span> Análise cinematográfica profissional | 
+                  <span className="font-medium text-green-600"> ⏱️ Tempo:</span> Pronto em segundos
                 </div>
               </div>
               
               <div className="w-full md:w-1/2">
                 <h2 className="text-xl font-semibold mb-4 flex items-center">
-                  <FaVideo className="text-indigo-600 mr-2" /> 
-                  Vídeo Resultante
+                  <FaUsers className="text-indigo-600 mr-2" /> 
+                  Análise do Crítico
                 </h2>
                 <div className="bg-gray-100 h-64 rounded-md flex items-center justify-center relative">
                   {videoGenerated ? (
