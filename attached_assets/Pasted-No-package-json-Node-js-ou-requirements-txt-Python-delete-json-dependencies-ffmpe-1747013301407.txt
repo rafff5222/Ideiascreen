@@ -1,0 +1,128 @@
+No package.json (Node.js) ou requirements.txt (Python), delete:
+
+json
+"dependencies": {
+  "ffmpeg": "❌ Remover",
+  "pexels-api": "❌ Remover",
+  "video-processing-libs": "❌ Remover"
+}
+No Replit, atualize .replit:
+
+ini
+[packages]
+# Mantenha apenas:
+openai = "*"
+# Ou, se for usar Hugging Face:
+transformers = "*"
+2. Simplifique a Interface
+Substitua todo o HTML por algo como:
+
+html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gerador de Roteiros IA</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; }
+        textarea { width: 100%; height: 200px; }
+    </style>
+</head>
+<body>
+    <h1>📝 Gerador de Roteiros IA</h1>
+    <textarea id="prompt" placeholder="Ex.: 'Crie um roteiro para um curta-metragem de ficção científica...'"></textarea>
+    <button id="generate">Gerar Roteiro</button>
+    <div id="result" style="white-space: pre-wrap; margin-top: 20px;"></div>
+
+    <script>
+        document.getElementById("generate").addEventListener("click", async () => {
+            const prompt = document.getElementById("prompt").value;
+            const response = await fetch("/generate-script", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt })
+            });
+            const data = await response.json();
+            document.getElementById("result").textContent = data.script;
+        });
+    </script>
+</body>
+</html>
+3. Atualize o Backend
+Exemplo em Node.js:
+
+javascript
+import express from "express";
+import { OpenAI } from "openai";
+
+const app = express();
+const openai = new OpenAI(process.env.OPENAI_API_KEY);
+
+app.post("/generate-script", async (req, res) => {
+    const { prompt } = req.body;
+    const completion = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [{
+            role: "user",
+            content: `Crie um roteiro detalhado com diálogos, cenas e direções. Tema: ${prompt}`
+        }]
+    });
+    res.json({ script: completion.choices[0].message.content });
+});
+
+app.listen(3000, () => console.log("Servidor rodando!"));
+Exemplo em Python (usando Hugging Face free):
+
+python
+from flask import Flask, request, jsonify
+from transformers import pipeline
+
+app = Flask(__name__)
+script_generator = pipeline("text-generation", model="gpt2-medium")  # Modelo free
+
+@app.route("/generate-script", methods=["POST"])
+def generate_script():
+    prompt = request.json.get("prompt")
+    script = script_generator(f"Roteiro sobre: {prompt}", max_length=500)[0]['generated_text']
+    return jsonify({"script": script})
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=3000)
+4. Remova Arquivos Inúteis
+Delete:
+
+video-processing/ (pastas de vídeo)
+
+routes/video.js (rotas relacionadas)
+
+public/video-player.html (templates antigos)
+
+5. Atualize o README.md
+Substitua por:
+
+markdown
+# 📜 Script Generator AI
+
+Gerador de roteiros automatizado usando IA. Basta inserir um tema e receba um roteiro completo!
+
+## Como Usar
+1. Digite um prompt (ex.: "Um drama urbano sobre imigração")
+2. Clique em "Gerar Roteiro"
+3. Copie o resultado formatado
+🎯 Opcionais para Melhorar
+Adicione Templates:
+
+javascript
+// No frontend:
+const templates = {
+    "Curta-metragem": "Gere um roteiro de 3 cenas com...",
+    "Documentário": "Estrutura com introdução, desenvolvimento..."
+};
+Salve Roteiros (usando localStorage):
+
+javascript
+// Após gerar:
+localStorage.setItem("last_script", script);
+Exportar para PDF:
+
+html
+<button onclick="window.print()">Exportar PDF</button>

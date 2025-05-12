@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gerador de Roteiros IA</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-bottom: 16px;
+            font-family: inherit;
+        }
+        button {
+            background: linear-gradient(90deg, #4776E6, #8E54E9);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        #result {
+            white-space: pre-wrap;
+            margin-top: 20px;
+            padding: 16px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            border-left: 4px solid #8E54E9;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 24px;
+        }
+        .templates {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .template-btn {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .template-btn:hover {
+            background: #e0e0e0;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        #loading {
+            display: none;
+            margin-left: 10px;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>📝 Gerador de Roteiros IA</h1>
+    
+    <div class="templates">
+        <button class="template-btn" data-template="curta">Curta-metragem</button>
+        <button class="template-btn" data-template="documentario">Documentário</button>
+        <button class="template-btn" data-template="comercial">Comercial</button>
+        <button class="template-btn" data-template="entrevista">Entrevista</button>
+    </div>
+    
+    <textarea id="prompt" placeholder="Ex.: 'Crie um roteiro para um curta-metragem de ficção científica sobre viagens no tempo...'"></textarea>
+    
+    <div>
+        <button id="generate">Gerar Roteiro</button>
+        <span id="loading">Gerando... ⏳</span>
+    </div>
+    
+    <div id="result" style="display:none;"></div>
+    
+    <div id="saved-scripts" style="display:none; margin-top: 30px;">
+        <h3>Roteiros Salvos</h3>
+        <ul id="saved-list"></ul>
+    </div>
+    
+    <div class="actions" style="display:none;">
+        <button id="save">Salvar Roteiro</button>
+        <button id="copy">Copiar Texto</button>
+        <button id="export" onclick="window.print()">Exportar PDF</button>
+    </div>
+    
+    <div class="footer">
+        <p>Gerador de Roteiros IA - Use IA para criar roteiros profissionais em segundos</p>
+    </div>
+
+    <script>
+        // Templates de roteiros
+        const templates = {
+            curta: "Crie um roteiro detalhado para um curta-metragem com 3 cenas, incluindo diálogos, descrições de cenário e direções para os atores. O tema é:",
+            documentario: "Elabore um roteiro para documentário com estrutura de introdução, desenvolvimento e conclusão, incluindo narração em off e sugestões para entrevistas. O tema é:",
+            comercial: "Crie um roteiro para um comercial de TV de 30 segundos, incluindo descrições visuais, texto para narração e mensagem final com call-to-action. O produto é:",
+            entrevista: "Desenvolva um roteiro para uma entrevista em vídeo, incluindo 10 perguntas principais, texto de introdução para o apresentador e instruções para a filmagem. O entrevistado é um especialista em:"
+        };
+
+        // Selecionar elementos
+        const promptEl = document.getElementById("prompt");
+        const generateBtn = document.getElementById("generate");
+        const resultEl = document.getElementById("result");
+        const loadingEl = document.getElementById("loading");
+        const actionsEl = document.querySelector(".actions");
+        const saveBtn = document.getElementById("save");
+        const copyBtn = document.getElementById("copy");
+        const templateBtns = document.querySelectorAll(".template-btn");
+        const savedScriptsEl = document.getElementById("saved-scripts");
+        const savedListEl = document.getElementById("saved-list");
+
+        // Carregar roteiros salvos
+        loadSavedScripts();
+
+        // Template buttons
+        templateBtns.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const template = btn.dataset.template;
+                promptEl.value = templates[template] + " ";
+                promptEl.focus();
+            });
+        });
+
+        // Gerar roteiro
+        generateBtn.addEventListener("click", async () => {
+            const prompt = promptEl.value.trim();
+            
+            if (!prompt) {
+                alert("Por favor, insira um prompt para gerar o roteiro.");
+                return;
+            }
+            
+            // Mostrar loading
+            generateBtn.disabled = true;
+            loadingEl.style.display = "inline";
+            resultEl.style.display = "none";
+            actionsEl.style.display = "none";
+            
+            try {
+                const response = await fetch("/api/generate-script", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ prompt })
+                });
+                
+                const data = await response.json();
+                
+                if (data.script) {
+                    resultEl.textContent = data.script;
+                    resultEl.style.display = "block";
+                    actionsEl.style.display = "flex";
+                } else {
+                    resultEl.textContent = "Erro ao gerar roteiro. Por favor, tente novamente.";
+                    resultEl.style.display = "block";
+                }
+            } catch (error) {
+                console.error("Erro:", error);
+                resultEl.textContent = "Erro ao gerar roteiro: " + error.message;
+                resultEl.style.display = "block";
+            } finally {
+                generateBtn.disabled = false;
+                loadingEl.style.display = "none";
+            }
+        });
+
+        // Salvar roteiro
+        saveBtn.addEventListener("click", () => {
+            const script = resultEl.textContent;
+            const prompt = promptEl.value;
+            const title = prompt.split(" ").slice(0, 5).join(" ") + "...";
+            
+            // Criar ID único baseado em data e texto
+            const id = Date.now().toString(36);
+            
+            // Salvar no localStorage
+            const savedScripts = JSON.parse(localStorage.getItem("saved_scripts") || "[]");
+            savedScripts.push({ id, title, script, prompt, date: new Date().toISOString() });
+            localStorage.setItem("saved_scripts", JSON.stringify(savedScripts));
+            
+            alert("Roteiro salvo com sucesso!");
+            loadSavedScripts();
+        });
+
+        // Copiar texto
+        copyBtn.addEventListener("click", () => {
+            const script = resultEl.textContent;
+            navigator.clipboard.writeText(script)
+                .then(() => alert("Roteiro copiado para a área de transferência!"))
+                .catch(err => console.error("Erro ao copiar:", err));
+        });
+
+        // Carregar roteiros salvos
+        function loadSavedScripts() {
+            const savedScripts = JSON.parse(localStorage.getItem("saved_scripts") || "[]");
+            
+            if (savedScripts.length > 0) {
+                savedScriptsEl.style.display = "block";
+                savedListEl.innerHTML = "";
+                
+                savedScripts.forEach(script => {
+                    const date = new Date(script.date).toLocaleDateString();
+                    const li = document.createElement("li");
+                    li.style.marginBottom = "10px";
+                    li.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <strong>${script.title}</strong>
+                            <span style="color:#888; font-size:12px;">${date}</span>
+                        </div>
+                        <div style="display:flex; gap:10px; margin-top:5px;">
+                            <button class="load-btn" data-id="${script.id}" style="font-size:12px; padding:4px 8px;">Carregar</button>
+                            <button class="delete-btn" data-id="${script.id}" style="font-size:12px; padding:4px 8px; background:#ff4444;">Excluir</button>
+                        </div>
+                    `;
+                    savedListEl.appendChild(li);
+                });
+                
+                // Adicionar eventos para carregar e excluir
+                document.querySelectorAll(".load-btn").forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        const id = btn.dataset.id;
+                        const script = savedScripts.find(s => s.id === id);
+                        if (script) {
+                            promptEl.value = script.prompt;
+                            resultEl.textContent = script.script;
+                            resultEl.style.display = "block";
+                            actionsEl.style.display = "flex";
+                        }
+                    });
+                });
+                
+                document.querySelectorAll(".delete-btn").forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        const id = btn.dataset.id;
+                        const newSavedScripts = savedScripts.filter(s => s.id !== id);
+                        localStorage.setItem("saved_scripts", JSON.stringify(newSavedScripts));
+                        loadSavedScripts();
+                    });
+                });
+            } else {
+                savedScriptsEl.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
