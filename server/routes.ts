@@ -120,7 +120,144 @@ declare global {
   }
 }
 
+// Rota para geração de roteiros - Adicionado para nova versão simplificada
+async function generateScript(req: Request, res: Response) {
+  try {
+    const { prompt } = req.body;
+    
+    if (!prompt) {
+      return res.status(400).json({ error: 'Prompt é obrigatório' });
+    }
+    
+    // Verificar se a API está configurada
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+    const USE_HUGGINGFACE = process.env.USE_HUGGINGFACE === 'true';
+    
+    if (!OPENAI_API_KEY && !USE_HUGGINGFACE) {
+      return res.status(500).json({ 
+        error: 'Nenhuma API de IA configurada', 
+        script: 'DEMO: Este é um roteiro de demonstração. Configure a API_KEY da OpenAI ou use Hugging Face para gerar roteiros reais.' 
+      });
+    }
+
+    let generatedScript = '';
+
+    if (USE_HUGGINGFACE) {
+      // Usar Hugging Face (gratuito)
+      try {
+        // URL do modelo no Hugging Face (usando modelo gratuito)
+        const apiUrl = "https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct";
+        
+        // Formatar o prompt para o modelo
+        const systemPrompt = "Você é um roteirista profissional especializado em criar roteiros detalhados e formatados.";
+        const formattedPrompt = `${systemPrompt}\n\n${prompt}\n\nCrie um roteiro detalhado com diálogos, cenas e direções de câmera. Formate corretamente como um roteiro profissional.`;
+        
+        // Fazer a requisição para a API Hugging Face
+        const fetch = (await import('node-fetch')).default;
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            inputs: formattedPrompt,
+            parameters: {
+              max_new_tokens: 1000,
+              temperature: 0.7,
+              top_p: 0.95,
+              do_sample: true,
+            }
+          }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`API respondeu com status ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        // Extrair o texto gerado da resposta
+        if (Array.isArray(result) && result.length > 0) {
+          generatedScript = result[0].generated_text;
+        } else if (result.generated_text) {
+          generatedScript = result.generated_text;
+        } else {
+          throw new Error('Formato de resposta inesperado');
+        }
+        
+        // Limpar o prompt do texto gerado
+        generatedScript = generatedScript.replace(formattedPrompt, '').trim();
+      } catch (error) {
+        console.error('Erro ao usar Hugging Face:', error);
+        
+        // Tentar OpenAI como fallback se tivermos a chave
+        if (OPENAI_API_KEY) {
+          console.log('Usando OpenAI como fallback');
+          const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+          const completion = await openai.chat.completions.create({
+            model: "gpt-4o", // o mais novo modelo da OpenAI
+            messages: [
+              {
+                role: "system",
+                content: "Você é um roteirista profissional especializado em criar roteiros detalhados e formatados para diversos formatos de mídia."
+              },
+              {
+                role: "user",
+                content: `${prompt}\n\nCrie um roteiro detalhado com diálogos, cenas e direções de câmera. Formate corretamente como um roteiro profissional.`
+              }
+            ],
+            max_tokens: 2000
+          });
+          
+          generatedScript = completion.choices[0].message.content;
+        } else {
+          // Se não temos OpenAI como fallback, retornar erro
+          return res.status(500).json({ 
+            error: `Erro ao gerar roteiro: ${error.message}`,
+            script: "DEMONSTRAÇÃO: Este é um roteiro de exemplo criado devido a um erro na API.\n\nCENA 1 - EXTERIOR - DIA\n\nUma pessoa está sentada em um banco de parque, contemplando o horizonte. A câmera se aproxima lentamente."
+          });
+        }
+      }
+    } else {
+      // Usar OpenAI
+      const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o", // o mais novo modelo da OpenAI
+        messages: [
+          {
+            role: "system",
+            content: "Você é um roteirista profissional especializado em criar roteiros detalhados e formatados para diversos formatos de mídia."
+          },
+          {
+            role: "user",
+            content: `${prompt}\n\nCrie um roteiro detalhado com diálogos, cenas e direções de câmera. Formate corretamente como um roteiro profissional.`
+          }
+        ],
+        max_tokens: 2000
+      });
+      
+      generatedScript = completion.choices[0].message.content;
+    }
+    
+    // Retornar o roteiro gerado
+    return res.json({ script: generatedScript });
+  } catch (error: any) {
+    console.error('Erro ao gerar roteiro:', error);
+    return res.status(500).json({ 
+      error: `Erro ao gerar roteiro: ${error.message}`,
+      script: "DEMONSTRAÇÃO: Ocorreu um erro ao gerar o roteiro. Este é um exemplo de roteiro para demonstração.\n\nCENA 1 - INTERIOR - ESCRITÓRIO - DIA\n\nJOÃO, 30 anos, está sentado em frente ao computador. Sua expressão mostra concentração e cansaço."
+    });
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Adicionar rota para o gerador de roteiros
+  app.post('/api/generate-script', generateScript);
+  
+  // Adicionar rota para a página principal do gerador de roteiros
+  app.get('/script-generator', (req, res) => {
+    res.sendFile(path.join(process.cwd(), 'client/public/index.html'));
+  });
   // Criação do servidor HTTP para Express e WebSockets
   const httpServer = createServer(app);
   
