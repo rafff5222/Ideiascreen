@@ -1891,45 +1891,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
         }
         
-        // Verificar OpenAI com teste mais robusto
-        let openaiResult = { working: false, status: "unconfigured" };
-        if (process.env.OPENAI_API_KEY) {
+        // Verificar Hugging Face com teste robusto
+        let aiResult = { working: false, status: "unconfigured" };
+        if (process.env.HUGGINGFACE_API_KEY) {
           try {
-            console.log('Verificando API OpenAI...');
-            const openai = new OpenAI({
-              apiKey: process.env.OPENAI_API_KEY
+            console.log('Verificando API Hugging Face...');
+            const fetch = (await import('node-fetch')).default;
+            
+            // Testar com um prompt simples
+            const response = await fetch("https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.HUGGINGFACE_API_KEY}`
+              },
+              body: JSON.stringify({
+                inputs: "Olá, este é um teste de API. Por favor responda apenas com 'ok'.",
+                parameters: {
+                  max_new_tokens: 5,
+                  return_full_text: false
+                }
+              })
             });
             
-            // Tentar fazer uma requisição real para testar autenticação e capacidade
-            const completion = await openai.chat.completions.create({
-              model: "gpt-3.5-turbo",
-              messages: [{ role: "user", content: "API test" }],
-              max_tokens: 5
-            });
+            if (!response.ok) {
+              throw new Error(`API respondeu com status ${response.status}`);
+            }
             
-            console.log('OpenAI respondeu com:', completion.choices[0]?.message?.content);
+            const result = await response.json();
+            const aiResponse = Array.isArray(result) && result.length > 0 ? result[0]?.generated_text : 'Sem resposta';
             
-            openaiResult = { 
+            console.log('Hugging Face respondeu com:', aiResponse);
+            
+            aiResult = { 
               working: true, 
               status: "ok", 
-              model: completion.model,
-              response: completion.choices[0]?.message?.content,
-              usage: completion.usage
+              model: "mistralai/Mistral-7B-Instruct-v0.2",
+              response: aiResponse
             };
           } catch (error: any) {
-            console.error('Erro detalhado OpenAI:', error);
+            console.error('Erro detalhado Hugging Face:', error);
             
             // Análise mais detalhada do erro
             let errorStatus = "api_error";
-            if (error.status === 401) {
+            if (error.message && error.message.includes('401')) {
               errorStatus = "invalid_api_key";
-            } else if (error.status === 429) {
+            } else if (error.message && error.message.includes('429')) {
               errorStatus = "rate_limit_exceeded";
-            } else if (error.status === 403) {
+            } else if (error.message && error.message.includes('403')) {
               errorStatus = "permission_denied";
             }
             
-            openaiResult = { 
+            aiResult = { 
               working: false, 
               status: errorStatus,
               message: error.message,
@@ -2014,7 +2027,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return {
           redis: redisResult,
           ffmpeg: ffmpegResult,
-          openai: openaiResult,
+          ai: aiResult, // Alterado de OpenAI para API do Hugging Face
           elevenlabs: elevenlabsResult,
           environment: {
             node: process.version,
@@ -2037,7 +2050,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           !results.redis.working ? "Reinicie o servidor Redis com: redis-server --daemonize yes" : null,
           !results.ffmpeg.working ? "Instale o FFmpeg com: sudo apt-get install ffmpeg" : null,
           !results.elevenlabs.working && results.elevenlabs.status === "authentication error" ? "Verifique a chave API do ElevenLabs" : null,
-          !results.openai.working && results.openai.status === "authentication error" ? "Verifique a chave API da OpenAI" : null
+          !results.ai.working && results.ai.status === "invalid_api_key" ? "Verifique a chave API do Hugging Face" : null
         ].filter(Boolean)
       });
     } catch (error: any) {
