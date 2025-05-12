@@ -34,8 +34,8 @@ export default function Features() {
     },
     {
       icon: <Film className="h-10 w-10 text-primary" />,
-      title: "Montagem Automática",
-      description: "Recurso exclusivo que transforma seus roteiros em vídeos prontos com apenas um clique."
+      title: "Modo Diretor",
+      description: "Análise cinematográfica profissional que aprimora seus roteiros com sugestões de estrutura narrativa."
     },
     {
       icon: <AlarmClock className="h-10 w-10 text-primary" />,
