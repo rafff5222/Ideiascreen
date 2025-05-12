@@ -86,17 +86,17 @@ export default function PricingTable() {
           <div className="grid-cell"><FaCheck className="check-icon" /></div>
         </div>
 
-        {/* Montagem automática */}
+        {/* Análise Crítica de Cinema */}
         <div className="grid-row">
-          <div className="grid-cell">Montagem automática</div>
+          <div className="grid-cell">Análise Crítica de Cinema</div>
           <div className="grid-cell"><FaTimes className="x-icon" /></div>
           <div className="grid-cell"><FaCheck className="check-icon" /></div>
           <div className="grid-cell"><FaCheck className="check-icon" /></div>
         </div>
 
-        {/* Edição com IA */}
+        {/* Modo Diretor */}
         <div className="grid-row">
-          <div className="grid-cell">Edição com IA avançada</div>
+          <div className="grid-cell">Modo Diretor Profissional</div>
           <div className="grid-cell"><FaTimes className="x-icon" /></div>
           <div className="grid-cell"><FaTimes className="x-icon" /></div>
           <div className="grid-cell"><FaCheck className="check-icon" /></div>
@@ -153,7 +153,7 @@ export default function PricingTable() {
             </li>
             <li className="flex items-start">
               <FaTimes className="text-red-500 mr-2 flex-shrink-0" size={16} />
-              <span className="text-gray-500">Montagem automática de vídeos</span>
+              <span className="text-gray-500">Análise Crítica de Cinema</span>
             </li>
           </ul>
           <button 
@@ -186,7 +186,7 @@ export default function PricingTable() {
             </li>
             <li className="flex items-start">
               <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
-              <span>Montagem automática de vídeos</span>
+              <span>Análise Crítica de Cinema</span>
             </li>
           </ul>
           <button 
