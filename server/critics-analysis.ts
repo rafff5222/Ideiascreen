@@ -55,7 +55,7 @@ Responda apenas com um objeto JSON no seguinte formato:
       const analysis = result.text;
       
       // Tentar fazer parse do JSON
-      const jsonMatch = analysis.match(/\{.*\}/s);
+      const jsonMatch = analysis.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const analysisJson = JSON.parse(jsonMatch[0]);
         return res.json(analysisJson);

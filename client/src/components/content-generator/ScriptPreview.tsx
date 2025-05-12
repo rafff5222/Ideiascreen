@@ -4,6 +4,7 @@ import { Copy, CheckCircle, Share2, Download, Loader2, Save, History, Sparkles, 
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import CriticAnalysis from './CriticAnalysis';
 
 type ScriptPreviewProps = {
   prompt: string;
@@ -496,6 +497,11 @@ export default function ScriptPreview({
                   </Button>
                 </div>
               </div>
+            )}
+            
+            {/* Análise de Crítico de Cinema */}
+            {!directorMode && !isLoadingAnalysis && script && (
+              <CriticAnalysis script={script} />
             )}
             
             {/* Loading para análise do diretor */}
