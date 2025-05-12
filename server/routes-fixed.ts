@@ -8,7 +8,6 @@ import path from "path";
 import { z } from 'zod';
 import { checkAllServices } from './service-status';
 import { generateScript } from './generate-script';
-import { fallbackScriptGeneration } from './fallback-generator';
 import { generateVideo as generateAIVideo } from "./ai-service";
 import { generateTestVideo } from "./test-video-generator";
 import { generateCompatibleVideo, generateSimpleVideo, fixExistingVideo } from "./video-fix";
@@ -97,9 +96,6 @@ function broadcastTaskUpdate(task: ProcessingTask) {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Adicionar rota para o gerador de roteiros
   app.post('/api/generate-script', generateScript);
-  
-  // Rota alternativa que usa o gerador de fallback (sem depender de APIs externas)
-  app.post('/api/generate-script/fallback', fallbackScriptGeneration);
   
   /**
    * Endpoint para estatísticas do servidor - utilizado para monitoramento e debugging
