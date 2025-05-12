@@ -327,6 +327,10 @@ export default function VideoGenerator() {
                     <li>• Escreva como se estivesse falando</li>
                   </ul>
                 </div>
+                
+                <div className="mt-6">
+                  <ServiceStatusDisplay />
+                </div>
               </CardContent>
             </Card>
           </div>
