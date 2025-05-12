@@ -1447,38 +1447,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).send('Arquivo de vídeo não encontrado');
       }
       
-      // Configuração para streaming de vídeo
-      const stat = await fs.promises.stat(fullPath);
-      const fileSize = stat.size;
-      const range = req.headers.range;
+      // Importar e usar o serviço de streaming de vídeo otimizado
+      const { videoStreamService } = await import('./video-stream-service');
       
-      if (range) {
-        // Streaming parcial (range request)
-        const parts = range.replace(/bytes=/, "").split("-");
-        const start = parseInt(parts[0], 10);
-        const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+      // Registrar evento de visualização para analytics
+      try {
+        const { videoAnalytics } = await import('./video-analytics-service');
+        const videoId = path.basename(filePath);
         
-        const chunksize = (end - start) + 1;
-        const file = fs.createReadStream(fullPath, { start, end });
-        const head = {
-          'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-          'Accept-Ranges': 'bytes',
-          'Content-Length': chunksize,
-          'Content-Type': 'video/mp4',
-        };
+        // Registrar início de visualização
+        videoAnalytics.recordEvent({
+          videoId,
+          eventType: 'play',
+          sessionId,
+          userId,
+          eventData: {
+            source: 'api',
+            referrer: req.headers.referer || 'direct',
+            path: filePath
+          }
+        });
         
-        res.writeHead(206, head);
-        file.pipe(res);
-      } else {
-        // Streaming completo
-        const head = {
-          'Content-Length': fileSize,
-          'Content-Type': 'video/mp4',
-        };
-        
-        res.writeHead(200, head);
-        fs.createReadStream(fullPath).pipe(res);
+        // Incrementar contador de visualizações
+        videoAnalytics.recordView({
+          videoId,
+          sessionId,
+          userId,
+          watchTime: 0, // Será atualizado pelo cliente
+          completed: false, // Será atualizado pelo cliente
+          segments: [], // Será atualizado pelo cliente
+          playbackRate: 1,
+          device: req.headers['user-agent'] || 'unknown',
+          quality: 'auto'
+        });
+      } catch (analyticError) {
+        console.error('Erro ao registrar analytics de vídeo:', analyticError);
+        // Não interromper o streaming por falha nos analytics
       }
+      
+      // Stream do vídeo com suporte a range requests, cache e otimizações
+      await videoStreamService.streamVideo(req, res, fullPath, {
+        cacheControl: 'public, max-age=3600' // Cache por 1 hora
+      });
     } catch (error: any) {
       console.error('Erro ao streamar vídeo:', error);
       res.status(500).send(`Erro ao streamar vídeo: ${error.message}`);
@@ -2070,6 +2080,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
   /**
    * Endpoint para excluir um vídeo
    */
+
+  /**
+   * Endpoint para obter estatísticas de vídeo
+   */
+  app.get("/api/video-status/:videoId", async (req: Request, res: Response) => {
+    try {
+      const { videoId } = req.params;
+      
+      if (!videoId) {
+        return res.status(400).json({
+          success: false,
+          error: 'ID do vídeo não fornecido'
+        });
+      }
+      
+      // Verificar se o vídeo existe
+      let fullPath;
+      if (videoId.startsWith('videos/')) {
+        fullPath = path.join(process.cwd(), 'output', videoId);
+      } else {
+        fullPath = path.join(process.cwd(), 'output', 'videos', videoId);
+      }
+      
+      try {
+        await fs.promises.access(fullPath);
+      } catch (err) {
+        return res.status(404).json({
+          success: false,
+          error: 'Vídeo não encontrado'
+        });
+      }
+      
+      // Obter estatísticas do arquivo
+      const stats = await fs.promises.stat(fullPath);
+      
+      // Obter analytics do vídeo
+      let analyticsData = {};
+      try {
+        const { videoAnalytics } = await import('./video-analytics-service');
+        analyticsData = videoAnalytics.getVideoStats(videoId);
+      } catch (err) {
+        console.error('Erro ao buscar analytics:', err);
+      }
+      
+      // Extrair dados do vídeo usando ffmpeg
+      let videoMetadata = {
+        duration: 0,
+        resolution: '',
+        format: path.extname(fullPath).replace('.', ''),
+        codec: ''
+      };
+      
+      try {
+        // Exemplo de como obter metadados com ffmpeg
+        // Esta é uma versão simplificada - em produção usaríamos ffprobe
+        const { getAudioDuration } = await import('./audio-analyzer');
+        const duration = await getAudioDuration(fullPath);
+        videoMetadata.duration = duration;
+      } catch (err) {
+        console.error('Erro ao obter metadados do vídeo:', err);
+      }
+      
+      // Dados de resposta
+      const videoData = {
+        id: videoId,
+        name: path.basename(videoId),
+        path: fullPath,
+        size: stats.size,
+        createdAt: stats.birthtime.toISOString(),
+        duration: videoMetadata.duration,
+        resolution: videoMetadata.resolution || 'HD',
+        format: videoMetadata.format || 'mp4',
+        views: (analyticsData as any).totalViews || 0,
+        uniqueViewers: (analyticsData as any).uniqueViewers || 0,
+        avgWatchTime: (analyticsData as any).averageWatchTime || 0,
+        completionRate: (analyticsData as any).completionRate || 0
+      };
+      
+      res.json({
+        success: true,
+        video: videoData
+      });
+    } catch (error: any) {
+      console.error('Erro ao obter status do vídeo:', error);
+      res.status(500).json({
+        success: false,
+        error: `Erro ao obter status do vídeo: ${error.message}`
+      });
+    }
+  });
+
+  /**
+   * Endpoint para obter estatísticas de todos os vídeos
+   */
+  app.get("/api/video-analytics", async (req: Request, res: Response) => {
+    try {
+      // Obter analytics de todos os vídeos
+      const { videoAnalytics } = await import('./video-analytics-service');
+      const analyticsData = videoAnalytics.getAllStats();
+      
+      res.json({
+        success: true,
+        analytics: analyticsData
+      });
+    } catch (error: any) {
+      console.error('Erro ao obter analytics de vídeo:', error);
+      res.status(500).json({
+        success: false,
+        error: `Erro ao obter analytics de vídeo: ${error.message}`
+      });
+    }
+  });
+
   /**
    * Endpoint para gerar um vídeo de teste
    * Útil para depuração de problemas de reprodução de vídeo
