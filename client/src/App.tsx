@@ -7,15 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import Generator from "@/pages/generator";
-import Demo from "@/pages/demo";
-import GenerationDemo from "@/pages/GenerationDemo";
-import VideoDemo from "@/pages/VideoDemo";
-import VideoTester from "@/pages/VideoTester";
-import VideoLibrary from "@/pages/VideoLibrary";
-import VideoPreview from "@/pages/VideoPreview";
-import TestVideoPlayer from "@/pages/TestVideoPlayer";
-import VideoTest from "@/pages/VideoTest";
-import VideoGenerator from "@/pages/VideoGenerator";
+import ScriptGenerator from "@/pages/script-generator";
 import Settings from "@/pages/Settings";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -42,15 +34,8 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/generator" component={Generator} />
-      <Route path="/demo" component={Demo} />
-      <Route path="/generation-demo" component={GenerationDemo} />
-      <Route path="/video-demo" component={VideoDemo} />
-      <Route path="/video-tester" component={VideoTester} />
-      <Route path="/video-library" component={VideoLibrary} />
-      <Route path="/video-preview" component={VideoPreview} />
-      <Route path="/test-video" component={TestVideoPlayer} />
-      <Route path="/video-test" component={VideoTest} />
-      <Route path="/video-generator" component={VideoGenerator} />
+      <Route path="/roteiros" component={ScriptGenerator} />
+      <Route path="/script-generator" component={ScriptGenerator} />
       <Route path="/settings" component={Settings} />
       <Route component={NotFound} />
     </Switch>

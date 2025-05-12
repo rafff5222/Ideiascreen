@@ -19,10 +19,8 @@ export default function Navbar() {
     { name: "Como Funciona", href: "/#como-funciona" },
     { name: "Preços", href: "/#precos" },
     { name: "Depoimentos", href: "/#depoimentos" },
-    { name: "Demo", href: "/demo" },
-    { name: "Gerador Demo", href: "/generation-demo" },
-    { name: "Nova Versão", href: "/video-tester", highlight: true },
-    { name: "Biblioteca", href: "/video-library" },
+    { name: "Gerador de Roteiros", href: "/roteiros", highlight: true },
+    { name: "Dashboard", href: "/dashboard" },
   ];
 
   // Fixed DOM nesting by using div instead of a when using Link component
@@ -52,17 +50,11 @@ export default function Navbar() {
               <Link href="/">
                 <div className="font-medium hover:text-primary transition cursor-pointer">Início</div>
               </Link>
-              <Link href="/demo">
-                <div className="font-medium hover:text-primary transition cursor-pointer">Demo</div>
+              <Link href="/roteiros">
+                <div className="font-medium text-purple-600 font-semibold hover:text-primary transition cursor-pointer">Gerador de Roteiros</div>
               </Link>
-              <Link href="/generation-demo">
-                <div className="font-medium hover:text-primary transition cursor-pointer">Gerador Demo</div>
-              </Link>
-              <Link href="/video-tester">
-                <div className="font-medium text-purple-600 font-semibold hover:text-primary transition cursor-pointer">Nova Versão</div>
-              </Link>
-              <Link href="/video-library">
-                <div className="font-medium hover:text-primary transition cursor-pointer">Biblioteca</div>
+              <Link href="/dashboard">
+                <div className="font-medium hover:text-primary transition cursor-pointer">Dashboard</div>
               </Link>
               <Link href="/settings">
                 <div className="font-medium hover:text-primary transition cursor-pointer">Configurações</div>
@@ -122,36 +114,28 @@ export default function Navbar() {
                         Início
                       </div>
                     </Link>
-                    <Link href="/demo">
-                      <div 
-                        className="py-2 text-lg font-medium hover:text-primary transition cursor-pointer"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Demo
-                      </div>
-                    </Link>
-                    <Link href="/generation-demo">
-                      <div 
-                        className="py-2 text-lg font-medium hover:text-primary transition cursor-pointer"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Gerador Demo
-                      </div>
-                    </Link>
-                    <Link href="/video-tester">
+                    <Link href="/roteiros">
                       <div 
                         className="py-2 text-lg font-medium text-purple-600 hover:text-primary font-semibold transition cursor-pointer"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        Nova Versão
+                        Gerador de Roteiros
                       </div>
                     </Link>
-                    <Link href="/video-library">
+                    <Link href="/dashboard">
                       <div 
                         className="py-2 text-lg font-medium hover:text-primary transition cursor-pointer"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        Biblioteca
+                        Dashboard
+                      </div>
+                    </Link>
+                    <Link href="/settings">
+                      <div 
+                        className="py-2 text-lg font-medium hover:text-primary transition cursor-pointer"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Configurações
                       </div>
                     </Link>
                   </>
