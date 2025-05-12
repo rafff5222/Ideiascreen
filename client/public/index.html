@@ -456,13 +456,13 @@
             });
         });
 
-        // Gerar roteiro
+        // Gerar roteiro com tratamento de erros robusto
         generateBtn.addEventListener("click", async () => {
             const prompt = promptEl.value.trim();
             const scriptType = scriptTypeEl.value;
             
             if (!prompt) {
-                alert("Por favor, insira um prompt para gerar o roteiro.");
+                showNotification("Por favor, insira um prompt para gerar o roteiro.", "warning");
                 return;
             }
             
@@ -472,6 +472,8 @@
                 formattedPrompt = `Crie um roteiro para um vídeo de YouTube sobre: ${prompt}`;
             } else if (scriptType === "podcast" && !prompt.toLowerCase().includes("podcast")) {
                 formattedPrompt = `Crie um roteiro para um episódio de podcast sobre: ${prompt}`;
+            } else if (scriptType === "short-film" && !prompt.toLowerCase().includes("curta") && !prompt.toLowerCase().includes("filme")) {
+                formattedPrompt = `Crie um roteiro de curta-metragem sobre: ${prompt}`;
             }
             
             // Mostrar loading
@@ -482,37 +484,71 @@
             actionsEl.style.display = "none";
             
             try {
+                // Verificação pré-requisições
+                if (prompt.length > 1000) {
+                    throw new Error("O prompt é muito longo. Por favor, reduza o tamanho do texto.");
+                }
+                
+                console.log("Enviando prompt:", { formattedPrompt, type: scriptType });
+                
+                // Fazer a requisição com tratamento correto do erro da API
                 const response = await fetch("/api/generate-script", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ prompt: formattedPrompt })
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`Erro: ${response.status} - ${response.statusText}`);
+                // Obter o texto da resposta para debug
+                const responseText = await response.text();
+                
+                let data;
+                try {
+                    // Tentar parse do JSON
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    console.error("Falha ao processar JSON:", responseText);
+                    throw new Error("Resposta da API não é um JSON válido.");
                 }
                 
-                const data = await response.json();
-                
-                if (data.script) {
+                // Verificar erros na resposta
+                if (data.error) {
+                    console.warn("API respondeu com erro:", data.error);
+                    
+                    if (data.script) {
+                        // Se temos uma mensagem de erro mas também um script (fallback)
+                        resultEl.textContent = data.script;
+                        resultEl.style.display = "block";
+                        showNotification("Ocorreu um erro, mas conseguimos gerar um resultado parcial.", "warning");
+                    } else {
+                        throw new Error(data.error);
+                    }
+                } else if (data.script) {
+                    // Resposta com sucesso
                     resultEl.textContent = data.script;
                     resultEl.style.display = "block";
                     actionsEl.style.display = "flex";
                     
                     // Salvar no histórico local
                     saveToHistory(formattedPrompt, data.script);
+                    
+                    showNotification("Roteiro gerado com sucesso!", "success");
                 } else {
-                    resultEl.textContent = data.error || "Erro ao gerar roteiro. Por favor, tente novamente.";
-                    resultEl.style.display = "block";
+                    throw new Error("Resposta da API não contém roteiro.");
                 }
             } catch (error) {
-                console.error("Erro:", error);
-                resultEl.textContent = "Erro ao gerar roteiro: " + error.message;
+                console.error("Erro detalhado:", error);
+                resultEl.textContent = error.message || "Erro desconhecido ao gerar roteiro.";
                 resultEl.style.display = "block";
+                showNotification("Erro ao gerar roteiro. Tente novamente.", "error");
             } finally {
                 generateBtn.disabled = false;
                 generateBtn.textContent = "Gerar Roteiro";
                 loadingEl.style.display = "none";
+                
+                // Sempre mostrar o bloco de resultado para exibir mensagens de erro
+                if (resultEl.style.display === "none") {
+                    resultEl.style.display = "block";
+                }
             }
         });
 
@@ -656,8 +692,8 @@
             }
         }
         
-        // Notificação
-        function showNotification(message) {
+        // Notificação aprimorada com suporte a diferentes tipos
+        function showNotification(message, type = 'info') {
             // Verificar se já existe uma notificação
             let notification = document.querySelector('.notification');
             
@@ -665,25 +701,50 @@
                 notification.remove();
             }
             
+            // Determinar cores com base no tipo
+            let bgColor, icon;
+            switch (type) {
+                case 'success':
+                    bgColor = '#10b981'; // verde
+                    icon = '✓';
+                    break;
+                case 'error':
+                    bgColor = '#ef4444'; // vermelho
+                    icon = '✗';
+                    break;
+                case 'warning':
+                    bgColor = '#f59e0b'; // laranja
+                    icon = '⚠';
+                    break;
+                default:
+                    bgColor = 'var(--primary)'; // roxo (padrão)
+                    icon = 'ℹ';
+            }
+            
             // Criar notificação
             notification = document.createElement('div');
             notification.className = 'notification';
-            notification.textContent = message;
+            notification.innerHTML = `<span style="margin-right: 8px; font-weight: bold;">${icon}</span> ${message}`;
             
             // Estilizar
             Object.assign(notification.style, {
                 position: 'fixed',
                 bottom: '20px',
                 right: '20px',
-                background: 'var(--primary)',
+                background: bgColor,
                 color: 'white',
                 padding: '12px 20px',
                 borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                 zIndex: '1000',
                 transition: 'opacity 0.3s, transform 0.3s',
                 opacity: '0',
-                transform: 'translateY(10px)'
+                transform: 'translateY(10px)',
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                maxWidth: '90%',
+                wordBreak: 'break-word'
             });
             
             // Adicionar ao DOM
@@ -695,7 +756,8 @@
                 notification.style.transform = 'translateY(0)';
             }, 10);
             
-            // Remover após 3 segundos
+            // Remover após 3 segundos (mais tempo para erro)
+            const duration = type === 'error' ? 5000 : 3000;
             setTimeout(() => {
                 notification.style.opacity = '0';
                 notification.style.transform = 'translateY(10px)';
@@ -704,7 +766,15 @@
                 setTimeout(() => {
                     notification.remove();
                 }, 300);
-            }, 3000);
+            }, duration);
+            
+            // Permitir fechar clicando
+            notification.style.cursor = 'pointer';
+            notification.addEventListener('click', () => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(10px)';
+                setTimeout(() => notification.remove(), 300);
+            });
         }
     </script>
 </body>

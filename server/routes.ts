@@ -129,10 +129,16 @@ async function generateScript(req: Request, res: Response) {
       return res.status(400).json({ error: 'Prompt é obrigatório' });
     }
     
-    // Verificar se a API está configurada
+    // Forçar uso do Hugging Face - ignorando a configuração do .env para resolver problema
     const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
     const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
-    const USE_HUGGINGFACE = process.env.USE_HUGGINGFACE === 'true';
+    const USE_HUGGINGFACE = true; // Definido manualmente para resolver problema
+    
+    // Log para debug das variáveis de ambiente
+    console.log('ENV:', { 
+      USE_HUGGINGFACE_ENV: process.env.USE_HUGGINGFACE,
+      NODE_ENV: process.env.NODE_ENV
+    });
     
     if (!OPENAI_API_KEY && !USE_HUGGINGFACE) {
       return res.status(500).json({ 
@@ -146,7 +152,8 @@ async function generateScript(req: Request, res: Response) {
     // Log para depuração
     console.log('Configuração da API:', { 
       openaiKeyConfigured: !!OPENAI_API_KEY, 
-      useHuggingFace: USE_HUGGINGFACE 
+      useHuggingFace: USE_HUGGINGFACE, 
+      forçandoHuggingFace: 'Sim - para contornar problema de variáveis de ambiente'
     });
 
     if (USE_HUGGINGFACE) {
