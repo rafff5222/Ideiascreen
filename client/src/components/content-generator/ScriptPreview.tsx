@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Copy, CheckCircle, Share2, Download, Loader2 } from "lucide-react";
+import { Copy, CheckCircle, Share2, Download, Loader2, Save, History } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 type ScriptPreviewProps = {
   prompt: string;
@@ -21,7 +22,20 @@ export default function ScriptPreview({
   const [isCopied, setIsCopied] = useState(false);
   const [metadata, setMetadata] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [savedScripts, setSavedScripts] = useState<any[]>([]);
   const { toast } = useToast();
+  
+  // Carregar histórico de roteiros salvos
+  useEffect(() => {
+    try {
+      const savedHistory = localStorage.getItem('historico_roteiros');
+      if (savedHistory) {
+        setSavedScripts(JSON.parse(savedHistory));
+      }
+    } catch (err) {
+      console.error("Erro ao carregar histórico:", err);
+    }
+  }, []);
 
   // Gera o roteiro através da API
   useEffect(() => {
@@ -106,6 +120,59 @@ export default function ScriptPreview({
       });
     }, 1500);
   };
+  
+  // Salvar roteiro no localStorage
+  const handleSaveScript = () => {
+    if (!script) return;
+    
+    try {
+      const novoRoteiro = {
+        id: Date.now(),
+        titulo: prompt,
+        tipo: scriptType,
+        texto: script,
+        data: new Date().toISOString(),
+        metadata
+      };
+      
+      const historico = [...savedScripts, novoRoteiro];
+      localStorage.setItem('historico_roteiros', JSON.stringify(historico));
+      setSavedScripts(historico);
+      
+      toast({
+        title: "Roteiro Salvo!",
+        description: "Seu roteiro foi salvo em seu navegador",
+      });
+    } catch (err) {
+      console.error("Erro ao salvar:", err);
+      toast({
+        title: "Erro ao Salvar",
+        description: "Não foi possível salvar o roteiro",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  // Carregar roteiro do histórico
+  const handleLoadScript = (savedScript: any) => {
+    setScript(savedScript.texto);
+    toast({
+      title: "Roteiro Carregado",
+      description: `"${savedScript.titulo}" carregado com sucesso!`,
+    });
+  };
+  
+  // Excluir roteiro do histórico
+  const handleDeleteScript = (id: number) => {
+    const updatedHistory = savedScripts.filter(item => item.id !== id);
+    localStorage.setItem('historico_roteiros', JSON.stringify(updatedHistory));
+    setSavedScripts(updatedHistory);
+    
+    toast({
+      title: "Roteiro Excluído",
+      description: "O roteiro foi removido do histórico",
+    });
+  };
 
   if (isLoading) {
     return (
@@ -157,6 +224,79 @@ export default function ScriptPreview({
             <Download size={16} />
             PDF
           </Button>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleSaveScript} 
+            className="flex items-center gap-1 text-green-500"
+          >
+            <Save size={16} />
+            Salvar
+          </Button>
+          
+          {/* Histórico de Roteiros */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="flex items-center gap-1 text-blue-400"
+              >
+                <History size={16} />
+                Histórico
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="bg-gray-900 text-white border-l border-amber-500/30 overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle className="text-white text-left mb-4">Histórico de Roteiros</SheetTitle>
+              </SheetHeader>
+              
+              {savedScripts.length === 0 ? (
+                <div className="text-gray-400 text-center py-8">
+                  <History className="w-12 h-12 mx-auto text-gray-600 mb-3" />
+                  <p>Nenhum roteiro salvo ainda.</p>
+                  <p className="text-sm mt-2">Use o botão "Salvar" para guardar seus roteiros.</p>
+                </div>
+              ) : (
+                <div className="space-y-4 mt-4">
+                  {savedScripts.map((script, index) => (
+                    <div 
+                      key={script.id || index} 
+                      className="bg-gray-800 rounded-lg p-3 border border-amber-500/20 hover:border-amber-500/40 transition-all"
+                    >
+                      <div className="text-amber-500 font-semibold mb-1 text-sm truncate">
+                        {script.titulo}
+                      </div>
+                      <div className="text-xs text-gray-400 mb-2">
+                        {new Date(script.data).toLocaleDateString()} • {script.tipo}
+                      </div>
+                      <div className="text-xs line-clamp-2 text-gray-300 mb-3">
+                        {script.texto.substring(0, 100)}...
+                      </div>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="h-8 text-xs flex-1"
+                          onClick={() => handleLoadScript(script)}
+                        >
+                          Carregar
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="h-8 text-xs text-red-400 hover:text-red-300"
+                          onClick={() => handleDeleteScript(script.id)}
+                        >
+                          Excluir
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
       
@@ -209,26 +349,45 @@ export default function ScriptPreview({
       </div>
       
       <div className="p-4 bg-gradient-to-r from-gray-900 to-gray-800 border-t border-amber-500/30">
+        {/* Estrutura Narrativa - Timeline */}
+        {!error && script && (
+          <div className="mb-4">
+            <p className="text-xs font-semibold text-gray-400 mb-2">Estrutura Narrativa:</p>
+            <div className="timeline flex h-3 mb-2 rounded-full overflow-hidden">
+              <div className="ato1 w-[30%] bg-[#e53170]" title="Ato 1: Introdução"></div>
+              <div className="ato2 w-[40%] bg-[#ff8906]" title="Ato 2: Desenvolvimento"></div>
+              <div className="ato3 w-[30%] bg-[#f25f4c]" title="Ato 3: Conclusão"></div>
+            </div>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>Introdução</span>
+              <span>Desenvolvimento</span>
+              <span>Conclusão</span>
+            </div>
+          </div>
+        )}
+        
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-400">
             {!error && <>
               <span className="text-amber-500">{script.length}</span> caracteres • Aproximadamente <span className="text-amber-500">{Math.ceil(script.length / 1000)}</span> minuto(s) de leitura
             </>}
           </p>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            className="flex items-center gap-1 text-blue-400 hover:text-blue-300 hover:bg-gray-800"
-            onClick={() => {
-              toast({
-                title: "Link copiado",
-                description: "Link para compartilhamento copiado para área de transferência",
-              });
-            }}
-          >
-            <Share2 size={16} />
-            Compartilhar
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="flex items-center gap-1 text-blue-400 hover:text-blue-300 hover:bg-gray-800"
+              onClick={() => {
+                toast({
+                  title: "Link copiado",
+                  description: "Link para compartilhamento copiado para área de transferência",
+                });
+              }}
+            >
+              <Share2 size={16} />
+              Compartilhar
+            </Button>
+          </div>
         </div>
       </div>
     </div>
