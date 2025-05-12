@@ -219,6 +219,28 @@ export default function ScriptGenerator() {
                     </div>
                     
                     <div>
+                      <Label htmlFor="creativeMode">Modo Criativo</Label>
+                      <Select
+                        value={creativeMode}
+                        onValueChange={setCreativeMode}
+                      >
+                        <SelectTrigger id="creativeMode" className="mt-1">
+                          <SelectValue placeholder="Selecione o modo criativo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {creativeModes.map((item) => (
+                            <SelectItem key={item.id} value={item.id}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {creativeModes.find(mode => mode.id === creativeMode)?.description}
+                      </p>
+                    </div>
+                    
+                    <div>
                       <Label htmlFor="narrativeArc">Estrutura Narrativa</Label>
                       <Select
                         value={narrativeArc}
@@ -309,6 +331,7 @@ export default function ScriptGenerator() {
                 Tipo: ${scriptTypes.find(type => type.id === scriptType)?.label}
                 Nível de Detalhe: ${detailLevels.find(level => level.id === detailLevel)?.label}
                 Tom: ${toneOptions.find(t => t.id === tone)?.label}
+                Modo Criativo: ${creativeModes.find(mode => mode.id === creativeMode)?.label}
                 Estrutura Narrativa: ${narrativeArcs.find(arc => arc.id === narrativeArc)?.label}
                 ${characters ? `Personagens: ${characters}` : ''}
                 ${setting ? `Cenário/Ambiente: ${setting}` : ''}
