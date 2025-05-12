@@ -6,6 +6,33 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Sistema de cores semânticas */
+:root {
+  --color-primary: #6e45e2;
+  --color-success: #4caf50;
+  --color-warning: #ff9800;
+  --color-danger: #f44336;
+}
+
+/* Estilização para textos com gradiente */
+.gradient-text {
+  background: linear-gradient(90deg, #6e45e2, #8766ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+/* Microinterações */
+.card {
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
 /* Otimização de visualização em dispositivos móveis */
 @media (max-width: 600px) {
   .script-content {
@@ -25,8 +52,18 @@
     font-size: 16px !important; /* Evita zoom indesejado no iOS */
     touch-action: manipulation; /* Melhora resposta ao toque */
   }
-  
-  /* Aumentar espaçamento entre elementos no formulário para facilitar toque */
+}
+
+/* Correção específica para mobile em formulários */
+@media (max-width: 768px) {
+  select, input {
+    padding: 12px 15px !important;
+    margin-bottom: 10px;
+  }
+}
+
+/* Aumentar espaçamento entre elementos no formulário para facilitar toque */
+@media (max-width: 600px) {
   .space-y-6 > * {
     margin-top: 1.75rem !important;
     margin-bottom: 1.75rem !important;
