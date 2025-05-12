@@ -136,7 +136,7 @@ async function generateScript(req: Request, res: Response) {
     if (!OPENAI_API_KEY && !USE_HUGGINGFACE) {
       return res.status(500).json({ 
         error: 'Nenhuma API de IA configurada', 
-        script: 'DEMO: Este é um roteiro de demonstração. Configure a API_KEY da OpenAI ou use Hugging Face para gerar roteiros reais.' 
+        script: 'Por favor, configure a API da OpenAI ou ative o Hugging Face nas configurações para gerar roteiros.' 
       });
     }
 
@@ -214,7 +214,7 @@ async function generateScript(req: Request, res: Response) {
           // Se não temos OpenAI como fallback, retornar erro
           return res.status(500).json({ 
             error: `Erro ao gerar roteiro: ${error.message}`,
-            script: "DEMONSTRAÇÃO: Este é um roteiro de exemplo criado devido a um erro na API.\n\nCENA 1 - EXTERIOR - DIA\n\nUma pessoa está sentada em um banco de parque, contemplando o horizonte. A câmera se aproxima lentamente."
+            script: "Não foi possível gerar o roteiro no momento. Por favor, tente novamente mais tarde.\n\nDica: Tente um prompt mais simples ou diferente."
           });
         }
       }
@@ -245,7 +245,7 @@ async function generateScript(req: Request, res: Response) {
     console.error('Erro ao gerar roteiro:', error);
     return res.status(500).json({ 
       error: `Erro ao gerar roteiro: ${error.message}`,
-      script: "DEMONSTRAÇÃO: Ocorreu um erro ao gerar o roteiro. Este é um exemplo de roteiro para demonstração.\n\nCENA 1 - INTERIOR - ESCRITÓRIO - DIA\n\nJOÃO, 30 anos, está sentado em frente ao computador. Sua expressão mostra concentração e cansaço."
+      script: "Ocorreu um erro ao processar seu pedido. Por favor, tente novamente em alguns instantes.\n\nSe o problema persistir, verifique sua conexão ou tente um prompt diferente."
     });
   }
 }
