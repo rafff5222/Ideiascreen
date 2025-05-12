@@ -59,22 +59,30 @@ export default function Home() {
   return (
     <>
       <Helmet>
-        <title>ContentPro - Crie Vídeos Virais para Instagram e TikTok com IA</title>
+        <title>PLOTMACHINE - Crie Roteiros Profissionais e Cinematográficos com IA</title>
         <meta 
           name="description" 
-          content="Crie scripts, legendas e ideias virais para Instagram e TikTok usando IA. Economize tempo e aumente seu engajamento com conteúdo otimizado."
+          content="Crie roteiros profissionais para vídeos, podcasts e apresentações em segundos usando IA. Estrutura narrativa profissional e resultados impressionantes."
+        />
+        <meta 
+          name="keywords" 
+          content="roteiro, cinema, escritor criativo, IA, narrativa, gerador de roteiros, inteligência artificial"
         />
         <meta 
           property="og:title" 
-          content="ContentPro - Crie conteúdo viral para redes sociais com IA" 
+          content="PLOTMACHINE - Roteiros Profissionais Gerados por IA" 
         />
         <meta 
           property="og:description" 
-          content="Ferramenta completa de IA para criadores de conteúdo do Instagram e TikTok: scripts, legendas otimizadas e montagem automática de vídeos."
+          content="Transforme ideias em roteiros cinematográficos em segundos. IA especializada em narrativa com estrutura profissional."
         />
         <meta 
           property="og:image" 
           content="https://contentpro.com.br/social-preview.jpg" 
+        />
+        <meta 
+          property="og:url" 
+          content="https://seusite.com/gerador-roteiros" 
         />
         <meta name="twitter:card" content="summary_large_image" />
         
@@ -83,19 +91,21 @@ export default function Home() {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            "name": "ContentPro",
-            "applicationCategory": "SocialMediaApplication",
+            "name": "PLOTMACHINE",
+            "applicationCategory": "CreativeWritingApplication",
             "operatingSystem": "Web",
+            "description": "IA especializada em geração de roteiros profissionais com estrutura narrativa cinematográfica",
             "offers": {
               "@type": "Offer",
-              "price": "59.00",
+              "price": "69.90",
               "priceCurrency": "BRL"
             },
             "aggregateRating": {
               "@type": "AggregateRating",
               "ratingValue": "4.8",
-              "ratingCount": "2783"
-            }
+              "ratingCount": "2400"
+            },
+            "featureList": "37 gêneros cinematográficos, Análise de Crítico de Cinema, Modo Diretor, Exportação em múltiplos formatos"
           })}
         </script>
         

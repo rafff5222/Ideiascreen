@@ -16,13 +16,22 @@ export default function Hero() {
               <span>Novo: Gerador de Roteiros Profissionais</span>
             </div>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-              Roteiros Profissionais com IA
+            <h1 className="hero-title text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+              Transforme ideias em <span className="gradient-text">roteiros cinematográficos</span>
             </h1>
             
-            <p className="text-lg md:text-xl text-gray-700 mb-6">
-              Crie roteiros perfeitos para seus vídeos, podcasts e apresentações em segundos com ajuda da inteligência artificial. Ideal para criadores de conteúdo e profissionais.
+            <p className="hero-description text-lg md:text-xl text-gray-700 mb-6">
+              IA especializada em narrativa + estrutura profissional
             </p>
+            
+            <div className="badges flex flex-wrap gap-3 mb-6">
+              <span className="inline-flex items-center px-3 py-1 text-sm rounded-full bg-primary/10 text-primary">
+                ⚡ 2.400+ roteiros gerados
+              </span>
+              <span className="inline-flex items-center px-3 py-1 text-sm rounded-full bg-primary/10 text-primary">
+                🎬 37 gêneros
+              </span>
+            </div>
             
             <div className="flex flex-wrap items-center gap-4 mb-8">
               {/* Botão para o gerador de roteiros */}
