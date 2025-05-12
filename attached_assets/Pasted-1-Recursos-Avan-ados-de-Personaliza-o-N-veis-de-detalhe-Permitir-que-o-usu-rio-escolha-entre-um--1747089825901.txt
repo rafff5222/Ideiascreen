@@ -1,0 +1,57 @@
+1. Recursos Avançados de Personalização
+Níveis de detalhe: Permitir que o usuário escolha entre um esboço rápido ou um roteiro detalhado (com atos, cenas, diálogos).
+
+Inputs customizáveis: Campos para inserir:
+
+Nomes de personagens (ex.: "Transforme [Nome] no vilão").
+
+Cenário específico (ex.: "Uma espaçonave abandonada em 2150").
+
+Mood (sombrio, épico, cômico) e tom (profissional, informal).
+
+Arcos narrativos pré-definidos: Opções como "Jornada do Herói", "Tragédia Shakespeariana", etc.
+
+2. Inteligência de Roteiro Mais "Humana"
+Geração baseada em referências: Permitir que o usuário insira filmes/livros como inspiração (ex.: "No estilo de Stranger Things").
+
+Feedback iterativo: Opção de refinar o roteiro gerado (ex.: "Torne o vilão mais complexo" ou "Adicione um plot twist").
+
+Diálogos gerados automaticamente: Com opção de ajustar o estilo (realista, poético, sarcástico).
+
+3. Ferramentas de Organização e Exportação
+Storyboard básico: Exibir o roteiro em formato de timeline ou cards (como no Trello).
+
+Exportar em formatos úteis:
+
+PDF (para impressão).
+
+.FDX (Final Draft, padrão da indústria cinematográfica).
+
+.TXT (simples para edição posterior).
+
+Salvar projetos na nuvem: Com login via Google/GitHub para acessar histórias anteriores.
+
+4. Comunidade e Colaboração
+Compartilhamento público: Usuários podem publicar roteiros e receber likes/comentários (como um mini Wattpad para roteiristas).
+
+Modo colaborativo: Edição em tempo real com amigos (estilo Google Docs).
+
+Desafios criativos: Promoções como "Melhor roteiro de terror do mês" com premiação simbólica.
+
+5. Elementos Visuais e Inspiração
+Geração de mood boards: Usar IA para criar imagens de cenários/personagens baseadas no roteiro (via DALL·E ou Stable Diffusion).
+
+Sugestão de trilha sonora: Links para músicas no YouTube/Spotify que combinem com a atmosfera da história.
+
+6. Monetização (Futuro SaaS)
+Plano gratuito: Com gerações limitadas por dia.
+
+Plano pago: Recursos como roteiros ilimitados, exportação em .FDX, colaboração em equipe.
+
+IA premium: Modelos mais avançados (ex.: GPT-4 Turbo) para assinantes.
+
+7. Diferenciais Criativos
+Gêneros incomuns: Combinações como "Cyberpunk + Romance de Época" ou "Faroeste Cósmico".
+
+Prompt invisível: Mostrar ao usuário "como a IA pensou" (ex.: "Usei a estrutura de 3 atos com um vilão redimível").
+
