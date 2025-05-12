@@ -71,6 +71,26 @@ export default function ScriptPreview({
     }, 2000);
   };
 
+  // Função para exportar como TXT
+  const handleExportTXT = () => {
+    if (!script) return;
+    
+    const blob = new Blob([script], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `roteiro-${scriptType}-${new Date().toISOString().slice(0, 10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Roteiro Exportado!",
+      description: "Seu roteiro foi baixado em formato TXT",
+    });
+  };
+  
   // Função para exportar como PDF
   const handleExportPDF = () => {
     toast({
@@ -122,6 +142,15 @@ export default function ScriptPreview({
           <Button 
             variant="outline" 
             size="sm"
+            onClick={handleExportTXT} 
+            className="flex items-center gap-1"
+          >
+            <Download size={16} />
+            TXT
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm"
             onClick={handleExportPDF} 
             className="flex items-center gap-1"
           >
@@ -139,7 +168,7 @@ export default function ScriptPreview({
           </div>
         ) : (
           <div className="prose prose-sm max-w-none">
-            <pre className="whitespace-pre-line bg-gray-50 p-4 rounded-lg border text-sm overflow-auto max-h-[500px]">
+            <pre id="texto-gerado" className="whitespace-pre-line bg-gray-50 p-4 rounded-lg border text-sm overflow-auto max-h-[500px] script-content mobile-optimized">
               {script}
             </pre>
           </div>

@@ -6,6 +6,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Otimização de visualização em dispositivos móveis */
+@media (max-width: 600px) {
+  .script-content {
+    padding: 10px !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+  }
+  
+  .mobile-optimized {
+    font-size: 16px !important;
+    max-height: 400px !important;
+  }
+}
+
 h2 {
   font-size: 32px;
   margin-bottom: 24px;

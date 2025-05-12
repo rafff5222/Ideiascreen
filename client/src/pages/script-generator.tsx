@@ -36,8 +36,20 @@ const toneOptions = [
   { id: 'casual', label: 'Casual' },
   { id: 'humoristico', label: 'Humorístico' },
   { id: 'dramatico', label: 'Dramático' },
+  { id: 'poetico', label: 'Poético' },
+  { id: 'sarcastico', label: 'Sarcástico' },
   { id: 'inspirador', label: 'Inspirador' },
   { id: 'educativo', label: 'Educativo' },
+];
+
+// Modos criativos especiais
+const creativeModes = [
+  { id: 'padrao', label: 'Padrão', description: 'Geração regular de roteiro' },
+  { id: 'maluco', label: 'Roteiro Maluco', description: 'Combina gêneros absurdos, como "Faroeste Espacial"' },
+  { id: 'curta', label: 'Curta-Metragem', description: 'História com 1 cenário e poucos personagens' },
+  { id: 'twist', label: 'Plot Twist', description: 'Inclui uma reviravolta inesperada no roteiro' },
+  { id: 'alternativo', label: 'Final Alternativo', description: 'Inclui dois finais possíveis para a história' },
+  { id: 'generos', label: 'Multi-Gênero', description: 'Mistura elementos de diferentes gêneros narrativos' },
 ];
 
 // Arcos narrativos
@@ -56,6 +68,7 @@ export default function ScriptGenerator() {
   const [detailLevel, setDetailLevel] = useState('padrao');
   const [tone, setTone] = useState('profissional');
   const [narrativeArc, setNarrativeArc] = useState('padrao');
+  const [creativeMode, setCreativeMode] = useState('padrao');
   const [characters, setCharacters] = useState('');
   const [setting, setSetting] = useState('');
   const [reference, setReference] = useState('');
@@ -81,6 +94,7 @@ export default function ScriptGenerator() {
       detailLevel,
       tone,
       narrativeArc,
+      creativeMode,
       characters: characters.trim() ? characters : undefined,
       setting: setting.trim() ? setting : undefined,
       reference: reference.trim() ? reference : undefined
