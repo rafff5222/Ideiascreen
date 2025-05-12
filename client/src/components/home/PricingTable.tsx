@@ -220,11 +220,11 @@ export default function PricingTable() {
             </li>
             <li className="flex items-start">
               <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
-              <span>Montagem automática de vídeos</span>
+              <span>Análise Crítica de Cinema</span>
             </li>
             <li className="flex items-start">
               <FaCheck className="text-green-500 mr-2 flex-shrink-0" size={16} />
-              <span>Edição com IA avançada e efeitos</span>
+              <span>Modo Diretor Profissional</span>
             </li>
           </ul>
           <button 
