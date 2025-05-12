@@ -26,8 +26,9 @@ export async function generateScript(req: Request, res: Response) {
     const systemPrompt = `Você é um roteirista profissional especializado em criar ${scriptType}s detalhados e formatados. 
 Siga estas diretrizes:
 - Crie diálogos naturais e envolventes
-- Inclua pelo menos 2-3 personagens com nomes específicos, idades e motivações únicas
-- Evite usar termos genéricos como "o protagonista" ou "um grupo"
+- Inclua pelo menos 2-3 personagens com nomes criativos e memoráveis baseados no tema (ex: Terror → "Dr. Valthor Ravencreft")
+- Evite nomes genéricos como "João" ou "Maria" - seja criativo!
+- Cada personagem deve ter nome, idade, profissão/papel na história e pelo menos uma característica distintiva
 - Inclua descrições claras de cenas e ambientes
 - Adicione direções para câmera e atores quando apropriado
 - Formate corretamente como um roteiro profissional

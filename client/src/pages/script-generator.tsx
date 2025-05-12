@@ -179,14 +179,20 @@ export default function ScriptGenerator() {
         <meta name="description" content="Crie roteiros profissionais para vídeos, podcasts, tutoriais e storytelling em segundos usando nossa ferramenta de geração por IA. Exporte facilmente em PDF." />
       </Helmet>
     
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-12 bg-gray-900 min-h-screen">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            <div className="flex items-center justify-center mb-2">
+              <div className="text-4xl md:text-5xl font-black mr-2">🎬</div>
+              <h1 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent tracking-tight">
+                PLOTMACHINE
+              </h1>
+            </div>
+            <div className="bg-gray-800 text-white text-xs uppercase tracking-widest py-1 px-3 rounded-full inline-block mb-4 font-medium">
               Gerador de Roteiros Profissionais
-            </h1>
-            <p className="text-lg text-gray-600">
-              Crie roteiros para vídeos, podcasts, tutoriais e storytelling em segundos
+            </div>
+            <p className="text-lg text-gray-400 max-w-xl mx-auto">
+              Transforme suas ideias em roteiros cinematográficos, podcasts, tutoriais e histórias cativantes em segundos
             </p>
           </div>
 
@@ -480,8 +486,45 @@ export default function ScriptGenerator() {
             </CardContent>
           </Card>
           
-          <div className="mt-8 text-center text-sm text-gray-500">
-            <p>O gerador de roteiros utiliza inteligência artificial para criar conteúdo original. Revise sempre o conteúdo gerado.</p>
+          <div className="mt-12 mb-16">
+            <h2 className="text-2xl font-bold mb-6 text-center">
+              <span className="bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">
+                Roteiros Incríveis Gerados por Usuários
+              </span>
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-gray-900 border border-amber-500/20 rounded-lg p-4 hover:shadow-lg transition-shadow">
+                <div className="text-amber-500 font-semibold mb-2">"O Mistério da Caverna Esquecida"</div>
+                <p className="text-gray-400 text-sm mb-3">Roteiro de curta-metragem sobre exploradores que encontram uma porta para outra dimensão.</p>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Por: Marcela F.</span>
+                  <span>Estilo: Ficção Científica</span>
+                </div>
+              </div>
+              
+              <div className="bg-gray-900 border border-amber-500/20 rounded-lg p-4 hover:shadow-lg transition-shadow">
+                <div className="text-amber-500 font-semibold mb-2">"Café da Manhã com Aliens"</div>
+                <p className="text-gray-400 text-sm mb-3">Roteiro de comédia onde uma família suburbana descobre que seus novos vizinhos são extraterrestres disfarçados.</p>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Por: Ricardo T.</span>
+                  <span>Estilo: Comédia/Sci-Fi</span>
+                </div>
+              </div>
+              
+              <div className="bg-gray-900 border border-amber-500/20 rounded-lg p-4 hover:shadow-lg transition-shadow">
+                <div className="text-amber-500 font-semibold mb-2">"Vidas em Código"</div>
+                <p className="text-gray-400 text-sm mb-3">Roteiro para podcast sobre como a programação transforma vidas em comunidades carentes.</p>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Por: Amanda L.</span>
+                  <span>Estilo: Documentário</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-8 text-center text-sm text-gray-400 border-t border-gray-800 pt-6">
+            <p>O PLOTMACHINE utiliza inteligência artificial para criar conteúdo original. Revise sempre o conteúdo gerado antes de publicação.</p>
           </div>
         </div>
       </div>

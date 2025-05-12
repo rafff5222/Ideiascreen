@@ -18,6 +18,24 @@
     font-size: 16px !important;
     max-height: 400px !important;
   }
+  
+  /* Melhorias de acessibilidade para mobile */
+  select, input, textarea, button, [role="combobox"] {
+    min-height: 44px !important; /* Tamanho mínimo acessível */
+    font-size: 16px !important; /* Evita zoom indesejado no iOS */
+    touch-action: manipulation; /* Melhora resposta ao toque */
+  }
+  
+  /* Aumentar espaçamento entre elementos no formulário para facilitar toque */
+  .space-y-6 > * {
+    margin-top: 1.75rem !important;
+    margin-bottom: 1.75rem !important;
+  }
+  
+  /* Melhorar aparência de switches e botões no mobile */
+  button, [role="button"] {
+    padding: 0.75rem 1rem !important;
+  }
 }
 
 h2 {
