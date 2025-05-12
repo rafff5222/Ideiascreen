@@ -131,6 +131,7 @@ async function generateScript(req: Request, res: Response) {
     
     // Verificar se a API está configurada
     const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+    const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
     const USE_HUGGINGFACE = process.env.USE_HUGGINGFACE === 'true';
     
     if (!OPENAI_API_KEY && !USE_HUGGINGFACE) {
@@ -141,30 +142,68 @@ async function generateScript(req: Request, res: Response) {
     }
 
     let generatedScript = '';
+    
+    // Log para depuração
+    console.log('Configuração da API:', { 
+      openaiKeyConfigured: !!OPENAI_API_KEY, 
+      useHuggingFace: USE_HUGGINGFACE 
+    });
 
     if (USE_HUGGINGFACE) {
       // Usar Hugging Face (gratuito)
       try {
         // URL do modelo no Hugging Face (usando modelo gratuito)
-        const apiUrl = "https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct";
+        // Usar o modelo gratuito do Hugging Face
+        // Opções de modelos que funcionam bem para roteiros:
+        // - tiiuae/falcon-7b-instruct (mais rápido)
+        // - mistralai/Mistral-7B-Instruct-v0.2 (bons resultados)
+        // - google/flan-t5-xxl (bem generalista)
+        // - facebook/opt-iml-max-1.3b (bom para geração de texto criativo)
+        const apiUrl = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
         
-        // Formatar o prompt para o modelo
-        const systemPrompt = "Você é um roteirista profissional especializado em criar roteiros detalhados e formatados.";
-        const formattedPrompt = `${systemPrompt}\n\n${prompt}\n\nCrie um roteiro detalhado com diálogos, cenas e direções de câmera. Formate corretamente como um roteiro profissional.`;
+        // Formatar o prompt para o modelo - ajustado para melhores resultados
+        const scriptType = prompt.toLowerCase().includes("youtube") ? "vídeo para YouTube" : 
+                          prompt.toLowerCase().includes("podcast") ? "episódio de podcast" : 
+                          "roteiro profissional";
+        
+        const systemPrompt = `Você é um roteirista profissional especializado em criar ${scriptType}s detalhados e formatados. 
+Siga estas diretrizes:
+- Crie diálogos naturais e envolventes
+- Inclua descrições claras de cenas e ambientes
+- Adicione direções para câmera e atores quando apropriado
+- Formate corretamente como um roteiro profissional
+- Use formatação adequada ao tipo de conteúdo`;
+
+        const formattedPrompt = `${systemPrompt}
+
+Prompt do usuário: ${prompt}
+
+Responda APENAS com o roteiro completo, sem introduções ou conclusões.`;
         
         // Fazer a requisição para a API Hugging Face
         const fetch = (await import('node-fetch')).default;
+        
+        // Preparar os headers
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        
+        // Adicionar o token de API se disponível
+        if (HUGGINGFACE_API_KEY) {
+          headers["Authorization"] = `Bearer ${HUGGINGFACE_API_KEY}`;
+        }
+        
         const response = await fetch(apiUrl, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers,
           body: JSON.stringify({
             inputs: formattedPrompt,
             parameters: {
-              max_new_tokens: 1000,
-              temperature: 0.7,
+              max_new_tokens: 1500, // Aumentado para roteiros mais completos
+              temperature: 0.75,
               top_p: 0.95,
+              top_k: 50,
+              repetition_penalty: 1.1,
               do_sample: true,
             }
           }),
@@ -212,9 +251,17 @@ async function generateScript(req: Request, res: Response) {
           generatedScript = completion.choices[0].message.content;
         } else {
           // Se não temos OpenAI como fallback, retornar erro
+          let errorTips = `Ocorreu um erro ao usar a API do Hugging Face.\n\n`;
+          errorTips += `Possíveis causas e soluções:\n`;
+          errorTips += `• A API gratuita está temporariamente indisponível\n`;
+          errorTips += `• O modelo está sobrecarregado no momento\n`;
+          errorTips += `• Tente novamente em alguns minutos\n`;
+          errorTips += `• Tente um prompt mais simples\n`;
+          errorTips += `• Verifique sua conexão com a internet`;
+          
           return res.status(500).json({ 
             error: `Erro ao gerar roteiro: ${error.message}`,
-            script: "Não foi possível gerar o roteiro no momento. Por favor, tente novamente mais tarde.\n\nDica: Tente um prompt mais simples ou diferente."
+            script: errorTips
           });
         }
       }
@@ -243,9 +290,29 @@ async function generateScript(req: Request, res: Response) {
     return res.json({ script: generatedScript });
   } catch (error: any) {
     console.error('Erro ao gerar roteiro:', error);
+    // Formatar mensagem de erro com informações úteis
+    let errorTips = `Ocorreu um erro ao processar seu pedido.\n\n`;
+    
+    // Adicionar informações detalhadas se for erro de quota
+    if (error.message && error.message.includes("quota")) {
+      errorTips += `ERRO: Limite de requisições da API excedido.\n\n`;
+      errorTips += `Possíveis soluções:\n`;
+      errorTips += `• Espere alguns minutos e tente novamente\n`;
+      errorTips += `• Tente usar um prompt mais simples\n`;
+      errorTips += `• Se o erro persistir, verifique sua conexão\n\n`;
+      errorTips += `Alternativas:\n`;
+      errorTips += `• Ative a opção de usar Hugging Face (gratuito) no servidor`;
+    } else {
+      errorTips += `Possíveis causas e soluções:\n`;
+      errorTips += `• Verifique sua conexão com a internet\n`;
+      errorTips += `• Tente recarregar a página\n`;
+      errorTips += `• Espere alguns minutos e tente novamente\n`;
+      errorTips += `• Tente um prompt diferente`;
+    }
+    
     return res.status(500).json({ 
       error: `Erro ao gerar roteiro: ${error.message}`,
-      script: "Ocorreu um erro ao processar seu pedido. Por favor, tente novamente em alguns instantes.\n\nSe o problema persistir, verifique sua conexão ou tente um prompt diferente."
+      script: errorTips
     });
   }
 }
