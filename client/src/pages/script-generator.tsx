@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Sparkles, MessageSquare } from "lucide-react";
 import { Helmet } from "react-helmet";
 
 // Tipos de roteiros suportados
@@ -72,6 +74,8 @@ export default function ScriptGenerator() {
   const [characters, setCharacters] = useState('');
   const [setting, setSetting] = useState('');
   const [reference, setReference] = useState('');
+  const [surpriseMe, setSurpriseMe] = useState(false);
+  const [generateDialogue, setGenerateDialogue] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [examples] = useState([
@@ -82,22 +86,81 @@ export default function ScriptGenerator() {
     "Uma peça de teatro sobre conflitos familiares",
   ]);
 
+  // Função para gerar combinações aleatórias para a pílula criativa
+  const generateSurpriseElements = () => {
+    const randomGenres = [
+      'ficção científica', 'comédia romântica', 'terror psicológico', 
+      'faroeste futurista', 'fantasia medieval', 'drama histórico',
+      'thriller cyberpunk', 'policial noir', 'aventura steampunk',
+      'distopia pós-apocalíptica', 'suspense sobrenatural'
+    ];
+    
+    const randomSettings = [
+      'em uma estação espacial abandonada', 'em um reino subaquático',
+      'em uma cidade flutuante', 'durante o colapso da civilização',
+      'em um labirinto infinito', 'em uma dimensão paralela',
+      'na Era Vitoriana alternativa', 'em um deserto com criaturas alienígenas',
+      'em um castelo mal-assombrado', 'em um teatro mágico'
+    ];
+    
+    const randomTwists = [
+      'onde o vilão é na verdade o herói do passado', 
+      'onde o tempo flui ao contrário',
+      'onde todos compartilham uma consciência coletiva',
+      'onde a realidade é uma simulação',
+      'onde ninguém pode mentir',
+      'onde os objetos ganham vida',
+      'onde sonhos afetam a realidade',
+      'onde memórias podem ser transferidas entre pessoas'
+    ];
+    
+    return {
+      genre: randomGenres[Math.floor(Math.random() * randomGenres.length)],
+      setting: randomSettings[Math.floor(Math.random() * randomSettings.length)],
+      twist: randomTwists[Math.floor(Math.random() * randomTwists.length)]
+    };
+  };
+
   const handleGenerate = () => {
     if (!prompt) {
       return;
     }
     
+    let finalPrompt = prompt;
+    let selectedCharacters = characters;
+    let selectedSetting = setting;
+    let selectedReference = reference;
+    let selectedTone = tone;
+    let selectedCreativeMode = creativeMode;
+    
+    // Aplicar pílula criativa se ativada
+    if (surpriseMe) {
+      const surpriseElements = generateSurpriseElements();
+      
+      finalPrompt = `${prompt} (ELEMENTOS SURPRESA: Misture elementos de ${surpriseElements.genre} ${surpriseElements.setting}, e inclua uma reviravolta onde ${surpriseElements.twist})`;
+      
+      // Alterar também modo criativo
+      selectedCreativeMode = 'maluco';
+    }
+    
+    // Adicionar diálogos extras se solicitado
+    const dialogueInstruction = generateDialogue 
+      ? "IMPORTANTE: Após o roteiro principal, adicione uma seção de DIÁLOGOS EXTRAS com pelo menos 3 conversas cativantes entre os personagens principais, mostrando suas personalidades distintas."
+      : "";
+    
     // Construir um prompt enriquecido com todos os parâmetros
     const enrichedPrompt = {
-      prompt,
+      prompt: finalPrompt + (dialogueInstruction ? " " + dialogueInstruction : ""),
       scriptType,
       detailLevel,
-      tone,
+      tone: selectedTone,
       narrativeArc,
-      creativeMode,
-      characters: characters.trim() ? characters : undefined,
-      setting: setting.trim() ? setting : undefined,
-      reference: reference.trim() ? reference : undefined
+      creativeMode: selectedCreativeMode,
+      characters: selectedCharacters.trim() ? selectedCharacters : undefined,
+      setting: selectedSetting.trim() ? selectedSetting : undefined,
+      reference: selectedReference.trim() ? selectedReference : undefined,
+      surpriseMe,
+      generateDialogue
     };
     
     console.log('Gerando roteiro com configurações:', enrichedPrompt);
@@ -160,6 +223,43 @@ export default function ScriptGenerator() {
                     onChange={(e) => setPrompt(e.target.value)}
                     className="mt-1 h-32"
                   />
+                </div>
+                
+                {/* Features Especiais "Matadoras" */}
+                <div className="mt-6 space-y-4">
+                  <h3 className="text-base font-semibold">Features Criativas</h3>
+                  
+                  <div className="flex items-center justify-between bg-gradient-to-r from-yellow-500/10 to-amber-500/5 p-3 rounded-lg border border-amber-500/20">
+                    <div className="flex items-center space-x-3">
+                      <Sparkles className="w-5 h-5 text-amber-500" />
+                      <div>
+                        <Label htmlFor="surpriseMe" className="font-medium text-amber-500">Pílula Criativa</Label>
+                        <p className="text-xs text-muted-foreground">Mistura gêneros aleatórios e adiciona reviravoltas surpreendentes!</p>
+                      </div>
+                    </div>
+                    <Switch
+                      id="surpriseMe"
+                      checked={surpriseMe}
+                      onCheckedChange={setSurpriseMe}
+                      className="data-[state=checked]:bg-amber-500"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between bg-gradient-to-r from-blue-500/10 to-indigo-500/5 p-3 rounded-lg border border-blue-500/20">
+                    <div className="flex items-center space-x-3">
+                      <MessageSquare className="w-5 h-5 text-blue-400" />
+                      <div>
+                        <Label htmlFor="generateDialogue" className="font-medium text-blue-400">Gerador de Diálogos</Label>
+                        <p className="text-xs text-muted-foreground">Adiciona conversas cativantes entre os personagens!</p>
+                      </div>
+                    </div>
+                    <Switch
+                      id="generateDialogue"
+                      checked={generateDialogue}
+                      onCheckedChange={setGenerateDialogue}
+                      className="data-[state=checked]:bg-blue-500"
+                    />
+                  </div>
                 </div>
                 
                 <div>
