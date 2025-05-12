@@ -1,0 +1,35 @@
+[
+  {
+    "videoId": "test_video_1747011501911.mp4",
+    "eventType": "play",
+    "sessionId": "unknown",
+    "eventData": {
+      "source": "api",
+      "referrer": "https://9f52e595-f8fa-411c-b515-ae22e45b3c90-00-1zs5jzye903mh.janeway.replit.dev/video-preview?url=%2Fapi%2Fvideo-stream%2Fvideos%2Ftest_video_1747011501911.mp4",
+      "path": "videos/test_video_1747011501911.mp4"
+    },
+    "timestamp": 1747011521134
+  },
+  {
+    "videoId": "test_video_1747011501911.mp4",
+    "eventType": "play",
+    "sessionId": "unknown",
+    "eventData": {
+      "source": "api",
+      "referrer": "https://9f52e595-f8fa-411c-b515-ae22e45b3c90-00-1zs5jzye903mh.janeway.replit.dev/video-preview?url=%2Fapi%2Fvideo-stream%2Fvideos%2Ftest_video_1747011501911.mp4",
+      "path": "videos/test_video_1747011501911.mp4"
+    },
+    "timestamp": 1747011569515
+  },
+  {
+    "videoId": "test_video_1747011501911.mp4",
+    "eventType": "play",
+    "sessionId": "unknown",
+    "eventData": {
+      "source": "api",
+      "referrer": "https://9f52e595-f8fa-411c-b515-ae22e45b3c90-00-1zs5jzye903mh.janeway.replit.dev/video-library",
+      "path": "videos/test_video_1747011501911.mp4"
+    },
+    "timestamp": 1747011583051
+  }
+]

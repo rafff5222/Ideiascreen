@@ -1,0 +1,81 @@
+1. OpenAI (GPT-3.5 Turbo Free Tier)
+Problema: A partir de 2024, a OpenAI encerrou o plano gratuito.
+
+Solução alternativa:
+
+Use o GPT-3.5 Turbo (ainda tem um limite gratuito pequeno).
+
+Ou migre para alternativas gratuitas:
+
+Hugging Face (API gratuita com limite):
+
+python
+from transformers import pipeline
+chatbot = pipeline("text-generation", model="facebook/blenderbot-400M-distill")
+Ollama (local, sem custo):
+
+bash
+ollama run llama2
+2. ElevenLabs (Voz Gratuita)
+Limite free: ~10.000 caracteres/mês.
+
+Verifique:
+
+python
+from elevenlabs import set_api_key, voices
+set_api_key("SUA_CHAVE_GRATUITA")  # Chave free tier
+print(voices())  # Se retornar os vozes, está funcionando
+Se não tiver chave gratuita, use:
+
+Edge TTS (Microsoft) - 100% free:
+
+python
+import edge_tts
+voice = edge_tts.Communicate(text="Olá mundo!", voice="pt-BR-AntonioNeural")
+await voice.save("audio.mp3")
+3. Pexels (API Free)
+Limite: 200 requisições/hora.
+
+Como testar:
+
+bash
+curl -H "Authorization: SUA_CHAVE" https://api.pexels.com/v1/curated?per_page=1
+Se não tiver chave, use:
+
+Pixabay API (free, sem chave para baixo volume):
+
+bash
+curl "https://pixabay.com/api/?key=USER_KEY&q=nature"
+Unsplash (free com atribuição).
+
+4. FFmpeg (100% Gratuito)
+Se o status está "Verificando", instale localmente:
+
+bash
+# Linux/Mac:
+sudo apt install ffmpeg  # ou brew install ffmpeg
+
+# Windows (via Chocolatey):
+choco install ffmpeg
+No Replit, adicione no .replit:
+
+ini
+[packages]
+ffmpeg = "*"
+🚀 Solução Definitiva (Tudo Free)
+Se quer um sistema 100% gratuito, recomendo esta stack:
+
+Serviço	Alternativa Free	Como Usar
+OpenAI	Ollama (local) / Hugging Face	ollama run mistral
+ElevenLabs	EdgeTTS (Microsoft)	edge-tts --list-voices
+Pexels	Unsplash / Pixabay	fetch("https://pixabay.com/api/")
+FFmpeg	Já é free	Instale via apt/brew
+📌 Passos para Implementar
+Substitua as APIs pagas pelas alternativas acima.
+
+No Replit, adicione as dependências no .replit:
+
+ini
+[packages]
+python-edge-tts = "*"
+transformers = "*"
