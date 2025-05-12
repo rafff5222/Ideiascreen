@@ -203,6 +203,38 @@ h2 {
   -webkit-animation: pulse 2s infinite;
 }
 
+/* Efeito de digitação para o roteiro */
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: #ff8906 }
+}
+
+.typing-effect {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  animation: 
+    typing 3.5s steps(40, end),
+    blink-caret .75s step-end infinite;
+}
+
+/* Feedback visual para botões */
+button:hover {
+  transform: scale(1.03);
+  transition: all 0.2s ease;
+}
+
+/* Glow effect para elementos destacados */
+.glow-effect:hover {
+  box-shadow: 0 0 15px rgba(255, 137, 6, 0.6);
+  transition: all 0.3s ease;
+}
+
 .shake {
   animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
   transform: translate3d(0, 0, 0);

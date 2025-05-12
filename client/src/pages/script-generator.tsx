@@ -175,8 +175,31 @@ export default function ScriptGenerator() {
   return (
     <>
       <Helmet>
-        <title>Gerador de Roteiros Profissionais | Roteiros para diversos formatos</title>
-        <meta name="description" content="Crie roteiros profissionais para vídeos, podcasts, tutoriais e storytelling em segundos usando nossa ferramenta de geração por IA. Exporte facilmente em PDF." />
+        <title>PLOTMACHINE | Gerador de Roteiros Profissionais com IA</title>
+        <meta name="description" content="Gerador de roteiros com IA: crie histórias para filmes, séries e games em segundos. 37 gêneros, análise narrativa e exportação profissional." />
+        <meta name="keywords" content="gerador de roteiros, roteiros para filmes, roteiro de série, script generator, ai script writing, roteiro com inteligência artificial" />
+        <meta property="og:title" content="PLOTMACHINE - Gerador de Roteiros Profissionais" />
+        <meta property="og:description" content="Crie roteiros profissionais em segundos com IA avançada. Ideal para videomakers, podcasters e criadores de conteúdo." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:image" content="/plot-machine-preview.jpg" />
+        
+        {/* Schema.org Markup for Rich Results */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "PLOTMACHINE",
+            "applicationCategory": "CreativeApplication",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "operatingSystem": "All",
+            "description": "Gerador de roteiros profissionais usando inteligência artificial. Crie conteúdo para filmes, séries, podcasts e muito mais."
+          })}
+        </script>
       </Helmet>
     
       <div className="container mx-auto px-4 py-12 bg-gray-900 min-h-screen">

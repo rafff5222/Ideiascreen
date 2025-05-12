@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Copy, CheckCircle, Share2, Download, Loader2, Save, History } from "lucide-react";
+import { Copy, CheckCircle, Share2, Download, Loader2, Save, History, Sparkles, Wand2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -23,6 +23,7 @@ export default function ScriptPreview({
   const [metadata, setMetadata] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [savedScripts, setSavedScripts] = useState<any[]>([]);
+  const [scriptVersions, setScriptVersions] = useState<any[]>([]);
   const { toast } = useToast();
   
   // Carregar histórico de roteiros salvos
@@ -172,6 +173,58 @@ export default function ScriptPreview({
       title: "Roteiro Excluído",
       description: "O roteiro foi removido do histórico",
     });
+  };
+  
+  // Gerar uma variação do roteiro atual
+  const handleGenerateVariation = async () => {
+    if (!script || isLoading) return;
+    
+    // Guardar versão atual
+    const currentVersion = {
+      id: Date.now(),
+      prompt,
+      script,
+      date: new Date().toISOString()
+    };
+    
+    const newVersions = [...scriptVersions, currentVersion];
+    setScriptVersions(newVersions);
+    
+    // Criar um novo prompt com variação
+    const variationPrompt = `${prompt} com final alternativo inesperado`;
+    
+    // Mostrar indicador de carregamento
+    setIsLoading(true);
+    
+    try {
+      // Chamada à API com o novo prompt
+      const response = await apiRequest("POST", "/api/generate-script", { prompt: variationPrompt });
+      const data = await response.json();
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      setScript(data.script);
+      setMetadata(data.metadata || {
+        modelUsed: 'gerador-interno',
+        generatedAt: new Date().toISOString(),
+      });
+      
+      toast({
+        title: "Variação Gerada!",
+        description: "Uma nova versão do roteiro foi criada com um final alternativo",
+      });
+    } catch (err: any) {
+      console.error("Erro ao gerar variação:", err);
+      toast({
+        title: "Erro",
+        description: "Não foi possível gerar uma variação",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isLoading) {
@@ -373,6 +426,72 @@ export default function ScriptPreview({
             </>}
           </p>
           <div className="flex gap-2">
+            {/* Botão para gerar variação */}
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="flex items-center gap-1 text-amber-500 hover:text-amber-400 bg-amber-500/10"
+              onClick={handleGenerateVariation}
+              disabled={isLoading}
+            >
+              <Wand2 size={16} />
+              Gerar Variação
+            </Button>
+            
+            {/* Versões do roteiro */}
+            {scriptVersions.length > 0 && (
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex items-center gap-1 text-amber-500"
+                  >
+                    <History size={16} />
+                    Versões ({scriptVersions.length})
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="bg-gray-900 text-white border-l border-amber-500/30 overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle className="text-white text-left mb-4">Versões Anteriores</SheetTitle>
+                  </SheetHeader>
+                  
+                  <div className="space-y-4 mt-4">
+                    {scriptVersions.map((version, index) => (
+                      <div 
+                        key={version.id} 
+                        className="bg-gray-800 rounded-lg p-3 border border-amber-500/20 hover:border-amber-500/40 transition-all"
+                      >
+                        <div className="text-amber-500 font-semibold mb-1 text-sm">
+                          Versão {index + 1}
+                        </div>
+                        <div className="text-xs text-gray-400 mb-2">
+                          {new Date(version.date).toLocaleString()}
+                        </div>
+                        <div className="text-xs line-clamp-2 text-gray-300 mb-3">
+                          {version.script.substring(0, 100)}...
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="h-8 text-xs w-full"
+                          onClick={() => {
+                            setScript(version.script);
+                            toast({
+                              title: "Versão Restaurada",
+                              description: `Versão ${index + 1} do roteiro restaurada`,
+                            });
+                          }}
+                        >
+                          Restaurar Esta Versão
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </SheetContent>
+              </Sheet>
+            )}
+            
             <Button 
               variant="ghost" 
               size="sm"
