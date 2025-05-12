@@ -1,9 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from 'ws';
-import OpenAI from "openai";
 import { contentGenerationSchema } from "../shared/schema";
-import { generateContent, generateSpeech, generateVideo as generateOpenAIVideo, type SpeechGenerationRequest, type VideoGenerationRequest } from "./openai";
 import { storage } from "./storage";
 import fs from "fs";
 import path from "path";
@@ -82,10 +80,7 @@ function calculateEstimatedTime(progress: number): number {
   return Math.ceil((100 - progress) / 100 * totalEstimatedTime);
 }
 
-// Initialize OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+// Removida inicialização do OpenAI - usando apenas HuggingFace
 
 // Esquema Zod para validação do request de geração de narração
 const speechGenerationSchema = z.object({
@@ -120,7 +115,7 @@ declare global {
   }
 }
 
-// Rota para geração de roteiros - Adicionado para nova versão simplificada
+// Rota para geração de roteiros - Versão simplificada usando apenas Hugging Face
 async function generateScript(req: Request, res: Response) {
   try {
     const { prompt } = req.body;
@@ -129,51 +124,29 @@ async function generateScript(req: Request, res: Response) {
       return res.status(400).json({ error: 'Prompt é obrigatório' });
     }
     
-    // Forçar uso do Hugging Face - ignorando a configuração do .env para resolver problema
-    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+    // Usaremos apenas Hugging Face
     const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
-    const USE_HUGGINGFACE = true; // Definido manualmente para resolver problema
-    
-    // Log para debug das variáveis de ambiente
-    console.log('ENV:', { 
-      USE_HUGGINGFACE_ENV: process.env.USE_HUGGINGFACE,
-      NODE_ENV: process.env.NODE_ENV
-    });
-    
-    if (!OPENAI_API_KEY && !USE_HUGGINGFACE) {
-      return res.status(500).json({ 
-        error: 'Nenhuma API de IA configurada', 
-        script: 'Por favor, configure a API da OpenAI ou ative o Hugging Face nas configurações para gerar roteiros.' 
-      });
-    }
-
-    let generatedScript = '';
     
     // Log para depuração
     console.log('Configuração da API:', { 
-      openaiKeyConfigured: !!OPENAI_API_KEY, 
-      useHuggingFace: USE_HUGGINGFACE, 
-      forçandoHuggingFace: 'Sim - para contornar problema de variáveis de ambiente'
+      tipoAPI: 'Usando API do Hugging Face diretamente',
+      huggingfaceKeyConfigured: !!HUGGINGFACE_API_KEY
     });
-
-    if (USE_HUGGINGFACE) {
-      // Usar Hugging Face (gratuito)
-      try {
-        // URL do modelo no Hugging Face (usando modelo gratuito)
-        // Usar o modelo gratuito do Hugging Face
-        // Opções de modelos que funcionam bem para roteiros:
-        // - tiiuae/falcon-7b-instruct (mais rápido)
-        // - mistralai/Mistral-7B-Instruct-v0.2 (bons resultados)
-        // - google/flan-t5-xxl (bem generalista)
-        // - facebook/opt-iml-max-1.3b (bom para geração de texto criativo)
-        const apiUrl = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
-        
-        // Formatar o prompt para o modelo - ajustado para melhores resultados
-        const scriptType = prompt.toLowerCase().includes("youtube") ? "vídeo para YouTube" : 
-                          prompt.toLowerCase().includes("podcast") ? "episódio de podcast" : 
-                          "roteiro profissional";
-        
-        const systemPrompt = `Você é um roteirista profissional especializado em criar ${scriptType}s detalhados e formatados. 
+    
+    // Lista de modelos para tentar
+    const models = [
+      "mistralai/Mistral-7B-Instruct-v0.2",  // primeira opção (bom equilíbrio)
+      "facebook/opt-iml-max-1.3b",           // segunda opção (mais rápido)
+      "google/flan-t5-xxl",                  // terceira opção (mais estável)
+      "tiiuae/falcon-7b-instruct"            // última opção (mais genérico)
+    ];
+    
+    // Formatar o prompt para o modelo - ajustado para melhores resultados
+    const scriptType = prompt.toLowerCase().includes("youtube") ? "vídeo para YouTube" : 
+                      prompt.toLowerCase().includes("podcast") ? "episódio de podcast" : 
+                      "roteiro profissional";
+    
+    const systemPrompt = `Você é um roteirista profissional especializado em criar ${scriptType}s detalhados e formatados. 
 Siga estas diretrizes:
 - Crie diálogos naturais e envolventes
 - Inclua descrições claras de cenas e ambientes
@@ -181,141 +154,114 @@ Siga estas diretrizes:
 - Formate corretamente como um roteiro profissional
 - Use formatação adequada ao tipo de conteúdo`;
 
-        const formattedPrompt = `${systemPrompt}
+    const formattedPrompt = `${systemPrompt}
 
 Prompt do usuário: ${prompt}
 
 Responda APENAS com o roteiro completo, sem introduções ou conclusões.`;
-        
-        // Fazer a requisição para a API Hugging Face
-        const fetch = (await import('node-fetch')).default;
-        
-        // Preparar os headers
-        const headers: Record<string, string> = {
-          "Content-Type": "application/json",
-        };
-        
-        // Adicionar o token de API se disponível
-        if (HUGGINGFACE_API_KEY) {
-          headers["Authorization"] = `Bearer ${HUGGINGFACE_API_KEY}`;
-        }
-        
-        const response = await fetch(apiUrl, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({
-            inputs: formattedPrompt,
-            parameters: {
-              max_new_tokens: 1500, // Aumentado para roteiros mais completos
-              temperature: 0.75,
-              top_p: 0.95,
-              top_k: 50,
-              repetition_penalty: 1.1,
-              do_sample: true,
-            }
-          }),
-        });
-        
-        if (!response.ok) {
-          throw new Error(`API respondeu com status ${response.status}`);
-        }
-        
-        const result = await response.json();
-        
-        // Extrair o texto gerado da resposta
-        if (Array.isArray(result) && result.length > 0) {
-          generatedScript = result[0].generated_text;
-        } else if (result.generated_text) {
-          generatedScript = result.generated_text;
-        } else {
-          throw new Error('Formato de resposta inesperado');
-        }
-        
-        // Limpar o prompt do texto gerado
-        generatedScript = generatedScript.replace(formattedPrompt, '').trim();
-      } catch (error) {
-        console.error('Erro ao usar Hugging Face:', error);
-        
-        // Tentar OpenAI como fallback se tivermos a chave
-        if (OPENAI_API_KEY) {
-          console.log('Usando OpenAI como fallback');
-          const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
-          const completion = await openai.chat.completions.create({
-            model: "gpt-4o", // o mais novo modelo da OpenAI
-            messages: [
-              {
-                role: "system",
-                content: "Você é um roteirista profissional especializado em criar roteiros detalhados e formatados para diversos formatos de mídia."
-              },
-              {
-                role: "user",
-                content: `${prompt}\n\nCrie um roteiro detalhado com diálogos, cenas e direções de câmera. Formate corretamente como um roteiro profissional.`
-              }
-            ],
-            max_tokens: 2000
-          });
-          
-          generatedScript = completion.choices[0].message.content;
-        } else {
-          // Se não temos OpenAI como fallback, retornar erro
-          let errorTips = `Ocorreu um erro ao usar a API do Hugging Face.\n\n`;
-          errorTips += `Possíveis causas e soluções:\n`;
-          errorTips += `• A API gratuita está temporariamente indisponível\n`;
-          errorTips += `• O modelo está sobrecarregado no momento\n`;
-          errorTips += `• Tente novamente em alguns minutos\n`;
-          errorTips += `• Tente um prompt mais simples\n`;
-          errorTips += `• Verifique sua conexão com a internet`;
-          
-          return res.status(500).json({ 
-            error: `Erro ao gerar roteiro: ${error.message}`,
-            script: errorTips
-          });
-        }
-      }
-    } else {
-      // Usar OpenAI
-      const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o", // o mais novo modelo da OpenAI
-        messages: [
-          {
-            role: "system",
-            content: "Você é um roteirista profissional especializado em criar roteiros detalhados e formatados para diversos formatos de mídia."
-          },
-          {
-            role: "user",
-            content: `${prompt}\n\nCrie um roteiro detalhado com diálogos, cenas e direções de câmera. Formate corretamente como um roteiro profissional.`
+    
+    const fetch = (await import('node-fetch')).default;
+    
+    // Preparar os headers
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    
+    // Adicionar o token de API se disponível
+    if (HUGGINGFACE_API_KEY) {
+      headers["Authorization"] = `Bearer ${HUGGINGFACE_API_KEY}`;
+    }
+    
+    // Função para tentar um modelo
+    async function tryModel(modelUrl: string) {
+      console.log(`Tentando modelo: ${modelUrl}`);
+      const response = await fetch(`https://api-inference.huggingface.co/models/${modelUrl}`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          inputs: formattedPrompt,
+          parameters: {
+            max_new_tokens: 1500,
+            temperature: 0.75,
+            top_p: 0.95,
+            top_k: 50,
+            repetition_penalty: 1.1,
+            do_sample: true,
           }
-        ],
-        max_tokens: 2000
+        }),
       });
       
-      generatedScript = completion.choices[0].message.content;
+      if (!response.ok) {
+        throw new Error(`API respondeu com status ${response.status} para modelo ${modelUrl}`);
+      }
+      
+      return await response.json();
     }
+    
+    // Tentar cada modelo na sequência
+    let result;
+    let modelUsed = '';
+    let errors = [];
+    
+    for (const model of models) {
+      try {
+        result = await tryModel(model);
+        modelUsed = model;
+        break;  // Se tiver sucesso, sai do loop
+      } catch (error) {
+        console.error(`Erro com modelo ${model}:`, error);
+        errors.push(`${model}: ${error.message}`);
+        continue;  // Tenta o próximo modelo
+      }
+    }
+    
+    if (!result) {
+      throw new Error(`Todos os modelos falharam: ${errors.join(', ')}`);
+    }
+    
+    // Extrair o texto gerado da resposta
+    let generatedScript = '';
+    if (Array.isArray(result) && result.length > 0) {
+      generatedScript = result[0].generated_text;
+    } else if (result.generated_text) {
+      generatedScript = result.generated_text;
+    } else {
+      throw new Error('Formato de resposta inesperado');
+    }
+    
+    // Limpar o prompt do texto gerado
+    generatedScript = generatedScript.replace(formattedPrompt, '').trim();
+    
+    // Se o script estiver vazio ou muito curto, retornar um erro
+    if (!generatedScript || generatedScript.length < 50) {
+      throw new Error('A resposta gerada é muito curta ou vazia');
+    }
+    
+    // Adicionar metadata
+    const metadata = {
+      modelUsed,
+      generatedAt: new Date().toISOString(),
+      promptTokens: prompt.length,
+      outputTokens: generatedScript.length
+    };
     
     // Retornar o roteiro gerado
-    return res.json({ script: generatedScript });
+    return res.json({ 
+      script: generatedScript,
+      metadata
+    });
+    
   } catch (error: any) {
     console.error('Erro ao gerar roteiro:', error);
+    
     // Formatar mensagem de erro com informações úteis
     let errorTips = `Ocorreu um erro ao processar seu pedido.\n\n`;
-    
-    // Adicionar informações detalhadas se for erro de quota
-    if (error.message && error.message.includes("quota")) {
-      errorTips += `ERRO: Limite de requisições da API excedido.\n\n`;
-      errorTips += `Possíveis soluções:\n`;
-      errorTips += `• Espere alguns minutos e tente novamente\n`;
-      errorTips += `• Tente usar um prompt mais simples\n`;
-      errorTips += `• Se o erro persistir, verifique sua conexão\n\n`;
-      errorTips += `Alternativas:\n`;
-      errorTips += `• Ative a opção de usar Hugging Face (gratuito) no servidor`;
-    } else {
-      errorTips += `Possíveis causas e soluções:\n`;
-      errorTips += `• Verifique sua conexão com a internet\n`;
-      errorTips += `• Tente recarregar a página\n`;
-      errorTips += `• Espere alguns minutos e tente novamente\n`;
-      errorTips += `• Tente um prompt diferente`;
-    }
+    errorTips += `Detalhes do erro: ${error.message}\n\n`;
+    errorTips += `Possíveis causas e soluções:\n`;
+    errorTips += `• Os servidores da API estão ocupados ou indisponíveis\n`;
+    errorTips += `• Tente novamente em alguns minutos\n`;
+    errorTips += `• Tente um prompt mais simples ou direto\n`;
+    errorTips += `• Verifique sua conexão com a internet`;
     
     return res.status(500).json({ 
       error: `Erro ao gerar roteiro: ${error.message}`,
@@ -1262,38 +1208,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const { api } = req.params;
     
     try {
-      // Verificação de OpenAI
-      if (api === 'openai') {
-        if (!process.env.OPENAI_API_KEY) {
+      // Verificação da API do Hugging Face
+      if (api === 'huggingface' || api === 'openai') { // Aceita 'openai' para compatibilidade
+        if (!process.env.HUGGINGFACE_API_KEY) {
           return res.status(400).json({
             success: false,
-            error: 'Chave de API da OpenAI não configurada'
+            error: 'Chave de API do Hugging Face não configurada'
           });
         }
         
-        // Teste de conexão simples à API da OpenAI
-        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-        
+        // Teste de conexão simples à API do Hugging Face
         try {
-          const models = await openai.models.list();
+          const fetch = (await import('node-fetch')).default;
           
-          return res.json({
-            success: true,
-            connection: {
-              working: true,
-              status: 'connected',
-              models: models.data.length
+          // Verificar status da API do Hugging Face
+          const response = await fetch("https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2", {
+            method: "HEAD",
+            headers: {
+              Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`
             }
           });
-        } catch (openAIError: any) {
-          console.error('Erro OpenAI:', openAIError);
+          
+          if (response.ok) {
+            return res.json({
+              success: true,
+              connection: {
+                working: true,
+                status: 'connected',
+                models: 3 // Número de modelos que usamos
+              }
+            });
+          } else {
+            throw new Error(`API respondeu com status ${response.status}`);
+          }
+        } catch (hfError: any) {
+          console.error('Erro Hugging Face:', hfError);
           
           return res.json({
             success: false,
             connection: {
               working: false,
               status: 'error',
-              message: openAIError.message
+              message: hfError.message
             }
           });
         }

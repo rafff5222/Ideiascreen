@@ -1,6 +1,17 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import dotenv from "dotenv";
+
+// Carregando variáveis de ambiente
+dotenv.config();
+
+// Log para debug das variáveis de ambiente
+console.log('Configurações carregadas do .env:', {
+  USE_HUGGINGFACE: process.env.USE_HUGGINGFACE,
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'CONFIGURADO' : 'NÃO DEFINIDO',
+  HUGGINGFACE_API_KEY: process.env.HUGGINGFACE_API_KEY ? 'CONFIGURADO' : 'NÃO DEFINIDO',
+});
 
 const app = express();
 app.use(express.json());
