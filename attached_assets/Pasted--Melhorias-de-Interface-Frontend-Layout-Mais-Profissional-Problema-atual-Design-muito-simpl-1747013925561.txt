@@ -1,0 +1,170 @@
+🎨 Melhorias de Interface (Frontend)
+Layout Mais Profissional
+
+Problema atual: Design muito simples, sem hierarquia visual.
+
+Solução:
+
+css
+/* Adicione no CSS */
+body {
+  background: #f5f7fa;
+  padding: 2rem;
+}
+#generator-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  padding: 2rem;
+}
+Preview em Tempo Real
+
+Sugestão: Mostre um preview do formato do roteiro enquanto o usuário digita:
+
+javascript
+document.getElementById("prompt").addEventListener("input", (e) => {
+  document.getElementById("format-preview").innerHTML = 
+    `Formato do roteiro:<br>• Título: <em>${e.target.value || '...'}</em><br>• Cenas: 3`;
+});
+⚡ Melhorias de Funcionalidade (Backend)
+Tipos de Roteiro
+
+Adicione dropdown para selecionar o formato:
+
+html
+<select id="script-type">
+  <option value="short-film">Curta-metragem</option>
+  <option value="youtube">Vídeo para YouTube</option>
+  <option value="podcast">Roteiro de Podcast</option>
+</select>
+No backend:
+
+javascript
+if (scriptType === "youtube") {
+  prompt = `Gere um roteiro para YouTube com introdução chamativa sobre: ${userPrompt}`;
+}
+Histórico Local
+
+Armazene os últimos roteiros no localStorage:
+
+javascript
+function saveScript(script) {
+  const history = JSON.parse(localStorage.getItem("history") || "[]");
+  history.unshift({ script, date: new Date() });
+  localStorage.setItem("history", JSON.stringify(history.slice(0, 5)));
+}
+🛠 Otimizações Técnicas
+Loading State
+
+Adicione um indicador durante a geração:
+
+javascript
+document.getElementById("generate").innerHTML = 
+  '<span class="loader"></span> Gerando...';
+Tratamento de Erros
+
+Melhore a resposta quando a API falhar:
+
+javascript
+try {
+  const response = await fetch("/generate-script", ...);
+  if (!response.ok) throw new Error("Falha na API");
+  // ...
+} catch (e) {
+  alert("Erro: " + e.message);
+}
+📱 Mobile Responsiveness
+Media Queries
+
+Adapte para celulares:
+
+css
+@media (max-width: 600px) {
+  textarea { height: 150px; }
+  button { width: 100%; }
+}
+🌟 Features Premium (Opcionais)
+Exportar para PDF
+
+Use html2pdf.js:
+
+html
+<button onclick="exportPDF()">📄 Exportar PDF</button>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+Sistema de Likes/Feedback
+
+Permita avaliações dos roteiros:
+
+javascript
+function rateScript(rating) {
+  fetch("/rate-script", { method: "POST", body: JSON.stringify({ rating }) });
+}
+🔍 Exemplo de Código Atualizado
+html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gerador de Roteiros IA</title>
+    <style>
+        :root {
+          --primary: #6d28d9;
+          --hover: #5b21b6;
+        }
+        body {
+          font-family: 'Inter', sans-serif;
+          background: #f8fafc;
+        }
+        #generator-container {
+          background: white;
+          border-radius: 16px;
+          box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+          max-width: 800px;
+          margin: 2rem auto;
+          padding: 2rem;
+        }
+        .loader {
+          display: inline-block;
+          width: 12px;
+          height: 12px;
+          border: 2px solid rgba(255,255,255,0.3);
+          border-radius: 50%;
+          border-top-color: white;
+          animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div id="generator-container">
+        <h1 style="color: var(--primary)">✍️ Gerador de Roteiros IA</h1>
+        <div id="format-preview" style="color: #64748b; margin-bottom: 1rem;"></div>
+        
+        <textarea 
+            id="prompt" 
+            placeholder="Ex.: 'Um thriller psicológico sobre identidade dupla...'"
+            style="padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px;"
+        ></textarea>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+            <select id="script-type" style="padding: 0.5rem; border-radius: 8px;">
+                <option value="short-film">Curta-metragem</option>
+                <option value="youtube">YouTube</option>
+            </select>
+            <button 
+                id="generate" 
+                style="background: var(--primary); color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 8px; cursor: pointer;"
+                onmouseover="this.style.background='var(--hover)'"
+                onmouseout="this.style.background='var(--primary)'"
+            >
+                Gerar Roteiro
+            </button>
+        </div>
+        
+        <div id="result" style="margin-top: 2rem; white-space: pre-wrap; line-height: 1.6;"></div>
+    </div>
+
+    <script>
+        // Seu código JS atualizado aqui
+    </script>
+</body>
+</html>

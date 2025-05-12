@@ -4,119 +4,330 @@
     <title>Gerador de Roteiros IA</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            line-height: 1.6;
+        :root {
+            --primary: #6d28d9;
+            --primary-hover: #5b21b6;
+            --secondary: #8E54E9;
+            --light-bg: #f8fafc;
+            --border: #e2e8f0;
+            --text-muted: #64748b;
         }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fa;
+            padding: 1rem;
+            margin: 0;
+            line-height: 1.6;
+            color: #334155;
+        }
+        
+        #generator-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+        
         textarea {
             width: 100%;
             height: 200px;
-            padding: 12px;
+            padding: 1rem;
             font-size: 16px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            margin-bottom: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 1rem;
             font-family: inherit;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
         }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(109, 40, 217, 0.2);
+        }
+        
         button {
-            background: linear-gradient(90deg, #4776E6, #8E54E9);
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 0.75rem 1.5rem;
             font-size: 16px;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: all 0.2s;
+            font-weight: 500;
         }
+        
         button:hover {
             opacity: 0.9;
+            transform: translateY(-1px);
         }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
         button:disabled {
             background: #cccccc;
             cursor: not-allowed;
+            transform: none;
         }
+        
         #result {
             white-space: pre-wrap;
-            margin-top: 20px;
-            padding: 16px;
+            margin-top: 2rem;
+            padding: 1.5rem;
             background: #f9f9f9;
-            border-radius: 4px;
-            border-left: 4px solid #8E54E9;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            line-height: 1.8;
+            font-size: 16px;
         }
-        h1 {
-            color: #333;
-            margin-bottom: 24px;
+        
+        .controls-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
         }
+        
+        #script-type {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-family: inherit;
+            font-size: 16px;
+        }
+        
         .templates {
             display: flex;
-            gap: 10px;
-            margin-bottom: 16px;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
         }
+        
         .template-btn {
             background: #f0f0f0;
             color: #333;
             border: 1px solid #ddd;
-            padding: 8px 16px;
+            padding: 0.5rem 1rem;
             font-size: 14px;
             border-radius: 20px;
             cursor: pointer;
+            transition: all 0.2s;
         }
+        
         .template-btn:hover {
             background: #e0e0e0;
+            transform: translateY(-1px);
         }
+        
         .actions {
             display: flex;
-            gap: 10px;
-            margin-top: 12px;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
         }
+        
+        .loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+            vertical-align: text-bottom;
+        }
+        
+        @keyframes spin { 
+            to { transform: rotate(360deg); } 
+        }
+        
         #loading {
             display: none;
-            margin-left: 10px;
+            margin-left: 1rem;
+            align-items: center;
+            color: var(--text-muted);
         }
+        
         .footer {
-            margin-top: 40px;
+            margin-top: 3rem;
             font-size: 14px;
-            color: #666;
+            color: var(--text-muted);
             text-align: center;
+        }
+        
+        #format-preview {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        #saved-scripts {
+            margin-top: 3rem;
+        }
+        
+        #saved-scripts h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        #saved-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .saved-item {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .saved-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .saved-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .status-free {
+            background-color: #10b981;
+        }
+        
+        .status-api {
+            background-color: #f59e0b;
+        }
+        
+        #api-status {
+            font-size: 14px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+            body {
+                padding: 0.5rem;
+            }
+            
+            #generator-container {
+                padding: 1.5rem 1rem;
+                margin: 1rem auto;
+            }
+            
+            textarea {
+                height: 150px;
+            }
+            
+            .controls-row {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .templates {
+                gap: 0.5rem;
+            }
+            
+            .template-btn {
+                font-size: 12px;
+                padding: 0.4rem 0.8rem;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>📝 Gerador de Roteiros IA</h1>
-    
-    <div class="templates">
-        <button class="template-btn" data-template="curta">Curta-metragem</button>
-        <button class="template-btn" data-template="documentario">Documentário</button>
-        <button class="template-btn" data-template="comercial">Comercial</button>
-        <button class="template-btn" data-template="entrevista">Entrevista</button>
-    </div>
-    
-    <textarea id="prompt" placeholder="Ex.: 'Crie um roteiro para um curta-metragem de ficção científica sobre viagens no tempo...'"></textarea>
-    
-    <div>
-        <button id="generate">Gerar Roteiro</button>
-        <span id="loading">Gerando... ⏳</span>
-    </div>
-    
-    <div id="result" style="display:none;"></div>
-    
-    <div id="saved-scripts" style="display:none; margin-top: 30px;">
-        <h3>Roteiros Salvos</h3>
-        <ul id="saved-list"></ul>
-    </div>
-    
-    <div class="actions" style="display:none;">
-        <button id="save">Salvar Roteiro</button>
-        <button id="copy">Copiar Texto</button>
-        <button id="export" onclick="window.print()">Exportar PDF</button>
-    </div>
-    
-    <div class="footer">
-        <p>Gerador de Roteiros IA - Use IA para criar roteiros profissionais em segundos</p>
+    <div id="generator-container">
+        <h1>✍️ Gerador de Roteiros IA</h1>
+        
+        <div id="api-status"></div>
+        
+        <div id="format-preview"></div>
+        
+        <div class="templates">
+            <button class="template-btn" data-template="curta">Curta-metragem</button>
+            <button class="template-btn" data-template="documentario">Documentário</button>
+            <button class="template-btn" data-template="comercial">Comercial</button>
+            <button class="template-btn" data-template="entrevista">Entrevista</button>
+            <button class="template-btn" data-template="youtube">YouTube</button>
+            <button class="template-btn" data-template="podcast">Podcast</button>
+        </div>
+        
+        <textarea id="prompt" placeholder="Ex.: 'Crie um roteiro para um curta-metragem de ficção científica sobre viagens no tempo...'"></textarea>
+        
+        <div class="controls-row">
+            <select id="script-type">
+                <option value="short-film">Curta-metragem</option>
+                <option value="youtube">Vídeo para YouTube</option>
+                <option value="documentary">Documentário</option>
+                <option value="podcast">Roteiro de Podcast</option>
+                <option value="interview">Entrevista</option>
+                <option value="commercial">Comercial</option>
+            </select>
+            
+            <button id="generate">Gerar Roteiro</button>
+            <div id="loading"><span class="loader"></span> Gerando...</div>
+        </div>
+        
+        <div id="result" style="display:none;"></div>
+        
+        <div class="actions" style="display:none;">
+            <button id="save">💾 Salvar Roteiro</button>
+            <button id="copy">📋 Copiar Texto</button>
+            <button id="export" onclick="exportPDF()">📄 Exportar PDF</button>
+            <button id="feedback">⭐ Avaliar</button>
+        </div>
+        
+        <div id="saved-scripts" style="display:none;">
+            <h3>Roteiros Salvos</h3>
+            <ul id="saved-list"></ul>
+        </div>
+        
+        <div class="footer">
+            <p>Gerador de Roteiros IA - Use IA para criar roteiros profissionais em segundos</p>
+        </div>
     </div>
 
     <script>
@@ -125,7 +336,9 @@
             curta: "Crie um roteiro detalhado para um curta-metragem com 3 cenas, incluindo diálogos, descrições de cenário e direções para os atores. O tema é:",
             documentario: "Elabore um roteiro para documentário com estrutura de introdução, desenvolvimento e conclusão, incluindo narração em off e sugestões para entrevistas. O tema é:",
             comercial: "Crie um roteiro para um comercial de TV de 30 segundos, incluindo descrições visuais, texto para narração e mensagem final com call-to-action. O produto é:",
-            entrevista: "Desenvolva um roteiro para uma entrevista em vídeo, incluindo 10 perguntas principais, texto de introdução para o apresentador e instruções para a filmagem. O entrevistado é um especialista em:"
+            entrevista: "Desenvolva um roteiro para uma entrevista em vídeo, incluindo 10 perguntas principais, texto de introdução para o apresentador e instruções para a filmagem. O entrevistado é um especialista em:",
+            youtube: "Crie um roteiro para um vídeo de YouTube de 5-7 minutos, com introdução chamativa, 3 seções principais de conteúdo e uma conclusão com call to action. O tema é:",
+            podcast: "Elabore um roteiro para episódio de podcast de 30 minutos, incluindo introdução, perguntas para entrevistado, transições e encerramento. O tema é:"
         };
 
         // Selecionar elementos
@@ -136,18 +349,109 @@
         const actionsEl = document.querySelector(".actions");
         const saveBtn = document.getElementById("save");
         const copyBtn = document.getElementById("copy");
+        const exportBtn = document.getElementById("export");
+        const feedbackBtn = document.getElementById("feedback");
         const templateBtns = document.querySelectorAll(".template-btn");
         const savedScriptsEl = document.getElementById("saved-scripts");
         const savedListEl = document.getElementById("saved-list");
+        const scriptTypeEl = document.getElementById("script-type");
+        const formatPreviewEl = document.getElementById("format-preview");
+        const apiStatusEl = document.getElementById("api-status");
 
+        // Verificar status da API
+        checkApiStatus();
+        
         // Carregar roteiros salvos
         loadSavedScripts();
+
+        // Preview em tempo real
+        promptEl.addEventListener("input", updateFormatPreview);
+        
+        // Atualizar o preview quando mudar o tipo de roteiro
+        scriptTypeEl.addEventListener("change", updateFormatPreview);
+        
+        function updateFormatPreview() {
+            const prompt = promptEl.value.trim();
+            const scriptType = scriptTypeEl.value;
+            
+            if (prompt) {
+                formatPreviewEl.style.display = "block";
+                let previewContent = `<strong>Formato:</strong> ${getScriptTypeName(scriptType)}<br>`;
+                
+                if (scriptType === "short-film") {
+                    previewContent += `<strong>Título:</strong> <em>${getShortTitle(prompt)}</em><br>`;
+                    previewContent += '<strong>Estrutura:</strong> Cenas com diálogos e descrições visuais';
+                } else if (scriptType === "youtube") {
+                    previewContent += `<strong>Título:</strong> <em>${getShortTitle(prompt)}</em><br>`;
+                    previewContent += '<strong>Estrutura:</strong> Gancho, introdução, 3 tópicos principais, conclusão';
+                } else if (scriptType === "podcast") {
+                    previewContent += `<strong>Tópico:</strong> <em>${getShortTitle(prompt)}</em><br>`;
+                    previewContent += '<strong>Estrutura:</strong> Introdução, discussão, perguntas, encerramento';
+                } else {
+                    previewContent += `<strong>Tema:</strong> <em>${getShortTitle(prompt)}</em>`;
+                }
+                
+                formatPreviewEl.innerHTML = previewContent;
+            } else {
+                formatPreviewEl.style.display = "none";
+            }
+        }
+        
+        function getScriptTypeName(type) {
+            const types = {
+                "short-film": "Curta-metragem",
+                "youtube": "Vídeo para YouTube",
+                "documentary": "Documentário",
+                "podcast": "Roteiro de Podcast",
+                "interview": "Entrevista",
+                "commercial": "Comercial"
+            };
+            
+            return types[type] || type;
+        }
+        
+        function getShortTitle(text) {
+            // Limitar a 40 caracteres
+            if (text.length <= 40) return text;
+            return text.substring(0, 40) + "...";
+        }
+
+        // Verificar status da API
+        async function checkApiStatus() {
+            try {
+                const response = await fetch("/api/generate-script", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ prompt: "teste rápido" })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error && data.error.includes("OpenAI")) {
+                    apiStatusEl.innerHTML = '<span class="status-indicator status-free"></span> Usando API gratuita (Hugging Face)';
+                } else {
+                    apiStatusEl.innerHTML = '<span class="status-indicator status-api"></span> Usando OpenAI API';
+                }
+            } catch (error) {
+                apiStatusEl.innerHTML = '<span class="status-indicator status-free"></span> Modo de demonstração';
+            }
+        }
 
         // Template buttons
         templateBtns.forEach(btn => {
             btn.addEventListener("click", () => {
                 const template = btn.dataset.template;
                 promptEl.value = templates[template] + " ";
+                
+                // Atualizar o select para corresponder ao botão de template
+                if (template === "curta") scriptTypeEl.value = "short-film";
+                if (template === "youtube") scriptTypeEl.value = "youtube";
+                if (template === "documentario") scriptTypeEl.value = "documentary";
+                if (template === "podcast") scriptTypeEl.value = "podcast";
+                if (template === "entrevista") scriptTypeEl.value = "interview";
+                if (template === "comercial") scriptTypeEl.value = "commercial";
+                
+                updateFormatPreview();
                 promptEl.focus();
             });
         });
@@ -155,15 +459,25 @@
         // Gerar roteiro
         generateBtn.addEventListener("click", async () => {
             const prompt = promptEl.value.trim();
+            const scriptType = scriptTypeEl.value;
             
             if (!prompt) {
                 alert("Por favor, insira um prompt para gerar o roteiro.");
                 return;
             }
             
+            // Formatar o prompt com base no tipo de roteiro
+            let formattedPrompt = prompt;
+            if (scriptType === "youtube" && !prompt.toLowerCase().includes("youtube")) {
+                formattedPrompt = `Crie um roteiro para um vídeo de YouTube sobre: ${prompt}`;
+            } else if (scriptType === "podcast" && !prompt.toLowerCase().includes("podcast")) {
+                formattedPrompt = `Crie um roteiro para um episódio de podcast sobre: ${prompt}`;
+            }
+            
             // Mostrar loading
             generateBtn.disabled = true;
-            loadingEl.style.display = "inline";
+            generateBtn.innerHTML = '<span class="loader"></span> Gerando...';
+            loadingEl.style.display = "flex";
             resultEl.style.display = "none";
             actionsEl.style.display = "none";
             
@@ -171,8 +485,12 @@
                 const response = await fetch("/api/generate-script", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ prompt })
+                    body: JSON.stringify({ prompt: formattedPrompt })
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`Erro: ${response.status} - ${response.statusText}`);
+                }
                 
                 const data = await response.json();
                 
@@ -180,8 +498,11 @@
                     resultEl.textContent = data.script;
                     resultEl.style.display = "block";
                     actionsEl.style.display = "flex";
+                    
+                    // Salvar no histórico local
+                    saveToHistory(formattedPrompt, data.script);
                 } else {
-                    resultEl.textContent = "Erro ao gerar roteiro. Por favor, tente novamente.";
+                    resultEl.textContent = data.error || "Erro ao gerar roteiro. Por favor, tente novamente.";
                     resultEl.style.display = "block";
                 }
             } catch (error) {
@@ -190,9 +511,17 @@
                 resultEl.style.display = "block";
             } finally {
                 generateBtn.disabled = false;
+                generateBtn.textContent = "Gerar Roteiro";
                 loadingEl.style.display = "none";
             }
         });
+
+        // Salvar no histórico local
+        function saveToHistory(prompt, script) {
+            const history = JSON.parse(localStorage.getItem("script_history") || "[]");
+            history.unshift({ prompt, script, date: new Date().toISOString() });
+            localStorage.setItem("script_history", JSON.stringify(history.slice(0, 10)));
+        }
 
         // Salvar roteiro
         saveBtn.addEventListener("click", () => {
@@ -205,10 +534,18 @@
             
             // Salvar no localStorage
             const savedScripts = JSON.parse(localStorage.getItem("saved_scripts") || "[]");
-            savedScripts.push({ id, title, script, prompt, date: new Date().toISOString() });
+            savedScripts.push({ 
+                id, 
+                title, 
+                script, 
+                prompt, 
+                type: scriptTypeEl.value,
+                date: new Date().toISOString() 
+            });
             localStorage.setItem("saved_scripts", JSON.stringify(savedScripts));
             
-            alert("Roteiro salvo com sucesso!");
+            // Mostrar notificação
+            showNotification("Roteiro salvo com sucesso!");
             loadSavedScripts();
         });
 
@@ -216,8 +553,50 @@
         copyBtn.addEventListener("click", () => {
             const script = resultEl.textContent;
             navigator.clipboard.writeText(script)
-                .then(() => alert("Roteiro copiado para a área de transferência!"))
+                .then(() => showNotification("Roteiro copiado para a área de transferência!"))
                 .catch(err => console.error("Erro ao copiar:", err));
+        });
+        
+        // Exportar PDF
+        function exportPDF() {
+            // Criar elemento temporário para impressão
+            const printContent = document.createElement('div');
+            printContent.innerHTML = `
+                <h1 style="color: #6d28d9;">${promptEl.value.split(' ').slice(0, 10).join(' ')}...</h1>
+                <p style="color: #64748b; margin-bottom: 20px;">Gerado em: ${new Date().toLocaleString()}</p>
+                <hr style="margin: 20px 0; border: none; border-top: 1px solid #e2e8f0;">
+                <div style="white-space: pre-wrap; line-height: 1.8;">${resultEl.textContent}</div>
+            `;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Script: ${promptEl.value.split(' ').slice(0, 5).join(' ')}...</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+                    </style>
+                </head>
+                <body>
+                    ${printContent.innerHTML}
+                </body>
+                </html>
+            `);
+            
+            setTimeout(() => {
+                printWindow.print();
+                // printWindow.close();
+            }, 500);
+        }
+        
+        // Avaliar roteiro
+        feedbackBtn.addEventListener("click", () => {
+            const rating = prompt("De 1 a 5 estrelas, como você avalia este roteiro?", "5");
+            
+            if (rating) {
+                // Enviar avaliação (mock)
+                showNotification(`Obrigado pelo feedback de ${rating} estrelas!`);
+            }
         });
 
         // Carregar roteiros salvos
@@ -230,16 +609,17 @@
                 
                 savedScripts.forEach(script => {
                     const date = new Date(script.date).toLocaleDateString();
+                    const time = new Date(script.date).toLocaleTimeString();
                     const li = document.createElement("li");
-                    li.style.marginBottom = "10px";
+                    li.className = "saved-item";
                     li.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="saved-header">
                             <strong>${script.title}</strong>
-                            <span style="color:#888; font-size:12px;">${date}</span>
+                            <span style="color:var(--text-muted); font-size:12px;">${date} ${time}</span>
                         </div>
-                        <div style="display:flex; gap:10px; margin-top:5px;">
-                            <button class="load-btn" data-id="${script.id}" style="font-size:12px; padding:4px 8px;">Carregar</button>
-                            <button class="delete-btn" data-id="${script.id}" style="font-size:12px; padding:4px 8px; background:#ff4444;">Excluir</button>
+                        <div class="saved-actions">
+                            <button class="load-btn" data-id="${script.id}">Carregar</button>
+                            <button class="delete-btn" data-id="${script.id}" style="background:#ff4444;">Excluir</button>
                         </div>
                     `;
                     savedListEl.appendChild(li);
@@ -252,24 +632,79 @@
                         const script = savedScripts.find(s => s.id === id);
                         if (script) {
                             promptEl.value = script.prompt;
+                            if (script.type) scriptTypeEl.value = script.type;
                             resultEl.textContent = script.script;
                             resultEl.style.display = "block";
                             actionsEl.style.display = "flex";
+                            updateFormatPreview();
                         }
                     });
                 });
                 
                 document.querySelectorAll(".delete-btn").forEach(btn => {
                     btn.addEventListener("click", () => {
-                        const id = btn.dataset.id;
-                        const newSavedScripts = savedScripts.filter(s => s.id !== id);
-                        localStorage.setItem("saved_scripts", JSON.stringify(newSavedScripts));
-                        loadSavedScripts();
+                        if (confirm("Tem certeza que deseja excluir este roteiro?")) {
+                            const id = btn.dataset.id;
+                            const newSavedScripts = savedScripts.filter(s => s.id !== id);
+                            localStorage.setItem("saved_scripts", JSON.stringify(newSavedScripts));
+                            loadSavedScripts();
+                        }
                     });
                 });
             } else {
                 savedScriptsEl.style.display = "none";
             }
+        }
+        
+        // Notificação
+        function showNotification(message) {
+            // Verificar se já existe uma notificação
+            let notification = document.querySelector('.notification');
+            
+            if (notification) {
+                notification.remove();
+            }
+            
+            // Criar notificação
+            notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            
+            // Estilizar
+            Object.assign(notification.style, {
+                position: 'fixed',
+                bottom: '20px',
+                right: '20px',
+                background: 'var(--primary)',
+                color: 'white',
+                padding: '12px 20px',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                zIndex: '1000',
+                transition: 'opacity 0.3s, transform 0.3s',
+                opacity: '0',
+                transform: 'translateY(10px)'
+            });
+            
+            // Adicionar ao DOM
+            document.body.appendChild(notification);
+            
+            // Animar entrada
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateY(0)';
+            }, 10);
+            
+            // Remover após 3 segundos
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(10px)';
+                
+                // Remover do DOM após a animação
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
         }
     </script>
 </body>
