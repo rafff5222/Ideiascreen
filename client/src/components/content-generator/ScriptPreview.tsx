@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Copy, CheckCircle, Share2, Download, Loader2, Save, History, Sparkles, Wand2 } from "lucide-react";
+import { Copy, CheckCircle, Share2, Download, Loader2, Save, History, Sparkles, Wand2, Video, Film, Clapperboard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -24,6 +24,13 @@ export default function ScriptPreview({
   const [error, setError] = useState<string | null>(null);
   const [savedScripts, setSavedScripts] = useState<any[]>([]);
   const [scriptVersions, setScriptVersions] = useState<any[]>([]);
+  const [directorMode, setDirectorMode] = useState(false);
+  const [directorAnalysis, setDirectorAnalysis] = useState<{
+    estiloVisual: string;
+    referencias: string[];
+    castingIdeal: {[key: string]: string};
+  } | null>(null);
+  const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(false);
   const { toast } = useToast();
   
   // Carregar histórico de roteiros salvos
@@ -173,6 +180,82 @@ export default function ScriptPreview({
       title: "Roteiro Excluído",
       description: "O roteiro foi removido do histórico",
     });
+  };
+  
+  // Ativar modo diretor - analisar o roteiro com visão de diretor
+  const handleDirectorMode = async () => {
+    if (!script || isLoadingAnalysis) return;
+    
+    setIsLoadingAnalysis(true);
+    setDirectorMode(true);
+    
+    try {
+      // Aqui simulamos uma análise de diretor
+      // Em um sistema real, você enviaria o roteiro para uma API de IA
+      setTimeout(() => {
+        // Análise simulada baseada no gênero do roteiro
+        let estiloVisual = "";
+        let referencias: string[] = [];
+        let castingIdeal: {[key: string]: string} = {};
+        
+        if (scriptType.toLowerCase().includes("terror") || prompt.toLowerCase().includes("terror")) {
+          estiloVisual = "Iluminação expressionista com contrastes acentuados, inspirada em filmes como 'O Gabinete do Dr. Caligari'";
+          referencias = ["O Iluminado (1980)", "Hereditário (2018)", "O Exorcista (1973)"];
+          castingIdeal = {
+            "Protagonista": "Florence Pugh",
+            "Antagonista": "Mads Mikkelsen",
+            "Personagem Secundário": "Adam Driver"
+          };
+        } else if (scriptType.toLowerCase().includes("ficção") || prompt.toLowerCase().includes("ficção")) {
+          estiloVisual = "Paleta futurista neo-noir com tons de azul e roxo, inspirada em 'Blade Runner'";
+          referencias = ["Blade Runner 2049 (2017)", "Chegada (2016)", "Ex-Machina (2014)"];
+          castingIdeal = {
+            "Protagonista": "Ryan Gosling",
+            "Antagonista": "Tilda Swinton",
+            "Personagem Secundário": "John David Washington"
+          };
+        } else if (scriptType.toLowerCase().includes("comédia") || prompt.toLowerCase().includes("comédia")) {
+          estiloVisual = "Visual vibrante e saturado, com movimentos de câmera dinâmicos, como em 'Scott Pilgrim'";
+          referencias = ["Superbad (2007)", "Booksmart (2019)", "Todo Mundo em Pânico (2000)"];
+          castingIdeal = {
+            "Protagonista": "Timothée Chalamet",
+            "Coadjuvante Cômico": "Awkwafina",
+            "Personagem Excêntrico": "Bill Hader"
+          };
+        } else {
+          // Genérico para outros tipos
+          estiloVisual = "Cinematografia naturalista com luz suave, inspirada em filmes indie contemporâneos";
+          referencias = ["Parasita (2019)", "Drive My Car (2021)", "Minari (2020)"];
+          castingIdeal = {
+            "Protagonista": "Saoirse Ronan",
+            "Coadjuvante": "Sterling K. Brown",
+            "Personagem Secundário": "Viola Davis"
+          };
+        }
+        
+        setDirectorAnalysis({
+          estiloVisual,
+          referencias,
+          castingIdeal
+        });
+        
+        setIsLoadingAnalysis(false);
+        
+        toast({
+          title: "Análise de Diretor Concluída",
+          description: "Visualize o roteiro pela perspectiva de um diretor profissional",
+        });
+      }, 1500);
+      
+    } catch (err) {
+      console.error("Erro ao analisar roteiro:", err);
+      setIsLoadingAnalysis(false);
+      toast({
+        title: "Erro na Análise",
+        description: "Não foi possível analisar o roteiro como diretor",
+        variant: "destructive"
+      });
+    }
   };
   
   // Gerar uma variação do roteiro atual
@@ -360,11 +443,74 @@ export default function ScriptPreview({
             <p className="text-sm whitespace-pre-line">{script}</p>
           </div>
         ) : (
-          <div className="prose prose-sm max-w-none">
-            <div 
-              id="texto-gerado" 
-              className="script-storyboard whitespace-pre-line bg-gray-900 text-white p-6 rounded-lg border border-amber-500/20 text-sm overflow-auto max-h-[600px] script-content mobile-optimized"
-            >
+          <>
+            {/* Análise do Diretor */}
+            {directorMode && directorAnalysis && (
+              <div className="mb-6 bg-gradient-to-r from-purple-900/30 to-indigo-900/20 rounded-lg p-5 border border-purple-500/30">
+                <div className="flex items-center mb-4">
+                  <Clapperboard className="text-purple-400 mr-2 h-5 w-5" />
+                  <h3 className="text-lg font-bold text-purple-400">Análise de Diretor</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-xs uppercase tracking-wider text-gray-400 mb-1">Estilo Visual</h4>
+                    <p className="text-sm text-white">{directorAnalysis.estiloVisual}</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-xs uppercase tracking-wider text-gray-400 mb-1">Referências Cinematográficas</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {directorAnalysis.referencias.map((ref, index) => (
+                        <span 
+                          key={index} 
+                          className="text-xs bg-purple-500/20 text-purple-300 py-1 px-2 rounded-full"
+                        >
+                          {ref}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-xs uppercase tracking-wider text-gray-400 mb-1">Casting Ideal</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {Object.entries(directorAnalysis.castingIdeal).map(([papel, ator], index) => (
+                        <div key={index} className="flex items-center">
+                          <span className="text-xs font-bold text-gray-300 mr-2">{papel}:</span>
+                          <span className="text-xs text-purple-300">{ator}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-4 pt-2 border-t border-purple-500/20">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setDirectorMode(false)}
+                    className="text-xs text-purple-400"
+                  >
+                    Voltar ao Modo Normal
+                  </Button>
+                </div>
+              </div>
+            )}
+            
+            {/* Loading para análise do diretor */}
+            {isLoadingAnalysis && (
+              <div className="mb-6 bg-gradient-to-r from-purple-900/30 to-indigo-900/20 rounded-lg p-5 border border-purple-500/30 flex items-center">
+                <Loader2 className="animate-spin h-5 w-5 text-purple-400 mr-3" />
+                <p className="text-sm text-purple-300">Analisando roteiro como diretor...</p>
+              </div>
+            )}
+          
+            <div className="prose prose-sm max-w-none">
+              <div 
+                id="texto-gerado" 
+                className="script-storyboard whitespace-pre-line bg-gray-900 text-white p-6 rounded-lg border border-amber-500/20 text-sm overflow-auto max-h-[600px] script-content mobile-optimized glow-effect"
+              >
               {script.split('\n\n').map((block, index) => {
                 // Identificar cabeçalhos e cenas
                 if (block.toUpperCase() === block && block.includes('CENA')) {
@@ -426,6 +572,18 @@ export default function ScriptPreview({
             </>}
           </p>
           <div className="flex gap-2">
+            {/* Botão para Modo Diretor */}
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="flex items-center gap-1 text-purple-500 hover:text-purple-400 bg-purple-500/10"
+              onClick={handleDirectorMode}
+              disabled={isLoading || isLoadingAnalysis}
+            >
+              <Video size={16} />
+              Modo Diretor
+            </Button>
+            
             {/* Botão para gerar variação */}
             <Button 
               variant="outline" 
