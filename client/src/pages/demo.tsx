@@ -885,25 +885,21 @@ export default function DemoPage() {
   }
 
   // Função de geração de vídeo usando a classe
-  const generateVideo = async () => {
+  const analyzeScript = async () => {
     if (!scriptText.trim()) {
-      alert('Por favor, adicione um roteiro de vídeo primeiro!');
+      alert('Por favor, adicione um roteiro primeiro!');
       return;
     }
-
-    const config = {
-      voice: voiceType,
-      speed: speed,
-      transitions: transitions,
-      outputFormat: outputFormat
-    };
     
     try {
-      // Criar elemento de status para retries se não existir
-      let statusElement = document.getElementById('retry-status');
+      // Mostrar estado de carregamento
+      setIsLoading(true);
+      
+      // Criar elemento de status se não existir
+      let statusElement = document.getElementById('analysis-status');
       if (!statusElement) {
         statusElement = document.createElement('div');
-        statusElement.id = 'retry-status';
+        statusElement.id = 'analysis-status';
         statusElement.className = 'mt-2 p-2 bg-blue-50 text-sm text-blue-700 rounded-md';
         statusElement.style.display = 'none';
         
@@ -913,24 +909,24 @@ export default function DemoPage() {
       
       // Atualizar indicadores na interface
       const indicatorEl = document.getElementById('api-status-indicator');
-      const elevenLabsEl = document.getElementById('elevenlabs-status');
       const openaiEl = document.getElementById('openai-status');
+      const huggingfaceEl = document.getElementById('huggingface-status');
       
       if (indicatorEl) indicatorEl.className = 'inline-block w-3 h-3 bg-yellow-400 rounded-full mr-2';
-      if (elevenLabsEl) elevenLabsEl.textContent = 'verificando...';
       if (openaiEl) openaiEl.textContent = 'verificando...';
+      if (huggingfaceEl) huggingfaceEl.textContent = 'verificando...';
       
       // Verificar status das APIs
       const apiStatus = await checkAPIStatus();
       
       // Atualizar indicadores com o resultado da verificação
       if (indicatorEl) {
-        indicatorEl.className = `inline-block w-3 h-3 ${apiStatus.elevenlabs || apiStatus.openai ? 'bg-green-500' : 'bg-red-500'} rounded-full mr-2`;
+        indicatorEl.className = `inline-block w-3 h-3 ${apiStatus.huggingface || apiStatus.openai ? 'bg-green-500' : 'bg-red-500'} rounded-full mr-2`;
       }
       
-      if (elevenLabsEl) {
-        elevenLabsEl.className = apiStatus.elevenlabs ? 'text-green-600 font-medium' : 'text-red-600';
-        elevenLabsEl.textContent = apiStatus.elevenlabs ? '✓ Disponível' : '✗ Indisponível';
+      if (huggingfaceEl) {
+        huggingfaceEl.className = apiStatus.huggingface ? 'text-green-600 font-medium' : 'text-red-600';
+        huggingfaceEl.textContent = apiStatus.huggingface ? '✓ Disponível' : '✗ Indisponível';
       }
       
       if (openaiEl) {
@@ -939,24 +935,37 @@ export default function DemoPage() {
       }
       
       // Verificar se pelo menos uma API está disponível
-      if (!apiStatus.elevenlabs && !apiStatus.openai) {
-        throw new Error("As APIs de geração de voz (ElevenLabs e OpenAI) não estão configuradas. Contate o suporte para resolver este problema.");
+      if (!apiStatus.huggingface && !apiStatus.openai) {
+        throw new Error("As APIs de análise de roteiro não estão disponíveis no momento. Tente novamente mais tarde.");
       }
       
-      // Exibir quais APIs estão disponíveis
-      if (statusElement) {
-        statusElement.textContent = `${apiStatus.elevenlabs ? "✓ ElevenLabs disponível" : "✗ ElevenLabs indisponível"} | ${apiStatus.openai ? "✓ OpenAI disponível" : "✗ OpenAI indisponível"}`;
-        statusElement.style.display = 'block';
+      // Enviar o roteiro para análise
+      const response = await fetch('/api/critic-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ script: scriptText })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Erro na análise: ${response.statusText}`);
       }
       
-      // Usar o sistema de retry automático
-      await generateWithRetry(scriptText, config, 3);
+      const analysisData = await response.json();
+      
+      // Mostrar o resultado da análise
+      displayCriticAnalysis(analysisData);
+      
+      // Atualizar estado
+      setVideoGenerated(true);
+      setIsLoading(false);
+      setShowMessage(true);
       
       // Esconder status após sucesso
       if (statusElement) statusElement.style.display = 'none';
     } catch (error: any) {
-      console.error("Falha após todas as tentativas:", error);
-      videoGenerator.displayError(error);
+      console.error("Falha na análise do roteiro:", error);
+      setIsLoading(false);
+      alert(`Erro ao analisar roteiro: ${error.message}`);
     }
   };
   
@@ -984,6 +993,48 @@ export default function DemoPage() {
     });
     
     return vtt;
+  };
+  
+  // Função para mostrar a análise do crítico
+  const displayCriticAnalysis = (analysisData: any) => {
+    // Atualizar a seção de análise do crítico com os dados recebidos
+    const container = document.getElementById('current-caption');
+    if (container) {
+      const analysisHTML = `
+        <div class="text-white p-4 text-left overflow-auto h-48">
+          <h3 class="font-bold text-xl mb-2">Análise do Crítico</h3>
+          <div class="mb-3">
+            <span class="font-medium text-green-400">Pontos Fortes:</span>
+            <p class="text-sm">${analysisData.strengths || 'Não disponível'}</p>
+          </div>
+          <div class="mb-3">
+            <span class="font-medium text-yellow-400">Pontos a Melhorar:</span>
+            <p class="text-sm">${analysisData.weaknesses || 'Não disponível'}</p>
+          </div>
+          <div class="mb-2">
+            <span class="font-medium text-blue-400">Comparações:</span>
+            <p class="text-sm">${analysisData.comparisons || 'Não disponível'}</p>
+          </div>
+          <div class="mt-4">
+            <span class="font-medium">Avaliação Geral:</span> 
+            <span class="text-yellow-400">★★★★☆</span>
+          </div>
+        </div>
+      `;
+      container.innerHTML = analysisHTML;
+    }
+
+    // Ocultar controles de áudio e outros elementos de vídeo que não são necessários
+    const audioElement = document.getElementById('demo-audio');
+    if (audioElement) {
+      audioElement.style.display = 'none';
+    }
+
+    // Esconder o overlay de play
+    const playOverlay = document.getElementById('play-overlay');
+    if (playOverlay) {
+      playOverlay.style.display = 'none';
+    }
   };
   
   // Formata segundos para o formato VTT de tempo
