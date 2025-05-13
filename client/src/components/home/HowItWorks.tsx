@@ -99,10 +99,10 @@ export default function HowItWorks() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
                 <div className="p-6 text-white">
                   <p className="font-medium">
-                    "Economizo pelo menos 15 horas por semana com a plataforma!"
+                    "O IdeiaScreen transformou meu processo criativo para roteiros!"
                   </p>
                   <p className="text-sm opacity-90 mt-1">
-                    Maria S., Influencer com 128k seguidores
+                    Maria S., Creator Digital
                   </p>
                 </div>
               </div>
