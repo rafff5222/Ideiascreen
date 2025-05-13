@@ -113,7 +113,7 @@ export default function UpdatedPricingSection() {
               <h3 className="mt-4 mb-2">{plan.name}</h3>
               
               <div className="mb-2">
-                <p>
+                <p className="price-display">
                   <strong>{plan.price}</strong>/{plan.period}
                 </p>
                 
