@@ -232,17 +232,24 @@ export default function PlansTablePage() {
               </p>
             </div>
             
-            <div className="offer-banner">
+            <div className="offer-banner promotion-gradient">
               <div className="offer-banner-content">
-                <h3>Oferta Especial de Lançamento!</h3>
-                <p>Aproveite 25% de desconto em todos os planos anuais. Oferta por tempo limitado!</p>
+                <div className="promo-badge">Oferta por tempo limitado!</div>
+                <h3>Promoção de Lançamento - Últimas Vagas!</h3>
+                <p className="text-lg mb-4">Aproveite <strong className="text-white text-xl">até 25% de desconto</strong> em todos os planos anuais. Oferta válida até:</p>
+                
                 <CountdownTimer endDate={new Date('2025-06-15T23:59:59')} />
-                <Button 
-                  className="btn-pricing"
-                  onClick={() => document.getElementById('pricing-table')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  Aproveitar Agora
-                </Button>
+                
+                <div className="mt-6 flex flex-col items-center">
+                  <p className="text-white mb-3 font-medium">Restam apenas 20 assinaturas com este desconto!</p>
+                  <Button 
+                    className="btn-pricing promotion-btn"
+                    onClick={() => document.getElementById('pricing-table')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    <span className="btn-text">Aproveitar esta Oferta</span>
+                    <span className="btn-icon">→</span>
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -428,6 +435,15 @@ export default function PlansTablePage() {
             <p className="mb-3">Todos os planos incluem acesso ao gerador de roteiros, atualizações regulares e suporte por email.</p>
             <p className="font-medium">Dúvidas? Entre em contato conosco: <span className="text-amber-400">suporte@plotmachine.com</span></p>
           </div>
+          
+          <footer className="mt-16 py-8 border-t border-gray-700 text-center">
+            <p className="text-gray-400">
+              Precisa de ajuda? <a href="/suporte" className="text-amber-400 hover:underline transition-colors">Entre em contato conosco</a> ou visite nossa <a href="/faq" className="text-amber-400 hover:underline transition-colors">página de FAQ</a>.
+            </p>
+            <p className="text-gray-500 text-sm mt-4">
+              Copyright © {new Date().getFullYear()} PLOTMACHINE. Todos os direitos reservados.
+            </p>
+          </footer>
         </div>
       </div>
       
