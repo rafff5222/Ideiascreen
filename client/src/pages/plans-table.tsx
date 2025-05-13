@@ -205,12 +205,19 @@ export default function PlansTablePage() {
         <title>Gerador de Roteiros Inteligentes | Planos e Preços | PLOTMACHINE</title>
         <meta 
           name="description" 
-          content="Crie roteiros profissionais usando IA. Escolha o plano ideal para gerar roteiros de filmes, vídeos e histórias em minutos com nossa ferramenta de inteligência artificial."
+          content="Transforme suas ideias em roteiros profissionais com PLOTMACHINE. Escolha entre nossos planos Gratuito, Iniciante, Profissional ou Estúdio para criar roteiros de filmes, vídeos e histórias em minutos com nossa tecnologia de IA avançada."
         />
         <meta
           name="keywords"
-          content="gerador de roteiros, roteiros com IA, inteligência artificial, criação de conteúdo, roteiros profissionais, redação de roteiros, script generator"
+          content="gerador de roteiros, roteiros com IA, inteligência artificial, criação de conteúdo, roteiros profissionais, redação de roteiros, script generator, planos, PLOTMACHINE"
         />
+        <meta property="og:title" content="PLOTMACHINE - Planos e Preços" />
+        <meta property="og:description" content="Crie roteiros profissionais com IA. Economize até 24% com planos anuais." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://plotmachine.replit.app/planos" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="PLOTMACHINE - Planos e Preços" />
+        <meta name="twitter:description" content="Crie roteiros profissionais com IA. Economize até 24% com planos anuais." />
       </Helmet>
 
       <div className="bg-gradient-to-b from-gray-900 to-gray-800 min-h-screen">
@@ -264,8 +271,8 @@ export default function PlansTablePage() {
                   <td>-</td>
                   <td>
                     <span className="check-icon">✓</span><span className="feature-highlight">3 roteiros/mês</span><br />
-                    <span className="check-icon">✓</span><span className="feature-highlight">5 gêneros básicos</span><br />
-                    <span className="check-icon">✓</span><span className="feature-highlight">Exportação rápida em TXT</span>
+                    <span className="check-icon">✓</span><span className="feature-highlight">Acesso a 5 gêneros essenciais</span><br />
+                    <span className="check-icon">✓</span><span className="feature-highlight">Exportação instantânea para TXT</span>
                   </td>
                   <td><span className="secondary-text">Ideal para: </span>Testadores, estudantes</td>
                 </tr>
@@ -285,8 +292,9 @@ export default function PlansTablePage() {
                   <td><span className="savings-badge">Economize R$ 67,20/ano (24%)</span></td>
                   <td>
                     <span className="check-icon">✓</span><span className="feature-highlight">30 roteiros/mês</span><br />
-                    <span className="check-icon">✓</span><span className="feature-highlight">Acesso a todos os 37+ gêneros</span><br />
-                    <span className="check-icon">✓</span><span className="feature-highlight">Exportação profissional em PDF</span>
+                    <span className="check-icon">✓</span><span className="feature-highlight">Biblioteca completa com 37+ gêneros</span><br />
+                    <span className="check-icon">✓</span><span className="feature-highlight">Exportação profissional em PDF</span><br />
+                    <span className="check-icon">✓</span><span className="feature-highlight">Revisões ilimitadas</span>
                   </td>
                   <td><span className="secondary-text">Ideal para: </span>Autores independentes, pequenos projetos</td>
                 </tr>
@@ -307,7 +315,8 @@ export default function PlansTablePage() {
                   <td>
                     <span className="check-icon">✓</span><span className="feature-highlight">Roteiros ilimitados</span><br />
                     <span className="check-icon">✓</span><span className="feature-highlight">Exportação em formato .FDX profissional</span><br />
-                    <span className="check-icon">✓</span><span className="feature-highlight">Análise avançada de estrutura narrativa</span>
+                    <span className="check-icon">✓</span><span className="feature-highlight">Análise avançada de estrutura narrativa</span><br />
+                    <span className="check-icon">✓</span><span className="feature-highlight">Modo Diretor com feedback detalhado</span>
                   </td>
                   <td><span className="secondary-text">Ideal para: </span>Freelancers, roteiristas profissionais</td>
                 </tr>
@@ -319,13 +328,17 @@ export default function PlansTablePage() {
                       <HelpCircle size={14} /> Saiba mais
                     </a>
                   </td>
-                  <td>R$ 249,90/mês</td>
-                  <td><strong>R$ 2.399,00/ano</strong><br />(≈R$199,90/mês)</td>
-                  <td><span className="savings-badge">Economize R$ 600/ano</span></td>
+                  <td><strong>R$ 249,90</strong><span className="secondary-text">/mês</span></td>
+                  <td>
+                    <strong>R$ 2.399,00</strong><span className="secondary-text">/ano</span><br />
+                    <span className="feature-highlight">(≈R$ 199,90/mês)</span>
+                  </td>
+                  <td><span className="savings-badge">Economize R$ 600,00/ano (20%)</span></td>
                   <td>
                     <span className="check-icon">✓</span><span className="feature-highlight">Acesso para 5 usuários simultâneos</span><br />
                     <span className="check-icon">✓</span><span className="feature-highlight">Suporte prioritário 24/7</span><br />
-                    <span className="check-icon">✓</span><span className="feature-highlight">Funcionalidades exclusivas para equipes</span>
+                    <span className="check-icon">✓</span><span className="feature-highlight">Ferramentas avançadas de colaboração</span><br />
+                    <span className="check-icon">✓</span><span className="feature-highlight">Consultoria personalizada de roteiros</span>
                   </td>
                   <td><span className="secondary-text">Ideal para: </span>Agências, produtoras de conteúdo</td>
                 </tr>
