@@ -1,0 +1,93 @@
+/* Estilos para a seção de preços atualizada */
+
+.plan-card {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+}
+
+.plan-card:hover {
+  transform: translateY(-5px);
+}
+
+.plan-card.popular {
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+.plan-card.popular:hover {
+  transform: scale(1.05) translateY(-5px);
+}
+
+.recommended-tag, .popular-tag {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 15px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 20px;
+  z-index: 20;
+  white-space: nowrap;
+}
+
+.pulse {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #fff;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+
+/* Botão com gradiente */
+.btn-gradient {
+  background: linear-gradient(to right, #f59e0b, #d97706);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+  background: linear-gradient(to right, #d97706, #b45309);
+  box-shadow: 0 5px 15px rgba(245, 158, 11, 0.35);
+}
+
+/* Distintivo de economia */
+.savings-badge {
+  display: inline-block;
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+  margin-top: 5px;
+}
+
+/* Animação para atributos mais importantes */
+.feature-highlight {
+  animation: featureGlow 2s infinite alternate;
+}
+
+@keyframes featureGlow {
+  from {
+    text-shadow: 0 0 0px transparent;
+  }
+  to {
+    text-shadow: 0 0 5px rgba(245, 158, 11, 0.4);
+  }
+}

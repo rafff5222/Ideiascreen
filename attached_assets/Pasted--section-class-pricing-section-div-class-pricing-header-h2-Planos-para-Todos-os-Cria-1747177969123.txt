@@ -1,0 +1,68 @@
+<section class="pricing-section">
+  <div class="pricing-header">
+    <h2>Planos para Todos os Criadores</h2>
+    <p>Desde criadores iniciantes até estúdios profissionais, temos o plano perfeito para suas necessidades.</p>
+  </div>
+
+  <div class="plans-container">
+    <!-- Plano Grátis -->
+    <div class="plan-card">
+      <h3>Grátis</h3>
+      <p><strong>R$ 0 /mês</strong></p>
+      <p>Para experimentar a plataforma e testar nossos recursos básicos.</p>
+      <ul>
+        <li>✓ 3 roteiros/mês</li>
+        <li>✓ Acesso a 5 gêneros essenciais</li>
+        <li>✓ Exportação instantânea para TXT</li>
+      </ul>
+      <button class="btn btn-secondary">Começar Agora</button>
+    </div>
+
+    <!-- Plano Iniciante -->
+    <div class="plan-card popular">
+      <h3>Iniciante</h3>
+      <p><strong>R$ 27,90 /mês</strong></p>
+      <p>ou <strong>R$ 268,80 / ano</strong> (<strong>≈ R$ 22,40/mês</strong>)</p>
+      <p><span style="background-color: #FFC107; color: black; padding: 5px; border-radius: 5px;">MAIS POPULAR</span></p>
+      <p>Ideal para criadores de conteúdo que precisam de mais roteiros com qualidade profissional.</p>
+      <ul>
+        <li>✓ 30 roteiros/mês</li>
+        <li>✓ Biblioteca completa com 37+ gêneros</li>
+        <li>✓ Exportação profissional em PDF</li>
+        <li>✓ Revisões ilimitadas</li>
+      </ul>
+      <button class="btn btn-primary">Assinar Agora</button>
+    </div>
+
+    <!-- Plano Profissional -->
+    <div class="plan-card recommended">
+      <h3>Profissional</h3>
+      <p><strong>R$ 79,90 /mês</strong></p>
+      <p>ou <strong>R$ 767,00 / ano</strong> (<strong>≈ R$ 63,90/mês</strong>)</p>
+      <p><span style="background-color: #FFC107; color: black; padding: 5px; border-radius: 5px;">RECOMENDADO</span></p>
+      <p>Solução completa para profissionais que dependem de roteiros de alta qualidade sem limitações.</p>
+      <ul>
+        <li>✓ Roteiros ilimitados</li>
+        <li>✓ Exportação em formato .FDX profissional</li>
+        <li>✓ Análise avançada de estrutura narrativa</li>
+        <li>✓ Modo Diretor com feedback detalhado</li>
+      </ul>
+      <button class="btn btn-primary">Assinar Agora</button>
+    </div>
+
+    <!-- Plano Estúdio -->
+    <div class="plan-card">
+      <h3>Estúdio</h3>
+      <p><strong>R$ 249,90 /mês</strong></p>
+      <p>ou <strong>R$ 2.399,00 / ano</strong> (<strong>≈ R$ 199,90/mês</strong>)</p>
+      <p>Ideal para equipes e agências que precisam de colaboração e recursos premium para múltiplos usuários.</p>
+      <ul>
+        <li>✓ Acesso para 5 usuários simultâneos</li>
+        <li>✓ Suporte prioritário 24/7</li>
+        <li>✓ Ferramentas avançadas de colaboração</li>
+        <li>✓ Consultoria personalizada de roteiros</li>
+      </ul>
+      <button class="btn btn-primary">Contatar Vendas</button>
+    </div>
+  </div>
+</section>
