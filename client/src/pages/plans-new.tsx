@@ -165,7 +165,7 @@ export default function PlansNewPage() {
   return (
     <div>
       <Helmet>
-        <title>PLOTMACHINE - Escolha seu plano</title>
+        <title>IdeiaScreen - Escolha seu plano</title>
         <meta 
           name="description" 
           content="Escolha o plano ideal para suas necessidades de criação de roteiros com IA."
@@ -244,7 +244,7 @@ export default function PlansNewPage() {
           
           <div className="text-center text-sm text-gray-400 mt-12">
             <p>Todos os planos incluem acesso ao gerador de roteiros, atualizações regulares e suporte por email.</p>
-            <p className="mt-2">Dúvidas? Entre em contato conosco: suporte@plotmachine.com</p>
+            <p className="mt-2">Dúvidas? Entre em contato conosco: suporte@ideiascreen.com</p>
           </div>
         </div>
       </div>

@@ -198,21 +198,21 @@ export default function ScriptGenerator() {
       />
       
       <Helmet>
-        <title>PLOTMACHINE | Gerador de Roteiros Profissionais com IA</title>
+        <title>IdeiaScreen | Gerador de Roteiros Profissionais com IA</title>
         <meta name="description" content="Gerador de roteiros com IA: crie histórias para filmes, séries e games em segundos. 37 gêneros, análise narrativa e exportação profissional." />
         <meta name="keywords" content="gerador de roteiros, roteiros para filmes, roteiro de série, script generator, ai script writing, roteiro com inteligência artificial" />
-        <meta property="og:title" content="PLOTMACHINE - Gerador de Roteiros Profissionais" />
+        <meta property="og:title" content="IdeiaScreen - Gerador de Roteiros Profissionais" />
         <meta property="og:description" content="Crie roteiros profissionais em segundos com IA avançada. Ideal para videomakers, podcasters e criadores de conteúdo." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
-        <meta property="og:image" content="/plot-machine-preview.jpg" />
+        <meta property="og:image" content="/ideiascreen-preview.jpg" />
         
         {/* Schema.org Markup for Rich Results */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebApplication",
-            "name": "PLOTMACHINE",
+            "name": "IdeiaScreen",
             "applicationCategory": "CreativeApplication",
             "offers": {
               "@type": "Offer",
@@ -231,7 +231,7 @@ export default function ScriptGenerator() {
             <div className="flex items-center justify-center mb-2">
               <div className="text-4xl md:text-5xl font-black mr-2">🎬</div>
               <h1 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent tracking-tight">
-                PLOTMACHINE
+                IDEIASCREEN
               </h1>
             </div>
             <div className="flex items-center justify-center gap-3 mb-4">
