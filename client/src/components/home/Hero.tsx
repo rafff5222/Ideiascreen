@@ -5,6 +5,11 @@ import DynamicCta from "@/components/conversion/DynamicCta";
 import SocialProof from "@/components/conversion/SocialProof";
 import ScriptGeneratorButton from "./ScriptGeneratorButton";
 
+// Importando imagens dos depoimentos
+import amandaAvatar from "@/assets/testimonials/amanda.svg";
+import carlosAvatar from "@/assets/testimonials/carlos.svg";
+import julianaAvatar from "@/assets/testimonials/juliana.svg";
+
 export default function Hero() {
   return (
     <section className="hero-section bg-gradient-to-b from-gray-800 to-gray-900 text-white py-20 md:py-28 relative overflow-hidden">
@@ -160,7 +165,7 @@ export default function Hero() {
               
               <div className="flex items-center mb-6">
                 <div className="relative">
-                  <img src="https://i.pravatar.cc/100?img=3" className="w-16 h-16 rounded-full mr-4 border-2 border-amber-500/30 group-hover:border-amber-500 transition-all duration-300" alt="Avatar" />
+                  <img src={amandaAvatar} className="w-16 h-16 rounded-full mr-4 border-2 border-amber-500/30 group-hover:border-amber-500 transition-all duration-300" alt="Avatar de Amanda" />
                   <div className="absolute -top-1 -right-1 bg-amber-500 w-6 h-6 rounded-full flex items-center justify-center">
                     <span className="text-xs">⭐</span>
                   </div>
@@ -187,7 +192,7 @@ export default function Hero() {
               
               <div className="flex items-center mb-6">
                 <div className="relative">
-                  <img src="https://i.pravatar.cc/100?img=5" className="w-16 h-16 rounded-full mr-4 border-2 border-amber-500/30 group-hover:border-amber-500 transition-all duration-300" alt="Avatar" />
+                  <img src={carlosAvatar} className="w-16 h-16 rounded-full mr-4 border-2 border-amber-500/30 group-hover:border-amber-500 transition-all duration-300" alt="Avatar de Carlos" />
                   <div className="absolute -top-1 -right-1 bg-amber-500 w-6 h-6 rounded-full flex items-center justify-center">
                     <span className="text-xs">⭐</span>
                   </div>
@@ -214,7 +219,7 @@ export default function Hero() {
               
               <div className="flex items-center mb-6">
                 <div className="relative">
-                  <img src="https://i.pravatar.cc/100?img=8" className="w-16 h-16 rounded-full mr-4 border-2 border-amber-500/30 group-hover:border-amber-500 transition-all duration-300" alt="Avatar" />
+                  <img src={julianaAvatar} className="w-16 h-16 rounded-full mr-4 border-2 border-amber-500/30 group-hover:border-amber-500 transition-all duration-300" alt="Avatar de Juliana" />
                   <div className="absolute -top-1 -right-1 bg-amber-500 w-6 h-6 rounded-full flex items-center justify-center">
                     <span className="text-xs">⭐</span>
                   </div>
