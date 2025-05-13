@@ -1,0 +1,115 @@
+1. Estrutura de Arquivos
+/
+├── public/
+│   ├── index.html (página de planos)
+│   └── assets/
+│       ├── style.css
+│       └── script.js
+└── server.js (backend simulado)
+2. Backend Simulado (server.js)
+javascript
+const express = require('express');
+const app = express();
+
+// Dados dos planos
+const PLANS = {
+  free: { requests: 3, export: 'txt' },
+  starter: { requests: 30, export: 'pdf' },
+  pro: { requests: Infinity, export: 'fdx' }
+};
+
+// Middleware para "verificar assinatura"
+app.use((req, res, next) => {
+  // Simula usuário logado (mude manualmente para testar)
+  req.user = { plan: 'free' }; // 'free', 'starter' ou 'pro'
+  next();
+});
+
+// Rota protegida
+app.post('/generate', (req, res) => {
+  const user = req.user;
+  
+  if (user.plan === 'free' && user.requests >= PLANS.free.requests) {
+    return res.status(403).json({ 
+      error: 'Limite atingido. Atualize seu plano em /plans' 
+    });
+  }
+
+  res.json({ 
+    script: 'Roteiro gerado...',
+    format: PLANS[user.plan].export 
+  });
+});
+
+app.listen(3000, () => console.log('Servidor rodando'));
+3. Frontend - Página de Planos (index.html)
+html
+<div class="plans">
+  <div class="plan free">
+    <h3>Grátis</h3>
+    <p>3 roteiros/mês</p>
+    <button onclick="setPlan('free')">Selecionar</button>
+  </div>
+
+  <div class="plan starter">
+    <h3>Iniciante</h3>
+    <p>R$27,90/mês</p>
+    <p>30 roteiros + PDF</p>
+    <button onclick="showUpgradeModal()">Assinar</button>
+  </div>
+
+  <div class="plan pro">
+    <h3>Profissional</h3>
+    <p>R$79,90/mês</p>
+    <p>Ilimitado + FDX</p>
+    <button onclick="showUpgradeModal()">Assinar</button>
+  </div>
+</div>
+
+<script>
+function setPlan(plan) {
+  fetch('/set-plan', { 
+    method: 'POST',
+    body: JSON.stringify({ plan }) 
+  }).then(() => location.reload());
+}
+
+function showUpgradeModal() {
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-content">
+      <h3>Em breve!</h3>
+      <p>Estamos finalizando o sistema de pagamentos.</p>
+      <p>Envie um e-mail para contato@seudominio.com para acesso antecipado.</p>
+    </div>
+  `;
+}
+</script>
+🔒 Como Simular Diferentes Planos
+Para testar como FREE:
+
+javascript
+// No server.js, deixe:
+req.user = { plan: 'free', requests: 0 };
+Para testar como STARTER:
+
+javascript
+req.user = { plan: 'starter', requests: 15 };
+Para testar como PRO:
+
+javascript
+req.user = { plan: 'pro' };
+💡 Fluxo Recomendado para Usuários
+Usuário Free:
+
+Após 3 gerações, mostrar:
+
+html
+<div class="upgrade-banner">
+  <p>Você atingiu seu limite gratuito!</p>
+  <button onclick="showPlans()">Ver Planos</button>
+</div>
+Botões de Assinatura:
+
+Podem abrir um modal explicando que os pagamentos estão em breve
+
+Coletar e-mails de interesse
