@@ -56,36 +56,38 @@ function App() {
   
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <div className="flex flex-col min-h-screen">
-          <Navbar />
-          <main className="flex-grow">
-            <Router />
-          </main>
-          <Footer />
-          
-          {/* Unificador de preços em toda a aplicação */}
-          <UnificadorPrecos />
-          
-          {/* Analytics e Componentes de Conversão */}
-          <ClickTracker />
-          <RetentionPixel />
-          <UpsellModal />
-          <SocialProof />
-          <OneClickCheckout />
-          <ErrorMonitor />
-          <DiagnosticTool />
-          <PurchaseCounter />
-          
-          {/* Exibe componentes apenas na página inicial */}
-          <Route path="/">
-            <ProgressBarOffer />
-            <ExitPopup />
-            <DynamicSocialProof />
-          </Route>
-        </div>
-      </TooltipProvider>
+      <SubscriptionProvider>
+        <TooltipProvider>
+          <Toaster />
+          <div className="flex flex-col min-h-screen">
+            <Navbar />
+            <main className="flex-grow">
+              <Router />
+            </main>
+            <Footer />
+            
+            {/* Unificador de preços em toda a aplicação */}
+            <UnificadorPrecos />
+            
+            {/* Analytics e Componentes de Conversão */}
+            <ClickTracker />
+            <RetentionPixel />
+            <UpsellModal />
+            <SocialProof />
+            <OneClickCheckout />
+            <ErrorMonitor />
+            <DiagnosticTool />
+            <PurchaseCounter />
+            
+            {/* Exibe componentes apenas na página inicial */}
+            <Route path="/">
+              <ProgressBarOffer />
+              <ExitPopup />
+              <DynamicSocialProof />
+            </Route>
+          </div>
+        </TooltipProvider>
+      </SubscriptionProvider>
     </QueryClientProvider>
   );
 }

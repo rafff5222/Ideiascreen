@@ -7,6 +7,7 @@ import { Check, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 interface PlanFeature {
   name: string;
@@ -44,11 +45,8 @@ export default function PlansPage() {
     refetchOnWindowFocus: false,
   });
 
-  // Usuário atual (simulado, seria obtido de um contexto de autenticação real)
-  const [currentUser, setCurrentUser] = useState({
-    plan: 'free',
-    requestsUsed: 2, // Número de requisições já usadas no ciclo atual
-  });
+  // Usar o contexto de assinatura para acessar e modificar os dados do usuário
+  const { user, updateUser, getRemainingRequests } = useSubscription();
 
   // Planos disponíveis (cairia para este fallback apenas se a API falhar)
   const defaultPlans: Plan[] = [
@@ -118,14 +116,14 @@ export default function PlansPage() {
 
   // Atualiza o plano selecionado com base no plano do usuário atual
   useEffect(() => {
-    setSelectedPlan(currentUser.plan);
-  }, [currentUser]);
+    setSelectedPlan(user.plan);
+  }, [user]);
 
   // Manipula o clique em um plano
   const handlePlanSelect = (planId: string) => {
     if (planId === 'free') {
       // Se o plano for gratuito, atualiza o usuário diretamente
-      setCurrentUser(prev => ({ ...prev, plan: planId }));
+      updateUser({ plan: planId });
       toast({
         title: "Plano Gratuito Selecionado",
         description: "Você está usando o plano gratuito com 3 roteiros por mês.",
@@ -135,18 +133,6 @@ export default function PlansPage() {
       setSelectedPlan(planId);
       setShowUpgradeModal(true);
     }
-  };
-
-  // Exibe o número de requisições restantes para o usuário
-  const getRequestsRemaining = () => {
-    const currentPlan = plans.find((p: Plan) => p.id === currentUser.plan);
-    if (!currentPlan) return 0;
-    
-    if (currentPlan.requestLimit === Infinity) {
-      return "ilimitado";
-    }
-    
-    return Math.max(0, currentPlan.requestLimit - currentUser.requestsUsed);
   };
 
   // Para o modal de upgrade
@@ -197,15 +183,15 @@ export default function PlansPage() {
               Escolha o plano ideal para suas necessidades de criação de roteiros
             </p>
             
-            {currentUser.plan !== 'free' ? (
+            {user.plan !== 'free' ? (
               <div className="mt-4 inline-block bg-amber-500/10 text-amber-400 px-4 py-2 rounded-full text-sm">
                 <span className="font-medium">Seu plano atual: </span> 
-                {plans.find((p: Plan) => p.id === currentUser.plan)?.name || 'Gratuito'}
+                {plans.find((p: Plan) => p.id === user.plan)?.name || 'Gratuito'}
               </div>
             ) : (
               <div className="mt-4 inline-block bg-blue-500/10 text-blue-400 px-4 py-2 rounded-full text-sm">
                 <span className="font-medium">Roteiros restantes: </span> 
-                {getRequestsRemaining()} de {plans.find((p: Plan) => p.id === 'free')?.requestLimit || 3}
+                {getRemainingRequests()} de {plans.find((p: Plan) => p.id === 'free')?.requestLimit || 3}
               </div>
             )}
           </div>
@@ -266,9 +252,9 @@ export default function PlansPage() {
                           : 'bg-gray-800 hover:bg-gray-700'
                     }`}
                     onClick={() => handlePlanSelect(plan.id)}
-                    disabled={plan.id === currentUser.plan}
+                    disabled={plan.id === user.plan}
                   >
-                    {plan.id === currentUser.plan 
+                    {plan.id === user.plan 
                       ? 'Plano Atual' 
                       : plan.id === 'free' 
                         ? 'Selecionar' 
