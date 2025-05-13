@@ -277,8 +277,11 @@ export default function PlansTablePage() {
                       <HelpCircle size={14} /> Saiba mais
                     </a>
                   </td>
-                  <td>R$ 27,90/mês</td>
-                  <td><strong>R$ 268,80/ano</strong><br />(≈R$22,40/mês)</td>
+                  <td><strong>R$ 27,90</strong><span className="secondary-text">/mês</span></td>
+                  <td>
+                    <strong>R$ 268,80</strong><span className="secondary-text">/ano</span><br />
+                    <span className="feature-highlight">(≈R$ 22,40/mês)</span>
+                  </td>
                   <td><span className="savings-badge">Economize R$ 67,20/ano (24%)</span></td>
                   <td>
                     <span className="check-icon">✓</span><span className="feature-highlight">30 roteiros/mês</span><br />
@@ -295,9 +298,12 @@ export default function PlansTablePage() {
                       <HelpCircle size={14} /> Saiba mais
                     </a>
                   </td>
-                  <td>R$ 79,90/mês</td>
-                  <td><strong>R$ 767,00/ano</strong><br />(≈R$63,90/mês)</td>
-                  <td><span className="savings-badge">Economize R$ 192/ano</span></td>
+                  <td><strong>R$ 79,90</strong><span className="secondary-text">/mês</span></td>
+                  <td>
+                    <strong>R$ 767,00</strong><span className="secondary-text">/ano</span><br />
+                    <span className="feature-highlight">(≈R$ 63,90/mês)</span>
+                  </td>
+                  <td><span className="savings-badge">Economize R$ 192,00/ano (20%)</span></td>
                   <td>
                     <span className="check-icon">✓</span><span className="feature-highlight">Roteiros ilimitados</span><br />
                     <span className="check-icon">✓</span><span className="feature-highlight">Exportação em formato .FDX profissional</span><br />
