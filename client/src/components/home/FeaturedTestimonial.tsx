@@ -1,4 +1,5 @@
 import { Star } from "lucide-react";
+import marciaAvatar from "@/assets/testimonials/marcia.svg";
 
 export default function FeaturedTestimonial() {
   return (
@@ -20,11 +21,16 @@ export default function FeaturedTestimonial() {
               </blockquote>
               
               <div className="flex items-center">
-                <img
-                  src="https://i.pravatar.cc/100?img=11"
-                  alt="Foto de Márcia Silva"
-                  className="w-14 h-14 rounded-full object-cover mr-4 border-2 border-amber-500"
-                />
+                <div className="relative">
+                  <img
+                    src={marciaAvatar}
+                    alt="Avatar de Márcia Silva"
+                    className="w-14 h-14 rounded-full mr-4 border-2 border-amber-500 transition-all duration-300 hover:border-amber-400"
+                  />
+                  <div className="absolute -top-1 -right-1 bg-amber-500 w-6 h-6 rounded-full flex items-center justify-center">
+                    <span className="text-xs">⭐</span>
+                  </div>
+                </div>
                 <div>
                   <p className="text-white font-semibold">Márcia Silva</p>
                   <p className="text-gray-400">Produtora de Conteúdo, Canal "Em Foco"</p>
