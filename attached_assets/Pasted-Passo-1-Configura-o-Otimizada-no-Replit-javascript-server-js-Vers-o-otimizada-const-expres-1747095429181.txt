@@ -1,0 +1,112 @@
+Passo 1: Configuração Otimizada no Replit
+javascript
+// server.js - Versão otimizada
+const express = require('express');
+const axios = require('axios');
+const Database = require('@replit/database'); // DB nativo do Replit
+const db = new Database();
+const app = express();
+
+// Rate limiting (15 req/minuto)
+const rateLimit = require('express-rate-limit');
+app.use('/generate-image', rateLimit({
+  windowMs: 60 * 1000,
+  max: 15
+}));
+
+app.post('/generate-image', async (req, res) => {
+  const { prompt } = req.body;
+  
+  // 1. Verifica cache no Replit DB
+  const cached = await db.get(prompt);
+  if (cached) return res.json({ image: cached, cached: true });
+
+  // 2. Geração com retry lógico
+  let attempts = 0;
+  while (attempts < 3) {
+    try {
+      const response = await axios.post('https://backend.craiyon.com/generate', 
+        { prompt }, 
+        { timeout: 30000 }
+      );
+      
+      const image = response.data.images[0];
+      await db.set(prompt, image); // Cache no Replit DB
+      return res.json({ image });
+      
+    } catch (error) {
+      attempts++;
+      if (attempts === 3) {
+        return res.status(500).json({ 
+          error: "Serviço ocupado. Tente em 1 minuto." 
+        });
+      }
+      await new Promise(r => setTimeout(r, 5000)); // Espera 5s
+    }
+  }
+});
+
+app.listen(3000);
+Passo 2: Frontend Resiliente
+html
+<script>
+async function gerarImagem() {
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  
+  try {
+    const response = await fetch('/generate-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        prompt: document.getElementById('prompt').value 
+      })
+    });
+    
+    const data = await response.json();
+    if (data.error) throw new Error(data.error);
+    
+    document.getElementById('result').src = `data:image/png;base64,${data.image}`;
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+</script>
+⚠️ Limitações Críticas (500 Imagens)
+Fator	Capacidade	Solução Contorno
+API DALL-E Mini	~300/dia	Rotacionar entre múltiplos serviços
+CPU Replit	0.5 vCPU	Limitar a 1 requisição/segundo
+Armazenamento	Volátil	Usar Replit DB (persiste entre sessões)
+🔄 Plano B - Serviços Alternativos Gratuitos
+Inclua estes fallbacks no seu código:
+
+javascript
+const APIS = [
+  {
+    url: "https://backend.craiyon.com/generate",
+    name: "DALL-E Mini"
+  },
+  {
+    url: "https://api.deepai.org/api/text2img",
+    name: "DeepAI",
+    headers: { "api-key": "quickstart-abc123" } // Chave pública free
+  }
+];
+
+async function tryAPIs(prompt) {
+  for (const api of APIS) {
+    try {
+      const response = await fetch(api.url, {
+        method: 'POST',
+        headers: api.headers || {},
+        body: JSON.stringify({ prompt })
+      });
+      return await response.json();
+    } catch (error) {
+      console.log(`Falha na ${api.name}, tentando próximo...`);
+    }
+  }
+  throw new Error("Todas as APIs falharam");
+}

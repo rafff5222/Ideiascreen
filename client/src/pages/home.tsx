@@ -24,7 +24,7 @@ import BehavioralPricing from "@/components/conversion/BehavioralPricing";
 import ContextualUpsell from "@/components/conversion/ContextualUpsell";
 import RealTimeScarcity from "@/components/conversion/RealTimeScarcity";
 import Comparador3DPlanos from "@/components/conversion/Comparador3DPlanos";
-import VoiceAssistant from "@/components/conversion/VoiceAssistant";
+
 import EngagementPersonalization from "@/components/conversion/EngagementPersonalization";
 import ExpressCheckout from "@/components/conversion/ExpressCheckout";
 import MagicButton from "@/components/conversion/MagicButton";
@@ -48,7 +48,7 @@ import SmartPricing from "@/components/conversion/SmartPricing";
 import PostInteractionUpsell from "@/components/conversion/PostInteractionUpsell";
 import InteractiveComparison from "@/components/conversion/InteractiveComparison";
 import PriorityLoading from "@/components/optimization/PriorityLoading";
-import VoiceCommandButton from "@/components/conversion/VoiceCommandButton";
+
 import MicroConversionsTracker from "@/components/analytics/MicroConversionsTracker";
 export default function Home() {
   // Scroll to top when navigating to home page
@@ -147,7 +147,7 @@ export default function Home() {
       <MicroConversionTracker />
       <RealTimeScarcity />
       <Comparador3DPlanos />
-      <VoiceAssistant />
+
       <EngagementPersonalization />
       <ExpressCheckout />
       <MagicButton />
@@ -162,7 +162,7 @@ export default function Home() {
       <SmartPricing />
       <PostInteractionUpsell />
       <InteractiveComparison />
-      <VoiceCommandButton />
+
       <PriorityLoading />
       <MicroConversionsTracker />
       <MiniMetricsWidget />
