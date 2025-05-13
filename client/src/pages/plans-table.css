@@ -19,6 +19,9 @@
 .pricing-header p {
   font-size: 1.2rem;
   color: #d1d5db;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
 }
 
 .pricing-table {
@@ -92,6 +95,18 @@
 
 .feature-highlight {
   font-weight: 500;
+  color: #f8f9fa;
+}
+
+.secondary-text {
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+.check-icon {
+  color: #10b981;
+  margin-right: 0.5rem;
+  font-weight: bold;
 }
 
 .pricing-cta {
@@ -103,17 +118,20 @@
 .btn-pricing {
   background-color: #f59e0b;
   color: black;
-  padding: 0.75rem 2rem;
-  border-radius: 0.375rem;
+  padding: 0.8rem 2.5rem;
+  border-radius: 0.5rem;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.05rem;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn-pricing:hover {
-  background-color: #d97706;
+  background-color: #FFD700; /* Amarelo mais claro */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
 }
 
 @media (max-width: 768px) {

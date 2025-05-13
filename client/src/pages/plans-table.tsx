@@ -227,11 +227,11 @@ export default function PlansTablePage() {
                   <td>-</td>
                   <td>-</td>
                   <td>
-                    ✓ <span className="feature-highlight">3 roteiros/mês</span><br />
-                    ✓ <span className="feature-highlight">5 gêneros básicos</span><br />
-                    ✓ <span className="feature-highlight">Exportação rápida em TXT</span>
+                    <span className="check-icon">✓</span><span className="feature-highlight">3 roteiros/mês</span><br />
+                    <span className="check-icon">✓</span><span className="feature-highlight">5 gêneros básicos</span><br />
+                    <span className="check-icon">✓</span><span className="feature-highlight">Exportação rápida em TXT</span>
                   </td>
-                  <td>Testadores, estudantes</td>
+                  <td><span className="secondary-text">Ideal para: </span>Testadores, estudantes</td>
                 </tr>
                 <tr className="popular">
                   <td><strong>Iniciante</strong><br /><small>🚀 Mais Popular</small></td>
@@ -239,11 +239,11 @@ export default function PlansTablePage() {
                   <td><strong>R$ 268,80/ano</strong><br />(≈R$22,40/mês)</td>
                   <td><span className="savings-badge">Economize 24%</span></td>
                   <td>
-                    ✓ <span className="feature-highlight">30 roteiros/mês</span><br />
-                    ✓ <span className="feature-highlight">Acesso a todos os 37+ gêneros</span><br />
-                    ✓ <span className="feature-highlight">Exportação profissional em PDF</span>
+                    <span className="check-icon">✓</span><span className="feature-highlight">30 roteiros/mês</span><br />
+                    <span className="check-icon">✓</span><span className="feature-highlight">Acesso a todos os 37+ gêneros</span><br />
+                    <span className="check-icon">✓</span><span className="feature-highlight">Exportação profissional em PDF</span>
                   </td>
-                  <td>Autores independentes, pequenos projetos</td>
+                  <td><span className="secondary-text">Ideal para: </span>Autores independentes, pequenos projetos</td>
                 </tr>
                 <tr>
                   <td><strong>Profissional</strong><br /><small>🎯 Recomendado</small></td>
@@ -251,11 +251,11 @@ export default function PlansTablePage() {
                   <td><strong>R$ 767,00/ano</strong><br />(≈R$63,90/mês)</td>
                   <td><span className="savings-badge">Economize R$ 192/ano</span></td>
                   <td>
-                    ✓ <span className="feature-highlight">Roteiros ilimitados</span><br />
-                    ✓ <span className="feature-highlight">Exportação em formato .FDX profissional</span><br />
-                    ✓ <span className="feature-highlight">Análise avançada de estrutura narrativa</span>
+                    <span className="check-icon">✓</span><span className="feature-highlight">Roteiros ilimitados</span><br />
+                    <span className="check-icon">✓</span><span className="feature-highlight">Exportação em formato .FDX profissional</span><br />
+                    <span className="check-icon">✓</span><span className="feature-highlight">Análise avançada de estrutura narrativa</span>
                   </td>
-                  <td>Freelancers, roteiristas profissionais</td>
+                  <td><span className="secondary-text">Ideal para: </span>Freelancers, roteiristas profissionais</td>
                 </tr>
                 <tr>
                   <td><strong>Estúdio</strong></td>
@@ -263,9 +263,9 @@ export default function PlansTablePage() {
                   <td><strong>R$ 2.399,00/ano</strong><br />(≈R$199,90/mês)</td>
                   <td><span className="savings-badge">Economize R$ 600/ano</span></td>
                   <td>
-                    ✓ <span className="feature-highlight">Acesso para 5 usuários simultâneos</span><br />
-                    ✓ <span className="feature-highlight">Suporte prioritário 24/7</span><br />
-                    ✓ <span className="feature-highlight">Funcionalidades exclusivas para equipes</span>
+                    <span className="check-icon">✓</span><span className="feature-highlight">Acesso para 5 usuários simultâneos</span><br />
+                    <span className="check-icon">✓</span><span className="feature-highlight">Suporte prioritário 24/7</span><br />
+                    <span className="check-icon">✓</span><span className="feature-highlight">Funcionalidades exclusivas para equipes</span>
                   </td>
                   <td>Agências, produtoras de conteúdo</td>
                 </tr>
