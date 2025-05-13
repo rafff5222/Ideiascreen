@@ -87,7 +87,7 @@ export default function Pricing() {
               <div className="flex items-start opacity-50">
                 <AlertTriangle className="text-gray-400 mt-1 flex-shrink-0" size={18} />
                 <span className="ml-3 text-gray-400">
-                  Montagem automática de vídeos
+                  Gerenciador de histórico de roteiros
                 </span>
               </div>
               <div className="flex items-start opacity-50">
@@ -153,13 +153,13 @@ export default function Pricing() {
               <div className="flex items-start">
                 <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
                 <span className="ml-3 text-gray-700">
-                  <strong>Montagem automática</strong> de vídeos
+                  <strong>Sistema de versões A/B</strong> para roteiros
                 </span>
               </div>
               <div className="flex items-start">
                 <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
                 <span className="ml-3 text-gray-700">
-                  Edição com 1-clique (Beta)
+                  Análise de roteiro automática
                 </span>
               </div>
               <div className="flex items-start opacity-50">
@@ -209,13 +209,13 @@ export default function Pricing() {
               <div className="flex items-start">
                 <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
                 <span className="ml-3 text-gray-700">
-                  <strong>Montagem automática</strong> de vídeos
+                  <strong>Modo Diretor</strong> para análise de roteiro
                 </span>
               </div>
               <div className="flex items-start">
                 <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
                 <span className="ml-3 text-gray-700">
-                  Edição avançada com IA
+                  Análise avançada com IA
                 </span>
               </div>
               <div className="flex items-start text-red-500">
