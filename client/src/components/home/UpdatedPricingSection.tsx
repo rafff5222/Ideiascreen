@@ -1,7 +1,5 @@
-import { Check, Info } from "lucide-react";
 import { Link } from "wouter";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import "./UpdatedPricing.css";
+import "./PricingStyles.css";
 
 export default function UpdatedPricingSection() {
   // Planos atualizados conforme o exemplo fornecido
@@ -79,15 +77,11 @@ export default function UpdatedPricingSection() {
   ];
 
   return (
-    <section className="pricing-section py-16 md:py-24" id="pricing">
+    <section className="pricing-section" id="pricing">
       <div className="container mx-auto px-4">
         <div className="pricing-header text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Planos para Todos os Criadores
-          </h2>
-          <p className="text-lg max-w-3xl mx-auto">
-            Desde criadores iniciantes até estúdios profissionais, temos o plano perfeito para suas necessidades.
-          </p>
+          <h2>Planos para Todos os Criadores</h2>
+          <p>Desde criadores iniciantes até estúdios profissionais, temos o plano perfeito para suas necessidades.</p>
         </div>
 
         <div className="plans-container">
@@ -103,20 +97,20 @@ export default function UpdatedPricingSection() {
               }`}
             >
               {plan.popular && (
-                <div className="popular-tag bg-amber-500 text-white font-semibold text-sm px-4 py-1 rounded-full">
+                <div className="popular-tag">
                   <span className="pulse mr-1"></span>
                   MAIS POPULAR
                 </div>
               )}
               
               {plan.recommended && (
-                <div className="recommended-tag bg-amber-500 text-white font-semibold text-sm px-4 py-1 rounded-full">
+                <div className="recommended-tag">
                   <span className="pulse mr-1"></span>
                   RECOMENDADO
                 </div>
               )}
               
-              <h3 className="text-xl font-bold text-gray-900 mt-4 mb-2">{plan.name}</h3>
+              <h3 className="mt-4 mb-2">{plan.name}</h3>
               
               <div className="mb-2">
                 <p>
@@ -145,19 +139,19 @@ export default function UpdatedPricingSection() {
               </div>
               
               <Link href={plan.ctaLink}>
-                <div className={`btn ${plan.highlight || plan.recommended ? 'btn-primary' : 'btn-secondary'}`}>
+                <button className={plan.highlight || plan.recommended ? 'btn btn-primary' : 'btn btn-secondary'}>
                   {plan.cta}
-                </div>
+                </button>
               </Link>
             </div>
           ))}
         </div>
         
         <div className="mt-12 text-center">
-          <p className="text-sm">
+          <p>
             Todos os planos incluem armazenamento local e sem limite de caracteres.
             <br />
-            Precisa de um plano personalizado? <Link href="/contato"><span className="text-amber-400 hover:underline cursor-pointer">Entre em contato</span></Link>.
+            Precisa de um plano personalizado? <Link href="/contato"><span style={{color: '#FFC107'}}>Entre em contato</span></Link>.
           </p>
         </div>
       </div>
