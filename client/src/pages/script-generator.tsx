@@ -9,6 +9,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Sparkles, MessageSquare } from "lucide-react";
 import { Helmet } from "react-helmet";
+import { useSubscription } from "@/contexts/SubscriptionContext";
+import { LimitReachedModal } from "@/components/subscription/LimitReachedModal";
 
 // Tipos de roteiros suportados
 const scriptTypes = [

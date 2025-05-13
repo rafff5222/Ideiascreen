@@ -3,10 +3,25 @@ import type { Request, Response } from "express";
 // Rota para geração de roteiros - Versão simplificada usando Hugging Face
 export async function generateScript(req: Request, res: Response) {
   try {
-    const { prompt } = req.body;
+    const { prompt, subscriptionCheck } = req.body;
     
     if (!prompt) {
       return res.status(400).json({ error: 'Prompt é obrigatório' });
+    }
+    
+    // Verificar limites de subscrição se o cliente enviou dados para verificação
+    if (subscriptionCheck) {
+      const { plan, requestsUsed, requestLimit } = subscriptionCheck;
+      
+      // Verificar se o usuário atingiu o limite de requisições
+      if (plan !== 'pro' && requestsUsed >= requestLimit) {
+        return res.status(403).json({
+          error: 'Limite de requisições atingido',
+          limitReached: true,
+          currentPlan: plan,
+          message: `Você atingiu o limite de ${requestLimit} roteiros do seu plano ${plan}. Faça um upgrade para continuar.`
+        });
+      }
     }
     
     // Usaremos apenas Hugging Face

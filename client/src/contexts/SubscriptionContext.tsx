@@ -1,4 +1,6 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 
 interface SubscriptionUser {
   plan: string;
@@ -18,96 +20,114 @@ interface SubscriptionContextType {
   resetRequestCount: () => void;
 }
 
+// Default values for the subscription context
 const defaultUser: SubscriptionUser = {
   plan: 'free',
   requestsUsed: 0,
   requestLimit: 3,
-  exportFormats: ['txt']
+  exportFormats: ['txt'],
 };
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
 export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<SubscriptionUser>(() => {
-    // Carregar do localStorage se disponível
-    const storedUser = localStorage.getItem('user_subscription');
+  const [user, setUser] = useState<SubscriptionUser>(defaultUser);
+  const { toast } = useToast();
+  
+  // Load user subscription data from localStorage on mount
+  useEffect(() => {
+    const storedUser = localStorage.getItem('subscription');
     if (storedUser) {
       try {
-        return JSON.parse(storedUser);
-      } catch (e) {
-        console.error('Erro ao parsear dados de assinatura:', e);
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error('Failed to parse stored subscription data:', error);
       }
     }
-    return defaultUser;
-  });
-
-  // Salvar no localStorage quando mudar
+    
+    // Try to load user data from the server if available
+    fetchUserSubscription();
+  }, []);
+  
+  // Save user subscription data to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('user_subscription', JSON.stringify(user));
+    localStorage.setItem('subscription', JSON.stringify(user));
   }, [user]);
-
-  const updateUser = (data: Partial<SubscriptionUser>) => {
-    setUser(prev => {
-      // Ao mudar de plano, atualizar o limite de requisições
-      const newData = { ...prev, ...data };
-      
-      // Atualizar o limite de requisições com base no plano
-      if (data.plan && data.plan !== prev.plan) {
-        switch (data.plan) {
-          case 'free':
-            newData.requestLimit = 3;
-            newData.exportFormats = ['txt'];
-            break;
-          case 'starter':
-            newData.requestLimit = 30;
-            newData.exportFormats = ['txt', 'pdf'];
-            break;
-          case 'pro':
-            newData.requestLimit = Infinity;
-            newData.exportFormats = ['txt', 'pdf', 'fdx'];
-            break;
-        }
+  
+  // Fetch user subscription data from the server
+  const fetchUserSubscription = async () => {
+    try {
+      const response = await apiRequest('GET', '/api/user/subscription');
+      if (response.ok) {
+        const data = await response.json();
+        setUser((prevUser) => ({
+          ...prevUser,
+          ...data,
+        }));
       }
-      
-      return newData;
-    });
-  };
-
-  const incrementRequestCount = () => {
-    setUser(prev => ({
-      ...prev,
-      requestsUsed: prev.requestsUsed + 1
-    }));
-  };
-
-  const resetRequestCount = () => {
-    setUser(prev => ({
-      ...prev,
-      requestsUsed: 0
-    }));
-  };
-
-  const getRemainingRequests = () => {
-    if (user.requestLimit === Infinity) {
-      return 'ilimitado';
+    } catch (error) {
+      console.error('Failed to fetch user subscription:', error);
     }
+  };
+  
+  // Update user data
+  const updateUser = (data: Partial<SubscriptionUser>) => {
+    setUser((prevUser) => ({
+      ...prevUser,
+      ...data,
+    }));
+  };
+  
+  // Increment the request count
+  const incrementRequestCount = () => {
+    // Don't increment if on pro plan (unlimited)
+    if (user.plan === 'pro') {
+      return;
+    }
+    
+    setUser((prevUser) => ({
+      ...prevUser,
+      requestsUsed: prevUser.requestsUsed + 1,
+    }));
+  };
+  
+  // Reset the request count
+  const resetRequestCount = () => {
+    setUser((prevUser) => ({
+      ...prevUser,
+      requestsUsed: 0,
+    }));
+  };
+  
+  // Calculate remaining requests
+  const getRemainingRequests = () => {
+    if (user.plan === 'pro') {
+      return '∞';
+    }
+    
     return Math.max(0, user.requestLimit - user.requestsUsed);
   };
-
+  
+  // Check if the user can make a request
   const canMakeRequest = () => {
-    if (user.requestLimit === Infinity) return true;
+    // Pro plan has unlimited requests
+    if (user.plan === 'pro') {
+      return true;
+    }
+    
     return user.requestsUsed < user.requestLimit;
   };
-
+  
   return (
-    <SubscriptionContext.Provider 
-      value={{ 
-        user, 
-        updateUser, 
-        incrementRequestCount, 
-        getRemainingRequests, 
+    <SubscriptionContext.Provider
+      value={{
+        user,
+        updateUser,
+        incrementRequestCount,
+        getRemainingRequests,
         canMakeRequest,
-        resetRequestCount 
+        resetRequestCount,
       }}
     >
       {children}
@@ -118,7 +138,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
 export const useSubscription = () => {
   const context = useContext(SubscriptionContext);
   if (context === undefined) {
-    throw new Error('useSubscription deve ser usado dentro de um SubscriptionProvider');
+    throw new Error('useSubscription must be used within a SubscriptionProvider');
   }
   return context;
 };

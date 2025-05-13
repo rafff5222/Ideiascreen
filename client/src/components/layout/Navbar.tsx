@@ -78,11 +78,14 @@ export default function Navbar() {
               </Link>
             </>
           ) : (
-            <Link href="/">
-              <div className="border border-gray-200 text-gray-800 font-medium px-4 py-2 rounded-lg hover:bg-gray-50 transition cursor-pointer">
-                Voltar ao site
-              </div>
-            </Link>
+            <>
+              <SubscriptionBadge />
+              <Link href="/">
+                <div className="border border-gray-200 text-gray-800 font-medium px-4 py-2 rounded-lg hover:bg-gray-50 transition cursor-pointer">
+                  Voltar ao site
+                </div>
+              </Link>
+            </>
           )}
           
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>

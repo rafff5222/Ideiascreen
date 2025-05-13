@@ -199,6 +199,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   /**
+   * Endpoint para obter dados da assinatura do usuário
+   */
+  app.get("/api/user/subscription", async (req: Request, res: Response) => {
+    try {
+      // Em uma implementação real, você obteria os dados do usuário autenticado
+      // Por exemplo: const user = await storage.getUserById(req.user.id);
+      
+      // Para fins de demonstração, retornamos um usuário com plano gratuito
+      const subscription = {
+        plan: 'free',
+        requestsUsed: 0,
+        requestLimit: 3,
+        exportFormats: ['txt'],
+        planStartDate: new Date().toISOString(),
+        planRenewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 dias
+      };
+      
+      return res.json(subscription);
+    } catch (error) {
+      console.error("Erro ao obter dados da assinatura:", error);
+      return res.status(500).json({ error: "Erro ao obter dados da assinatura" });
+    }
+  });
+
+  /**
+   * Endpoint para atualizar dados da assinatura
+   */
+  app.post("/api/user/subscription", async (req: Request, res: Response) => {
+    try {
+      const { plan } = req.body;
+      
+      if (!plan) {
+        return res.status(400).json({ error: "Dados da assinatura inválidos" });
+      }
+      
+      // Validar o plano
+      const validPlans = ['free', 'starter', 'pro'];
+      if (!validPlans.includes(plan)) {
+        return res.status(400).json({ error: "Plano inválido" });
+      }
+      
+      // Em uma implementação real, você atualizaria os dados do usuário no banco de dados
+      // Por exemplo: await storage.updateUserSubscription(req.user.id, plan);
+      
+      // Determinar limite de requisições com base no plano
+      let requestLimit = 3;
+      let exportFormats = ['txt'];
+      
+      if (plan === 'starter') {
+        requestLimit = 30;
+        exportFormats = ['txt', 'pdf'];
+      } else if (plan === 'pro') {
+        requestLimit = -1; // Ilimitado
+        exportFormats = ['txt', 'pdf', 'fdx'];
+      }
+      
+      // Retornar dados atualizados da assinatura
+      const subscription = {
+        plan,
+        requestsUsed: 0, // Reset ao mudar de plano
+        requestLimit,
+        exportFormats,
+        planStartDate: new Date().toISOString(),
+        planRenewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 dias
+      };
+      
+      return res.json(subscription);
+    } catch (error) {
+      console.error("Erro ao atualizar assinatura:", error);
+      return res.status(500).json({ error: "Erro ao atualizar assinatura" });
+    }
+  });
+
+  /**
    * Endpoint para pré-carregamento do modelo de IA
    * Otimiza a experiência do usuário iniciando o carregamento do modelo em background
    */
