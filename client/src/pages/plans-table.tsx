@@ -478,28 +478,44 @@ export default function PlansTablePage() {
         <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-center text-xl text-green-500">Assinatura Confirmada! 🎉</DialogTitle>
+              <DialogTitle className="text-center text-xl text-amber-500">Assinatura Confirmada! 🎉</DialogTitle>
             </DialogHeader>
             <div className="py-6 text-center">
-              <div className="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-                ✓
+              <div className="w-20 h-20 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-md">
+                <span className="animate-bounce inline-block">✓</span>
               </div>
-              <h3 className="text-lg font-medium mb-2">Bem-vindo ao plano {selectedPlan?.name}!</h3>
-              <p className="text-gray-500 mb-4">
-                Sua assinatura foi processada com sucesso. Agora você tem acesso a todos os recursos do plano.
+              <h3 className="text-xl font-medium mb-2">Bem-vindo ao plano {selectedPlan?.name}!</h3>
+              <p className="text-gray-400 mb-4">
+                Sua assinatura foi processada com sucesso. Você tem acesso imediato a todos os recursos premium.
               </p>
               
-              <div className="bg-gray-100 p-3 rounded-md text-left mb-4">
-                <h4 className="font-medium mb-2">Seu plano inclui:</h4>
-                <ul className="space-y-1 text-sm">
-                  <li>• {selectedPlan?.id === 'free' ? '3 roteiros por mês' : 
+              <div className="bg-gray-800 border border-amber-500/30 p-4 rounded-md text-left mb-4 shadow-inner">
+                <h4 className="font-medium mb-3 text-amber-400">Seu plano inclui:</h4>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center">
+                    <span className="check-icon mr-2">✓</span>
+                    <span>{selectedPlan?.id === 'free' ? '3 roteiros por mês' : 
                       selectedPlan?.id === 'starter' ? '30 roteiros por mês' : 
-                      'Roteiros ilimitados'}</li>
-                  <li>• {selectedPlan?.id === 'free' ? 'Exportação em TXT' : 
-                      selectedPlan?.id === 'starter' ? 'Exportação em TXT e PDF' : 
-                      'Exportação em TXT, PDF e FDX'}</li>
-                  {selectedPlan?.id !== 'free' && <li>• Análise de roteiro com IA</li>}
-                  {selectedPlan?.id === 'pro' && <li>• Modos criativos avançados</li>}
+                      'Roteiros ilimitados'}</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="check-icon mr-2">✓</span>
+                    <span>{selectedPlan?.id === 'free' ? 'Exportação instantânea em TXT' : 
+                      selectedPlan?.id === 'starter' ? 'Exportação profissional em PDF' : 
+                      'Exportação em formato .FDX profissional'}</span>
+                  </li>
+                  {selectedPlan?.id !== 'free' && (
+                    <li className="flex items-center">
+                      <span className="check-icon mr-2">✓</span>
+                      <span>Análise avançada de roteiro com IA</span>
+                    </li>
+                  )}
+                  {selectedPlan?.id === 'pro' && (
+                    <li className="flex items-center">
+                      <span className="check-icon mr-2">✓</span>
+                      <span>Modo Diretor com feedback detalhado</span>
+                    </li>
+                  )}
                 </ul>
               </div>
             </div>
@@ -508,10 +524,13 @@ export default function PlansTablePage() {
                 onClick={() => {
                   setShowSuccessDialog(false);
                   setLocation('/roteiros'); // Redireciona para a página de roteiros
-                }} 
-                className="w-full bg-primary hover:bg-primary/90"
+                }}
+                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-semibold py-6 shadow-lg transition-all duration-300 hover:shadow-xl"
               >
-                Começar a Criar Roteiros
+                <span className="flex items-center justify-center">
+                  <span className="mr-2">Começar a Criar Roteiros</span>
+                  <span className="text-xl">→</span>
+                </span>
               </Button>
             </DialogFooter>
           </DialogContent>

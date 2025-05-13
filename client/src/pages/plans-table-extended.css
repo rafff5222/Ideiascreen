@@ -216,6 +216,10 @@
   transform: translateX(5px);
 }
 
+.btn-pricing:has(> .btn-icon:first-child):hover .btn-icon {
+  transform: translateX(-5px);
+}
+
 /* Estilos da seção de depoimentos */
 .testimonials-section {
   max-width: 1000px;
