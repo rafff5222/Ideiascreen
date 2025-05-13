@@ -72,8 +72,8 @@ export default function Diferenciais() {
         </div>
 
         <div className="mt-16 text-center">
-          <Link href="/roteiros" className="inline-block">
-            <div className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-8 py-3 rounded-lg font-semibold text-lg shadow-lg hover:shadow-amber-500/20 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+          <Link href="/roteiros">
+            <div className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-8 py-3 rounded-lg font-semibold text-lg shadow-lg hover:shadow-amber-500/20 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer inline-block">
               Experimente Agora
             </div>
           </Link>

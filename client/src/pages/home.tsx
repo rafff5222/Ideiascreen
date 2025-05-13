@@ -4,7 +4,9 @@ import HowItWorks from "@/components/home/HowItWorks";
 import Pricing from "@/components/home/Pricing";
 import NovoLayoutPrecos from "@/components/home/NovoLayoutPrecos";
 import PricingTable from "@/components/home/PricingTable";
+import SimplifiedPricingTable from "@/components/home/SimplifiedPricingTable";
 import Testimonials from "@/components/home/Testimonials";
+import FeaturedTestimonial from "@/components/home/FeaturedTestimonial";
 import FAQ from "@/components/home/FAQ";
 import CallToAction from "@/components/home/CallToAction";
 import Diferenciais from "@/components/home/Diferenciais";
@@ -125,10 +127,10 @@ export default function Home() {
       {/* Componentes principais da página */}
       <Hero />
       <Diferenciais />
+      <FeaturedTestimonial />
+      <SimplifiedPricingTable />
       <Features />
       <HowItWorks />
-      <PricingTable />
-      <Testimonials />
       <FAQ />
       <CallToAction />
       
