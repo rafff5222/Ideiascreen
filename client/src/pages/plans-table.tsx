@@ -219,6 +219,10 @@ export default function PlansTablePage() {
             <div className="pricing-header">
               <h2>Planos e Preços</h2>
               <p>Escolha o plano ideal para seu projeto criativo</p>
+              <p className="mt-4 text-lg max-w-2xl mx-auto">
+                Transforme suas ideias em roteiros perfeitos usando nossa IA avançada. 
+                Criamos soluções para todos os tipos de projetos, de estudantes a produtoras profissionais.
+              </p>
             </div>
             
             <div className="offer-banner">
@@ -275,7 +279,7 @@ export default function PlansTablePage() {
                   </td>
                   <td>R$ 27,90/mês</td>
                   <td><strong>R$ 268,80/ano</strong><br />(≈R$22,40/mês)</td>
-                  <td><span className="savings-badge">Economize 24%</span></td>
+                  <td><span className="savings-badge">Economize R$ 67,20/ano (24%)</span></td>
                   <td>
                     <span className="check-icon">✓</span><span className="feature-highlight">30 roteiros/mês</span><br />
                     <span className="check-icon">✓</span><span className="feature-highlight">Acesso a todos os 37+ gêneros</span><br />

@@ -38,7 +38,7 @@
 
 .pricing-table th,
 .pricing-table td {
-  padding: 1.25rem 1.5rem;
+  padding: 1.5rem 1.75rem;
   text-align: left;
   border-bottom: 1px solid #3e4451;
   vertical-align: top;
@@ -65,12 +65,26 @@
 .pricing-table tbody tr.popular {
   background-color: rgba(245, 158, 11, 0.15);
   position: relative;
-  box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+  transform: scale(1.03);
+  z-index: 1;
+  border-radius: 8px;
 }
 
 .pricing-table tbody tr.popular td {
-  border-bottom: 1px solid rgba(245, 158, 11, 0.3);
-  border-top: 1px solid rgba(245, 158, 11, 0.3);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.5);
+  border-top: 1px solid rgba(245, 158, 11, 0.5);
+}
+
+.pricing-table tbody tr.popular td:first-child {
+  border-left: 3px solid #f59e0b;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.pricing-table tbody tr.popular td:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 
 .pricing-table tbody tr.popular td strong {
@@ -87,13 +101,27 @@
 
 .savings-badge {
   display: inline-block;
-  background-color: #FFC107;
+  background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
   color: black;
-  padding: 5px 8px;
+  padding: 6px 10px;
   border-radius: 5px;
-  font-weight: 600;
-  font-size: 0.85rem;
+  font-weight: 700;
+  font-size: 0.9rem;
   margin-top: 0.5rem;
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(255, 193, 7, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+  }
 }
 
 .feature-highlight {
