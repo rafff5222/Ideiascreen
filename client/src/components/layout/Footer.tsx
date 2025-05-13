@@ -18,9 +18,9 @@ export default function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           <div>
-            <h3 className="text-lg font-bold mb-4 text-white">ContentAI</h3>
+            <h3 className="text-lg font-bold mb-4 text-white">IdeiaScreen</h3>
             <p className="mb-4 text-gray-400">
-              Ferramentas de IA para criadores de conteúdo que desejam crescer no Instagram e TikTok sem estresse.
+              Ferramentas de IA para criadores de conteúdo que desejam criar roteiros profissionais para seus vídeos.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
@@ -64,7 +64,7 @@ export default function Footer() {
             <h3 className="text-lg font-bold mb-4 text-white">Fale conosco</h3>
             <p className="flex items-center mb-4 text-gray-400">
               <Mail size={16} className="mr-2" />
-              suporte@contentai.com.br
+              suporte@ideiascreen.com.br
             </p>
             
             <div className="bg-gray-800 p-4 rounded-lg">
@@ -115,7 +115,7 @@ export default function Footer() {
         
         <div className="border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-gray-500 mb-4 md:mb-0">
-            &copy; {currentYear} ContentAI. Todos os direitos reservados.
+            &copy; {currentYear} IdeiaScreen. Todos os direitos reservados.
           </p>
           
           <div className="flex space-x-6">
