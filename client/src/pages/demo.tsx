@@ -843,8 +843,8 @@ export default function DemoPage() {
     const apiStatus = await checkAPIStatus();
     
     // Verificar se pelo menos uma API está disponível
-    if (!apiStatus.elevenlabs && !apiStatus.openai) {
-      throw new Error("As APIs ElevenLabs e OpenAI não estão configuradas. Entre em contato com o suporte.");
+    if (!apiStatus.huggingface && !apiStatus.openai) {
+      throw new Error("As APIs HuggingFace e OpenAI não estão configuradas. Entre em contato com o suporte.");
     }
     
     for (let i = 0; i < retries; i++) {

@@ -9,7 +9,7 @@ interface SystemStatus {
     rss: number;
   } | null;
   apiStatus: {
-    elevenlabs: boolean;
+    huggingface: boolean;
     openai: boolean;
   };
   queue: {
@@ -31,7 +31,7 @@ export default function DebugTools() {
   const [systemStatus, setSystemStatus] = useState<SystemStatus>({
     memory: null,
     apiStatus: {
-      elevenlabs: false,
+      huggingface: false,
       openai: false
     },
     queue: null,
@@ -56,7 +56,7 @@ export default function DebugTools() {
         setSystemStatus({
           memory: statsData.memory,
           apiStatus: {
-            elevenlabs: apiData.apis.elevenlabs.configured,
+            huggingface: apiData.apis.huggingface?.configured || false,
             openai: apiData.apis.openai.configured
           },
           queue: statsData.queue,
@@ -157,9 +157,9 @@ export default function DebugTools() {
         </h4>
         <div className="grid grid-cols-2 gap-1">
           <div>
-            <span className="text-gray-400">ElevenLabs:</span>{' '}
-            <span className={systemStatus.apiStatus.elevenlabs ? "text-green-400" : "text-red-400"}>
-              {systemStatus.apiStatus.elevenlabs ? "✓ Disponível" : "✗ Indisponível"}
+            <span className="text-gray-400">HuggingFace:</span>{' '}
+            <span className={systemStatus.apiStatus.huggingface ? "text-green-400" : "text-red-400"}>
+              {systemStatus.apiStatus.huggingface ? "✓ Disponível" : "✗ Indisponível"}
             </span>
           </div>
           <div>
