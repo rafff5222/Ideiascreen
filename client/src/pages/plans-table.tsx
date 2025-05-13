@@ -6,6 +6,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import CountdownTimer from '@/components/ui/countdown-timer';
+import { MessageCircle, Book, HelpCircle } from 'lucide-react';
 import "./plans-table-extended.css";
 
 interface PlanFeature {
@@ -37,10 +39,11 @@ export default function PlansTablePage() {
   const [, setLocation] = useLocation();
   const { user, updateUser } = useSubscription();
   
-  // Estados para diálogo de confirmação
+  // Estados para diálogos e feedbacks
   const [showDialog, setShowDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   
   // Também precisamos do modal de upgrade para planos pagos
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -166,12 +169,17 @@ export default function PlansTablePage() {
       
       updateUser({ plan: selectedPlan.id });
       
+      // Fechamos o diálogo de confirmação
+      setShowDialog(false);
+      
+      // Mostramos o diálogo de sucesso
+      setShowSuccessDialog(true);
+      
+      // Exibimos também um toast de sucesso
       toast({
         title: "Plano Atualizado",
         description: `Você agora está no plano ${selectedPlan.name}. Aproveite!`,
       });
-      
-      setShowDialog(false);
     } catch (error) {
       toast({
         title: "Erro ao atualizar plano",
@@ -212,8 +220,22 @@ export default function PlansTablePage() {
               <h2>Planos e Preços</h2>
               <p>Escolha o plano ideal para seu projeto criativo</p>
             </div>
+            
+            <div className="offer-banner">
+              <div className="offer-banner-content">
+                <h3>Oferta Especial de Lançamento!</h3>
+                <p>Aproveite 25% de desconto em todos os planos anuais. Oferta por tempo limitado!</p>
+                <CountdownTimer endDate={new Date('2025-06-15T23:59:59')} />
+                <Button 
+                  className="btn-pricing"
+                  onClick={() => document.getElementById('pricing-table')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  Aproveitar Agora
+                </Button>
+              </div>
+            </div>
 
-            <table className="pricing-table">
+            <table className="pricing-table" id="pricing-table">
               <thead>
                 <tr>
                   <th>Plano</th>
@@ -226,7 +248,13 @@ export default function PlansTablePage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Grátis</strong></td>
+                  <td>
+                    <strong>Grátis</strong>
+                    <p className="plan-description">Perfeito para experimentar a plataforma e testar nossos recursos básicos.</p>
+                    <a href="/faq#free-plan" className="support-link">
+                      <HelpCircle size={14} /> Saiba mais
+                    </a>
+                  </td>
                   <td>R$ 0</td>
                   <td>-</td>
                   <td>-</td>
@@ -238,7 +266,13 @@ export default function PlansTablePage() {
                   <td><span className="secondary-text">Ideal para: </span>Testadores, estudantes</td>
                 </tr>
                 <tr className="popular">
-                  <td><strong>Iniciante</strong><br /><small>🚀 Mais Popular</small></td>
+                  <td>
+                    <strong>Iniciante</strong><br /><small>🚀 Mais Popular</small>
+                    <p className="plan-description">Ideal para criadores de conteúdo que precisam de mais roteiros com qualidade profissional.</p>
+                    <a href="/faq#starter-plan" className="support-link">
+                      <HelpCircle size={14} /> Saiba mais
+                    </a>
+                  </td>
                   <td>R$ 27,90/mês</td>
                   <td><strong>R$ 268,80/ano</strong><br />(≈R$22,40/mês)</td>
                   <td><span className="savings-badge">Economize 24%</span></td>
@@ -250,7 +284,13 @@ export default function PlansTablePage() {
                   <td><span className="secondary-text">Ideal para: </span>Autores independentes, pequenos projetos</td>
                 </tr>
                 <tr>
-                  <td><strong>Profissional</strong><br /><small>🎯 Recomendado</small></td>
+                  <td>
+                    <strong>Profissional</strong><br /><small>🎯 Recomendado</small>
+                    <p className="plan-description">Solução completa para profissionais que dependem de roteiros de alta qualidade sem limitações.</p>
+                    <a href="/faq#pro-plan" className="support-link">
+                      <HelpCircle size={14} /> Saiba mais
+                    </a>
+                  </td>
                   <td>R$ 79,90/mês</td>
                   <td><strong>R$ 767,00/ano</strong><br />(≈R$63,90/mês)</td>
                   <td><span className="savings-badge">Economize R$ 192/ano</span></td>
@@ -262,7 +302,13 @@ export default function PlansTablePage() {
                   <td><span className="secondary-text">Ideal para: </span>Freelancers, roteiristas profissionais</td>
                 </tr>
                 <tr>
-                  <td><strong>Estúdio</strong></td>
+                  <td>
+                    <strong>Estúdio</strong>
+                    <p className="plan-description">Para equipes e agências que precisam de colaboração e recursos premium para múltiplos usuários.</p>
+                    <a href="/faq#studio-plan" className="support-link">
+                      <HelpCircle size={14} /> Saiba mais
+                    </a>
+                  </td>
                   <td>R$ 249,90/mês</td>
                   <td><strong>R$ 2.399,00/ano</strong><br />(≈R$199,90/mês)</td>
                   <td><span className="savings-badge">Economize R$ 600/ano</span></td>
