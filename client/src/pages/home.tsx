@@ -14,9 +14,9 @@ import { useEffect } from "react";
 import { Helmet } from 'react-helmet';
 
 // Componentes de conversão avançada
-import OfferProgressBar from "@/components/conversion/OfferProgressBar";
 import OneClickCheckout from "@/components/conversion/OneClickCheckout";
 import TechnicalOptimizations from "@/components/conversion/TechnicalOptimizations";
+import ScriptOfferBanner from "@/components/conversion/ScriptOfferBanner";
 // Chatbots removidos a pedido do cliente
 // import SalesAiChatbot from "@/components/conversion/SalesAiChatbot";
 // import SalesChatbot from "@/components/conversion/SalesChatbot";
@@ -49,7 +49,6 @@ import MicroConversionTracker from "@/components/analytics/MicroConversionTracke
 import MetricsPanel from "@/components/admin/MetricsPanel-new";
 import TimeBasedOffers from "@/components/conversion/TimeBasedOffers";
 import SmartPricing from "@/components/conversion/SmartPricing";
-import PostInteractionUpsell from "@/components/conversion/PostInteractionUpsell";
 import InteractiveComparison from "@/components/conversion/InteractiveComparison";
 import PriorityLoading from "@/components/optimization/PriorityLoading";
 
@@ -121,11 +120,9 @@ export default function Home() {
         />
       </Helmet>
       
-      {/* Barra de oferta temporária com gatilho FOMO */}
-      <OfferProgressBar />
-      
       {/* Componentes principais da página */}
       <Hero />
+      <ScriptOfferBanner />
       <Diferenciais />
       <FeaturedTestimonial />
       <SimplifiedPricingTable />
@@ -164,7 +161,6 @@ export default function Home() {
       <TimeBasedOffers />
       {/* MemoryChatbot também removido */}
       <SmartPricing />
-      <PostInteractionUpsell />
       <InteractiveComparison />
 
       <PriorityLoading />
