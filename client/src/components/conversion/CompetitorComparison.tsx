@@ -51,33 +51,33 @@ export default function CompetitorComparison() {
             <tbody>
               <tr>
                 <td>Análise de Roteiro Profissional</td>
-                <td>❌</td>
-                <td class="highlight">✅</td>
+                <td><span class="no-badge">NÃO</span></td>
+                <td class="highlight"><span class="yes-badge">SIM</span></td>
               </tr>
               <tr>
                 <td>Modo Diretor</td>
-                <td>Limitado</td>
-                <td class="highlight">Completo</td>
+                <td><span class="limited-badge">Limitado</span></td>
+                <td class="highlight"><span class="complete-badge">Completo</span></td>
               </tr>
               <tr>
                 <td>Roteiros otimizados por gênero</td>
-                <td>❌</td>
-                <td class="highlight">✅</td>
+                <td><span class="no-badge">NÃO</span></td>
+                <td class="highlight"><span class="yes-badge">SIM</span></td>
               </tr>
               <tr>
                 <td>Análise Crítica Cinematográfica</td>
-                <td>Extra $$$</td>
-                <td class="highlight">Incluído</td>
+                <td><span class="extra-badge">Extra $$$</span></td>
+                <td class="highlight"><span class="included-badge">Incluído</span></td>
               </tr>
               <tr>
                 <td>Suporte ao usuário</td>
-                <td>Email</td>
-                <td class="highlight">24/7 Chat</td>
+                <td><span class="limited-badge">Email</span></td>
+                <td class="highlight"><span class="complete-badge">24/7 Chat</span></td>
               </tr>
               <tr>
                 <td>Preço Mensal</td>
-                <td>R$ 149+</td>
-                <td class="highlight">A partir de R$ 27,90</td>
+                <td><span class="extra-badge">R$ 149+</span></td>
+                <td class="highlight"><span class="price-badge">A partir de R$ 27,90</span></td>
               </tr>
             </tbody>
           </table>
@@ -183,33 +183,100 @@ export default function CompetitorComparison() {
           width: 100%;
           border-collapse: collapse;
           text-align: left;
-          background: white;
+          background: #1A202C;
+          color: white;
+        }
+        
+        .no-badge {
+          background-color: #E53E3E;
+          color: white;
+          padding: 2px 8px;
+          border-radius: 4px;
+          font-weight: bold;
+          display: inline-block;
+        }
+        
+        .yes-badge {
+          background-color: #38A169;
+          color: white;
+          padding: 2px 8px;
+          border-radius: 4px;
+          font-weight: bold;
+          display: inline-block;
+        }
+        
+        .limited-badge {
+          background-color: #ED8936;
+          color: white;
+          padding: 2px 8px;
+          border-radius: 4px;
+          font-weight: bold;
+          display: inline-block;
+        }
+        
+        .complete-badge {
+          background-color: #38A169;
+          color: white;
+          padding: 2px 8px;
+          border-radius: 4px;
+          font-weight: bold;
+          display: inline-block;
+        }
+        
+        .extra-badge {
+          background-color: #E53E3E;
+          color: white;
+          padding: 2px 8px;
+          border-radius: 4px;
+          font-weight: bold;
+          display: inline-block;
+        }
+        
+        .included-badge {
+          background-color: #38A169;
+          color: white;
+          padding: 2px 8px;
+          border-radius: 4px;
+          font-weight: bold;
+          display: inline-block;
+        }
+        
+        .price-badge {
+          background-color: #FFC107;
+          color: #1A202C;
+          padding: 2px 8px;
+          border-radius: 4px;
+          font-weight: bold;
+          display: inline-block;
         }
         
         .comparison-table th, .comparison-table td {
           padding: 16px 24px;
-          border-bottom: 1px solid #f0f0f0;
+          border-bottom: 1px solid #2D3748;
         }
         
         .comparison-table th {
           font-weight: 600;
           font-size: 16px;
-          background: #f9f9f9;
+          background: #2D3748;
+          color: white;
         }
         
         .comparison-table th.highlight {
-          background: rgba(139, 92, 246, 0.15);
-          color: #8B5CF6;
+          background: #6B46C1;
+          color: white;
         }
         
         .comparison-table td {
           font-size: 15px;
+          background: #1A202C;
+          color: white;
         }
         
         .comparison-table td.highlight {
-          background-color: rgba(139, 92, 246, 0.05);
-          font-weight: 500;
-          color: #8B5CF6;
+          background-color: #4A5568;
+          font-weight: 600;
+          color: #FFC107;
         }
         
         .comparison-cta {
