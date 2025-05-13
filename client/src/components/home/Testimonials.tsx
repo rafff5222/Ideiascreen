@@ -45,15 +45,15 @@ export default function Testimonials() {
   const testimonials: TestimonialProps[] = [
     {
       name: "Mariana Silva",
-      profession: "Influenciadora de moda",
-      text: "O ContentPro revolucionou a forma como produzo conteúdo. Economizo pelo menos 5 horas por semana e minhas taxas de engajamento aumentaram 32% no primeiro mês!",
+      profession: "Roteirista independente",
+      text: "O IdeiaScreen revolucionou a forma como escrevo roteiros. Economizo pelo menos 5 horas por semana e a qualidade dos meus projetos melhorou significativamente!",
       image: "https://randomuser.me/api/portraits/women/12.jpg",
       rating: 5
     },
     {
       name: "Pedro Almeida",
-      profession: "Criador de conteúdo fitness",
-      text: "Minha produtividade dobrou desde que comecei a usar a plataforma. Os roteiros gerados são incrivelmente bons e parecem escritos por alguém que entende do meu nicho.",
+      profession: "Diretor de curta-metragens",
+      text: "Minha produtividade dobrou desde que comecei a usar o IdeiaScreen. Os roteiros gerados são incrivelmente bons e as análises do Modo Diretor ajudaram a elevar a qualidade das minhas produções.",
       image: "https://randomuser.me/api/portraits/men/32.jpg",
       rating: 4
     },

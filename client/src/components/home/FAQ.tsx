@@ -33,24 +33,24 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
 export default function FAQ() {
   const faqItems: FAQItemProps[] = [
     {
-      question: "Como funciona a geração de conteúdo?",
-      answer: "O ContentPro utiliza inteligência artificial avançada para criar conteúdo personalizado para suas redes sociais. Basta selecionar a plataforma (Instagram ou TikTok), informar o assunto e escolher o estilo de comunicação. Em segundos, você terá um roteiro completo, legendas e sugestões de edição otimizadas para o algoritmo."
+      question: "Como funciona a geração de roteiros?",
+      answer: "O IdeiaScreen utiliza inteligência artificial avançada para criar roteiros profissionais personalizados. Basta selecionar o gênero, informar o tema e escolher o estilo de narrativa. Em segundos, você terá um roteiro completo, com estrutura narrativa e sugestões criativas otimizadas para seu projeto."
     },
     {
-      question: "Quantas vezes posso gerar conteúdo por mês?",
-      answer: "Depende do seu plano. O plano Básico oferece 50 gerações/mês, o Premium 150 gerações/mês, e o Ultimate oferece gerações ilimitadas."
+      question: "Quantos roteiros posso gerar por mês?",
+      answer: "Depende do seu plano. O plano Gratuito oferece 3 roteiros/mês, o Iniciante oferece 30 roteiros/mês, o Profissional e o Estúdio oferecem roteiros ilimitados."
     },
     {
-      question: "É possível personalizar o conteúdo para meu nicho específico?",
-      answer: "Sim! Durante o processo de geração, você pode especificar seu nicho de mercado, tom de voz e estilo de comunicação. O sistema aprende com suas preferências e torna-se cada vez mais preciso nas recomendações para seu público específico."
+      question: "É possível personalizar os roteiros para meu tipo de projeto?",
+      answer: "Sim! Durante o processo de geração, você pode especificar o gênero, tom de narrativa e estilo de escrita. O sistema aprende com suas preferências e torna-se cada vez mais preciso nas recomendações para seu tipo específico de projeto criativo."
     },
     {
-      question: "E se eu não gostar do conteúdo gerado?",
-      answer: "Você pode gerar novamente quantas vezes quiser dentro do limite do seu plano. Além disso, todos os planos incluem a capacidade de editar e refinar o conteúdo gerado. Caso ainda não esteja satisfeito, oferecemos garantia de 7 dias com reembolso total."
+      question: "E se eu não gostar do roteiro gerado?",
+      answer: "Você pode gerar novamente quantas vezes quiser dentro do limite do seu plano. Além disso, todos os planos incluem a capacidade de editar e refinar os roteiros gerados. Nossos planos pagos oferecem versões alternativas do mesmo roteiro. Caso ainda não esteja satisfeito, oferecemos garantia de 7 dias com reembolso total."
     },
     {
-      question: "Como funciona a montagem automática de vídeos?",
-      answer: "Disponível nos planos Premium e Ultimate, nossa tecnologia analisa seu roteiro e automaticamente seleciona os cortes mais relevantes, adiciona legendas e efeitos que mantêm a atenção do espectador. O plano Ultimate inclui recursos avançados como efeitos cinematográficos e transições profissionais."
+      question: "O que são os modos Diretor e Crítico de Cinema?",
+      answer: "Disponíveis nos planos Profissional e Estúdio, estes recursos analisam seu roteiro profissionalmente. O Modo Diretor fornece feedback técnico sobre estrutura, ritmo e potenciais problemas, enquanto o Modo Crítico oferece análise narrativa aprofundada, comparações com obras famosas e sugestões de melhoria criativa."
     },
     {
       question: "Posso cancelar minha assinatura a qualquer momento?",
