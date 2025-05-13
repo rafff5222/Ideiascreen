@@ -201,6 +201,21 @@
   transition: all 0.1s ease;
 }
 
+.btn-text {
+  margin-right: 8px;
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: transform 0.3s ease;
+  display: inline-block;
+}
+
+.btn-pricing:hover .btn-icon {
+  transform: translateX(5px);
+}
+
 /* Estilos da seção de depoimentos */
 .testimonials-section {
   max-width: 1000px;
@@ -515,5 +530,25 @@
   .support-links {
     flex-direction: column;
     gap: 1rem;
+  }
+  
+  .btn-pricing {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.95rem;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  
+  .check-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 0.7rem;
+  }
+  
+  /* Melhoria na navegação em dispositivos móveis */
+  .pricing-table tbody tr.popular {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
   }
 }

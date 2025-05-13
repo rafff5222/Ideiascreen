@@ -348,11 +348,13 @@ export default function PlansTablePage() {
             <div className="pricing-cta">
               {user.plan === 'free' ? (
                 <button className="btn-pricing" onClick={() => handlePlanSelect('starter')}>
-                  Fazer Upgrade Agora
+                  <span className="btn-text">Fazer Upgrade Agora</span>
+                  <span className="btn-icon">→</span>
                 </button>
               ) : (
                 <button className="btn-pricing" onClick={() => setLocation('/roteiros')}>
-                  Voltar para Roteiros
+                  <span className="btn-text">Voltar para Roteiros</span>
+                  <span className="btn-icon">←</span>
                 </button>
               )}
             </div>
