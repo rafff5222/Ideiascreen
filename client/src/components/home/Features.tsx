@@ -57,10 +57,10 @@ export default function Features() {
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-14">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Crie conteúdo viral com o poder da IA
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-purple-600">
+            CRIE CONTEÚDO VIRAL COM O PODER DA IA
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-700 max-w-2xl mx-auto font-medium">
             Economize tempo e aumente seu engajamento com nossas ferramentas inteligentes
           </p>
         </div>
@@ -72,7 +72,7 @@ export default function Features() {
               className="bg-gray-50 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300"
             >
               <div className="mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-bold mb-2 text-primary">{feature.title}</h3>
+              <h3 className="text-2xl font-bold mb-3 text-primary">{feature.title}</h3>
               <p className="text-gray-600">
                 {feature.description.split(' ').map((word, idx, arr) => {
                   // Destaca algumas palavras-chave para facilitar a leitura
