@@ -72,8 +72,18 @@ export default function Features() {
               className="bg-gray-50 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300"
             >
               <div className="mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-              <p className="text-gray-600">{feature.description}</p>
+              <h3 className="text-xl font-bold mb-2 text-primary">{feature.title}</h3>
+              <p className="text-gray-600">
+                {feature.description.split(' ').map((word, idx, arr) => {
+                  // Destaca algumas palavras-chave para facilitar a leitura
+                  const isKeyword = ['IA', 'Stories', 'Reels', 'templates', 'roteiros', 'cinematográfica', 'calendário'].includes(word);
+                  return (
+                    <span key={idx} className={isKeyword ? 'font-semibold text-gray-800' : ''}>
+                      {word}{idx < arr.length - 1 ? ' ' : ''}
+                    </span>
+                  );
+                })}
+              </p>
             </div>
           ))}
         </div>

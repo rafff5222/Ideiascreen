@@ -19,8 +19,8 @@ export default function HowItWorks() {
     },
     {
       number: "04",
-      title: "Edição com 1-clique (Premium)",
-      description: "Transforme seu roteiro em um vídeo montado automaticamente com nosso recurso exclusivo."
+      title: "Análise profissional (Premium)",
+      description: "Aprimore seu roteiro com o Modo Diretor que fornece feedback profissional sobre sua narrativa."
     }
   ];
 
@@ -40,14 +40,24 @@ export default function HowItWorks() {
           {steps.map((step, index) => (
             <div 
               key={index} 
-              className="bg-white rounded-xl p-6 shadow-md relative"
+              className="bg-white rounded-xl p-6 shadow-md relative hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
             >
-              <div className="absolute -top-5 -left-3 w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center text-xl font-bold">
+              <div className="absolute -top-5 -left-3 w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-xl font-bold">
                 {step.number}
               </div>
               
-              <h3 className="text-xl font-bold mb-3 mt-4">{step.title}</h3>
-              <p className="text-gray-600">{step.description}</p>
+              <h3 className="text-xl font-bold mb-3 mt-4 text-primary">{step.title}</h3>
+              <p className="text-gray-600">
+                {step.description.split(' ').map((word, idx, arr) => {
+                  // Destaca algumas palavras-chave para facilitar a leitura
+                  const isKeyword = ['IA', 'Stories', 'Reels', 'Premium', 'Modo', 'Diretor', 'otimizada', 'engajamento', 'narrativa'].includes(word);
+                  return (
+                    <span key={idx} className={isKeyword ? 'font-semibold text-gray-800' : ''}>
+                      {word}{idx < arr.length - 1 ? ' ' : ''}
+                    </span>
+                  );
+                })}
+              </p>
             </div>
           ))}
         </div>
@@ -55,36 +65,44 @@ export default function HowItWorks() {
         <div className="bg-white rounded-xl p-8 shadow-lg">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h3 className="text-2xl font-bold mb-4">
+              <h3 className="text-2xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-amber-700">
                 Por que criadores de conteúdo escolhem nossa plataforma?
               </h3>
               
-              <div className="space-y-4 mb-6">
-                <div className="flex items-start">
-                  <CheckCircle2 className="text-green-500 mt-1 flex-shrink-0" size={20} />
+              <div className="space-y-6 mb-6">
+                <div className="flex items-start group">
+                  <div className="mt-1 flex-shrink-0 transition-all duration-300 group-hover:scale-110">
+                    <CheckCircle2 className="text-green-500" size={24} />
+                  </div>
                   <p className="ml-3 text-gray-700">
-                    <strong>Economia de tempo</strong> – Reduza o processo de criação de horas para minutos
+                    <strong className="text-lg text-primary">Economia de tempo</strong> – Reduza o processo de criação de horas para minutos
                   </p>
                 </div>
                 
-                <div className="flex items-start">
-                  <CheckCircle2 className="text-green-500 mt-1 flex-shrink-0" size={20} />
+                <div className="flex items-start group">
+                  <div className="mt-1 flex-shrink-0 transition-all duration-300 group-hover:scale-110">
+                    <CheckCircle2 className="text-green-500" size={24} />
+                  </div>
                   <p className="ml-3 text-gray-700">
-                    <strong>Conteúdo que converte</strong> – Algoritmos treinados para maximizar engajamento
+                    <strong className="text-lg text-primary">Conteúdo que converte</strong> – Algoritmos treinados para maximizar engajamento
                   </p>
                 </div>
                 
-                <div className="flex items-start">
-                  <CheckCircle2 className="text-green-500 mt-1 flex-shrink-0" size={20} />
+                <div className="flex items-start group">
+                  <div className="mt-1 flex-shrink-0 transition-all duration-300 group-hover:scale-110">
+                    <CheckCircle2 className="text-green-500" size={24} />
+                  </div>
                   <p className="ml-3 text-gray-700">
-                    <strong>Aumente sua produtividade</strong> – Crie mais conteúdo de qualidade com menos esforço
+                    <strong className="text-lg text-primary">Aumente sua produtividade</strong> – Crie mais conteúdo de qualidade com menos esforço
                   </p>
                 </div>
                 
-                <div className="flex items-start">
-                  <CheckCircle2 className="text-green-500 mt-1 flex-shrink-0" size={20} />
+                <div className="flex items-start group">
+                  <div className="mt-1 flex-shrink-0 transition-all duration-300 group-hover:scale-110">
+                    <CheckCircle2 className="text-green-500" size={24} />
+                  </div>
                   <p className="ml-3 text-gray-700">
-                    <strong>Foco nos resultados</strong> – Dedique mais tempo à estratégia e menos à produção
+                    <strong className="text-lg text-primary">Foco nos resultados</strong> – Dedique mais tempo à estratégia e menos à produção
                   </p>
                 </div>
               </div>
