@@ -7,6 +7,7 @@ import PricingTable from "@/components/home/PricingTable";
 import Testimonials from "@/components/home/Testimonials";
 import FAQ from "@/components/home/FAQ";
 import CallToAction from "@/components/home/CallToAction";
+import Diferenciais from "@/components/home/Diferenciais";
 import { useEffect } from "react";
 import { Helmet } from 'react-helmet';
 
@@ -123,6 +124,7 @@ export default function Home() {
       
       {/* Componentes principais da página */}
       <Hero />
+      <Diferenciais />
       <Features />
       <HowItWorks />
       <PricingTable />
