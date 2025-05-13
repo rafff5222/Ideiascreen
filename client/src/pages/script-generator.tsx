@@ -80,6 +80,10 @@ export default function ScriptGenerator() {
   const [generateDialogue, setGenerateDialogue] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [showLimitModal, setShowLimitModal] = useState(false);
+  
+  // Integração com sistema de assinatura
+  const { user, incrementRequestCount, canMakeRequest } = useSubscription();
   const [examples] = useState([
     "Um roteiro de podcast sobre empreendedorismo digital",
     "Um tutorial passo-a-passo de como preparar lasanha",
@@ -127,6 +131,16 @@ export default function ScriptGenerator() {
     if (!prompt) {
       return;
     }
+    
+    // Verificar se o usuário pode gerar mais um roteiro com base no plano atual
+    if (!canMakeRequest()) {
+      // Mostrar modal de limite atingido
+      setShowLimitModal(true);
+      return;
+    }
+    
+    // Incrementar o contador de solicitações
+    incrementRequestCount();
     
     let finalPrompt = prompt;
     let selectedCharacters = characters;
@@ -176,6 +190,12 @@ export default function ScriptGenerator() {
 
   return (
     <>
+      {/* Modal de limite de requisições atingido */}
+      <LimitReachedModal 
+        show={showLimitModal}
+        onClose={() => setShowLimitModal(false)}
+      />
+      
       <Helmet>
         <title>PLOTMACHINE | Gerador de Roteiros Profissionais com IA</title>
         <meta name="description" content="Gerador de roteiros com IA: crie histórias para filmes, séries e games em segundos. 37 gêneros, análise narrativa e exportação profissional." />
