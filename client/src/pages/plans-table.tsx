@@ -406,6 +406,7 @@ export default function PlansTablePage() {
         </div>
       </div>
       
+      {/* Diálogo de confirmação de assinatura */}
       {showDialog && (
         <Dialog open={showDialog} onOpenChange={setShowDialog}>
           <DialogContent className="max-w-md">
@@ -441,6 +442,51 @@ export default function PlansTablePage() {
               </Button>
               <Button onClick={confirmPlanChange} className="bg-primary hover:bg-primary/90">
                 {isLoading ? "Processando..." : "Confirmar"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+      
+      {/* Diálogo de sucesso após assinatura */}
+      {showSuccessDialog && (
+        <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-center text-xl text-green-500">Assinatura Confirmada! 🎉</DialogTitle>
+            </DialogHeader>
+            <div className="py-6 text-center">
+              <div className="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                ✓
+              </div>
+              <h3 className="text-lg font-medium mb-2">Bem-vindo ao plano {selectedPlan?.name}!</h3>
+              <p className="text-gray-500 mb-4">
+                Sua assinatura foi processada com sucesso. Agora você tem acesso a todos os recursos do plano.
+              </p>
+              
+              <div className="bg-gray-100 p-3 rounded-md text-left mb-4">
+                <h4 className="font-medium mb-2">Seu plano inclui:</h4>
+                <ul className="space-y-1 text-sm">
+                  <li>• {selectedPlan?.id === 'free' ? '3 roteiros por mês' : 
+                      selectedPlan?.id === 'starter' ? '30 roteiros por mês' : 
+                      'Roteiros ilimitados'}</li>
+                  <li>• {selectedPlan?.id === 'free' ? 'Exportação em TXT' : 
+                      selectedPlan?.id === 'starter' ? 'Exportação em TXT e PDF' : 
+                      'Exportação em TXT, PDF e FDX'}</li>
+                  {selectedPlan?.id !== 'free' && <li>• Análise de roteiro com IA</li>}
+                  {selectedPlan?.id === 'pro' && <li>• Modos criativos avançados</li>}
+                </ul>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button 
+                onClick={() => {
+                  setShowSuccessDialog(false);
+                  setLocation('/roteiros'); // Redireciona para a página de roteiros
+                }} 
+                className="w-full bg-primary hover:bg-primary/90"
+              >
+                Começar a Criar Roteiros
               </Button>
             </DialogFooter>
           </DialogContent>
