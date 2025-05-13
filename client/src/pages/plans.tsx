@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import "./plans.css";
 
 interface PlanFeature {
   name: string;
@@ -176,10 +177,13 @@ export default function PlansPage() {
       <div className="bg-gradient-to-b from-gray-900 to-gray-800 min-h-screen">
         <div className="container mx-auto px-4 py-16">
           <div className="text-center mb-12">
-            <h1 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent mb-4">
-              Planos e Preços
+            <h1 className="text-4xl md:text-5xl font-black text-white mb-2">
+              PLOTMACHINE
             </h1>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent mb-4">
+              Planos e Preços
+            </h2>
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-6">
               Escolha o plano ideal para suas necessidades de criação de roteiros
             </p>
             
@@ -198,59 +202,100 @@ export default function PlansPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {plans.map((plan: Plan) => (
-              <Card 
-                key={plan.id} 
-                className={`relative border ${
-                  plan.popular 
-                    ? 'border-amber-500 shadow-lg shadow-amber-500/20' 
-                    : 'border-gray-700'
-                } transition-all hover:translate-y-[-4px]`}
+              <div 
+                key={plan.id}
+                className={`plan-card relative rounded-xl overflow-hidden ${
+                  plan.popular ? 'highlight border-2 border-amber-500 shadow-lg shadow-amber-500/20' : 
+                  plan.id === 'free' ? 'free border border-gray-700' : 
+                  'professional border border-amber-500'
+                } bg-gray-800 transition-all hover:translate-y-[-4px]`}
               >
                 {plan.badge && (
-                  <Badge className="absolute top-4 right-4 bg-amber-500 text-white">
+                  <div className="badge absolute top-0 right-5 bg-amber-500 text-white py-1 px-3 text-xs uppercase font-semibold rounded-b-md">
                     {plan.badge}
-                  </Badge>
+                  </div>
                 )}
-                <CardHeader>
-                  <CardTitle className="text-xl">{plan.name}</CardTitle>
-                  <CardDescription>{plan.description}</CardDescription>
-                  <div className="mt-2">
-                    <span className="text-3xl font-bold">{formatPrice(plan.price)}</span>
-                    <span className="text-gray-400">/mês</span>
+                
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-white mb-1">{plan.name}</h3>
+                  <p className="subtitle text-sm text-gray-400 mb-4">
+                    {plan.id === 'free' ? 'Para testadores e estudantes' : 
+                     plan.id === 'starter' ? 'Para autores independentes' : 
+                     'Para roteiristas freelancers'}
+                  </p>
+                  
+                  <div className="price text-2xl font-bold text-white mb-3">
+                    {formatPrice(plan.price)}<span className="text-sm font-normal text-gray-400">/mês</span>
                     
-                    {plan.monthlyPrice && (
-                      <div className="text-sm text-gray-400 mt-1">
-                        <span className="line-through">{formatPrice(plan.monthlyPrice)}</span>
-                        <span className="text-green-500 ml-1">Economize {formatPrice(plan.monthlyPrice - plan.price)}</span>
+                    {plan.id !== 'free' && (
+                      <div className="annual text-sm text-gray-400 mt-1">
+                        ou {formatPrice(plan.price * 9.6)}/ano <span className="text-green-500">(24% off)</span>
                       </div>
                     )}
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {plan.features.map((feature: PlanFeature, idx: number) => (
-                      <li key={idx} className="flex items-start">
-                        {feature.included ? (
-                          <Check className="h-5 w-5 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                        ) : (
-                          <AlertCircle className="h-5 w-5 text-gray-400 mt-0.5 mr-2 flex-shrink-0" />
-                        )}
-                        <span className={feature.included ? "text-gray-100" : "text-gray-400"}>
-                          {feature.name}
-                        </span>
+                  
+                  {plan.monthlyPrice && (
+                    <div className="discount text-sm text-green-500 font-medium mb-4">
+                      Economize {formatPrice(plan.monthlyPrice - plan.price)}
+                    </div>
+                  )}
+                  
+                  <ul className="features space-y-3 mb-6">
+                    <li className="included flex items-start">
+                      <span className="text-green-500 mr-2">✓</span>
+                      <span>{plan.id === 'free' ? '3 roteiros/mês' : 
+                             plan.id === 'starter' ? '30 roteiros/mês' :
+                             'Roteiros ilimitados'}</span>
+                    </li>
+                    
+                    <li className={plan.id === 'free' ? 'included' : 'included'}>
+                      <span className="text-green-500 mr-2">✓</span>
+                      <span>{plan.id === 'free' ? '5 gêneros básicos' : 
+                             plan.id === 'starter' ? 'Todos os gêneros (37+)' :
+                             'Combinações de gêneros'}</span>
+                    </li>
+                    
+                    <li className="included">
+                      <span className="text-green-500 mr-2">✓</span>
+                      <span>Exportação em {
+                        plan.id === 'free' ? 'TXT' : 
+                        plan.id === 'starter' ? 'TXT, PDF' :
+                        'TXT, PDF, FDX'
+                      }</span>
+                    </li>
+                    
+                    <li className={plan.id === 'free' ? 'excluded' : 'included'}>
+                      <span className={plan.id === 'free' ? 'text-red-500 mr-2' : 'text-green-500 mr-2'}>
+                        {plan.id === 'free' ? '×' : '✓'}
+                      </span>
+                      <span>{plan.id === 'starter' ? 'Análise básica de roteiro' : 'Análise avançada com IA'}</span>
+                    </li>
+                    
+                    {plan.id === 'pro' && (
+                      <li className="included">
+                        <span className="text-green-500 mr-2">✓</span>
+                        <span>Modos criativos especiais</span>
                       </li>
-                    ))}
+                    )}
+                    
+                    <li className={plan.id === 'free' || plan.id === 'starter' ? 'excluded' : 'included'}>
+                      <span className={plan.id === 'free' || plan.id === 'starter' ? 'text-red-500 mr-2' : 'text-green-500 mr-2'}>
+                        {plan.id === 'free' || plan.id === 'starter' ? '×' : '✓'}
+                      </span>
+                      <span>Exportação .FDX</span>
+                    </li>
                   </ul>
-                </CardContent>
-                <CardFooter>
-                  <Button 
+                  
+                  <Button
                     className={`w-full ${
-                      plan.popular 
-                        ? 'bg-amber-500 hover:bg-amber-600' 
-                        : plan.id === 'free' 
-                          ? 'bg-gray-700 hover:bg-gray-600' 
-                          : 'bg-gray-800 hover:bg-gray-700'
-                    }`}
+                      plan.id === user.plan 
+                        ? 'bg-gray-700 hover:bg-gray-700' 
+                        : plan.popular 
+                          ? 'bg-amber-500 hover:bg-amber-600' 
+                          : plan.id === 'free' 
+                            ? 'bg-blue-600 hover:bg-blue-700' 
+                            : 'bg-amber-500 hover:bg-amber-600'
+                    } text-white py-3 rounded-lg font-medium text-center`}
                     onClick={() => handlePlanSelect(plan.id)}
                     disabled={plan.id === user.plan}
                   >
@@ -260,8 +305,8 @@ export default function PlansPage() {
                         ? 'Selecionar' 
                         : 'Assinar Agora'}
                   </Button>
-                </CardFooter>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
 

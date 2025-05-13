@@ -1,0 +1,147 @@
+html
+<div class="plans-container">
+  <h1>ConteniPro</h1>
+  <h2>Planos e Preços</h2>
+  <p>Escolha o plano ideal para suas necessidades de criação de roteiros</p>
+
+  <!-- Plano Grátis -->
+  <div class="plan-card free">
+    <h3>Grátis</h3>
+    <p class="subtitle">Para testadores e estudantes</p>
+    <div class="price">R$ 0,00/mês</div>
+    
+    <ul class="features">
+      <li class="included">✓ 3 roteiros/mês</li>
+      <li class="included">✓ 5 gêneros básicos</li>
+      <li class="included">✓ Exportação em TXT</li>
+      <li class="excluded">× Análise de roteiro</li>
+      <li class="excluded">× Exportação .FDX</li>
+    </ul>
+    
+    <button class="current-plan">Plano Atual</button>
+  </div>
+
+  <!-- Plano Iniciante -->
+  <div class="plan-card starter">
+    <h3>Iniciante</h3>
+    <p class="subtitle">Para autores independentes</p>
+    <div class="price">R$ 27,90/mês <span class="annual">ou R$268,80/ano (24% off)</span></div>
+    
+    <ul class="features">
+      <li class="included">✓ 30 roteiros/mês</li>
+      <li class="included">✓ Todos os gêneros (37+)</li>
+      <li class="included">✓ Exportação em PDF</li>
+      <li class="included">✓ Análise básica de roteiro</li>
+      <li class="excluded">× Exportação .FDX</li>
+    </ul>
+    
+    <button class="cta-button">Assinar Agora</button>
+  </div>
+
+  <!-- Plano Profissional -->
+  <div class="plan-card professional highlight">
+    <div class="badge">MAIS POPULAR</div>
+    <h3>Profissional</h3>
+    <p class="subtitle">Para roteiristas freelancers</p>
+    <div class="price">R$ 79,90/mês <span class="annual">ou R$767,00/ano (25% off)</span></div>
+    <div class="discount">Economize R$20,00</div>
+    
+    <ul class="features">
+      <li class="included">✓ Roteiros ilimitados</li>
+      <li class="included">✓ Combinações de gêneros</li>
+      <li class="included">✓ Exportação .FDX e .PDF</li>
+      <li class="included">✓ Análise avançada com IA</li>
+      <li class="included">✓ Modos criativos especiais</li>
+    </ul>
+    
+    <button class="cta-button">Assinar Agora</button>
+  </div>
+</div>
+
+<style>
+  /* Estilos mínimos para ficar apresentável */
+  .plans-container {
+    font-family: Arial, sans-serif;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .plan-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  
+  .highlight {
+    border: 2px solid #6e45e2;
+  }
+  
+  .badge {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    background: #6e45e2;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+  }
+  
+  .price {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+  }
+  
+  .annual {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .discount {
+    color: #4caf50;
+    font-weight: bold;
+  }
+  
+  .features {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .included::before {
+    content: "✓ ";
+    color: #4caf50;
+  }
+  
+  .excluded::before {
+    content: "× ";
+    color: #f44336;
+  }
+</style>
+🔍 Melhorias Implementadas:
+Hierarquia Visual Clara:
+
+Destaque para o plano profissional (com tag "MAIS POPULAR")
+
+Cores para benefícios incluídos (✓ verde) e excluídos (× vermelho)
+
+Informações Completas:
+
+Adicionei os valores anuais com porcentagem de desconto
+
+Incluí os públicos-alvo como subtítulos
+
+Psicologia de Vendas:
+
+Destaque para a economia ("Economize R$20,00")
+
+Comparação visual entre planos
+
+Consistência:
+
+Alinhado com a tabela de preços que sugerimos anteriormente
+
+Mesmos valores e benefícios-chave
