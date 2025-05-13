@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import "./plans-table.css";
+import "./plans-table-extended.css";
 
 interface PlanFeature {
   name: string;
@@ -194,10 +194,14 @@ export default function PlansTablePage() {
   return (
     <div>
       <Helmet>
-        <title>PLOTMACHINE - Planos e Preços</title>
+        <title>Gerador de Roteiros Inteligentes | Planos e Preços | PLOTMACHINE</title>
         <meta 
           name="description" 
-          content="Escolha o plano ideal para suas necessidades de criação de roteiros com IA."
+          content="Crie roteiros profissionais usando IA. Escolha o plano ideal para gerar roteiros de filmes, vídeos e histórias em minutos com nossa ferramenta de inteligência artificial."
+        />
+        <meta
+          name="keywords"
+          content="gerador de roteiros, roteiros com IA, inteligência artificial, criação de conteúdo, roteiros profissionais, redação de roteiros, script generator"
         />
       </Helmet>
 
@@ -284,6 +288,70 @@ export default function PlansTablePage() {
               )}
             </div>
           </section>
+          
+          {/* Seção de depoimentos */}
+          <section className="testimonials-section">
+            <div className="testimonials-header">
+              <h2>O que dizem nossos usuários</h2>
+              <p>Histórias reais de roteiristas que transformaram suas ideias em roteiros profissionais</p>
+            </div>
+            
+            <div className="testimonials-grid">
+              <div className="testimonial-card">
+                <div className="testimonial-content">
+                  "O PLOTMACHINE revolucionou meu processo criativo. Consigo criar roteiros de qualidade em uma fração do tempo que levava antes. A ferramenta é intuitiva e os resultados são impressionantes."
+                </div>
+                <div className="testimonial-author">
+                  <div className="testimonial-info">
+                    <span className="testimonial-name">Maria Silva</span>
+                    <span className="testimonial-role">Roteirista freelancer</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="testimonial-card">
+                <div className="testimonial-content">
+                  "Como produtor de conteúdo, preciso de eficiência sem comprometer a qualidade. O PLOTMACHINE entrega exatamente isso. A análise avançada de roteiro me ajuda a identificar problemas estruturais que eu provavelmente não notaria."
+                </div>
+                <div className="testimonial-author">
+                  <div className="testimonial-info">
+                    <span className="testimonial-name">Carlos Mendes</span>
+                    <span className="testimonial-role">Produtor de conteúdo</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="testimonial-card">
+                <div className="testimonial-content">
+                  "Nossa agência precisava de uma solução escalável para criação de roteiros. O plano Estúdio do PLOTMACHINE nos permitiu colaborar eficientemente e entregar projetos com maior rapidez para nossos clientes."
+                </div>
+                <div className="testimonial-author">
+                  <div className="testimonial-info">
+                    <span className="testimonial-name">Ana Ferreira</span>
+                    <span className="testimonial-role">Diretora de agência</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          
+          {/* Seção de suporte */}
+          <div className="support-section">
+            <h3>Precisa de ajuda para escolher seu plano?</h3>
+            <p className="text-gray-300">Nossa equipe está disponível para ajudar você a encontrar o plano perfeito para suas necessidades.</p>
+            
+            <div className="support-links">
+              <a href="/faq" className="support-link">
+                Perguntas Frequentes
+              </a>
+              <a href="/suporte" className="support-link">
+                Entre em contato
+              </a>
+              <a href="/demonstracao" className="support-link">
+                Agendar demonstração
+              </a>
+            </div>
+          </div>
           
           <div className="text-center text-sm text-gray-400 mt-12 bg-gray-800/50 py-6 px-4 rounded-lg max-w-3xl mx-auto">
             <p className="mb-3">Todos os planos incluem acesso ao gerador de roteiros, atualizações regulares e suporte por email.</p>
