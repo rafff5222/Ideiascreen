@@ -49,6 +49,9 @@
   color: #fff;
   font-weight: 600;
   font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #3e4451;
 }
 
 .pricing-table tbody tr:last-child td {
@@ -134,10 +137,18 @@
   transform: translateY(-2px);
 }
 
-@media (max-width: 768px) {
+.btn-pricing:active {
+  background-color: #e6c200;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translateY(0);
+  transition: all 0.1s ease;
+}
+
+@media (max-width: 980px) {
   .pricing-table {
     display: block;
     overflow-x: auto;
+    white-space: nowrap;
   }
   
   .pricing-header h2 {
@@ -148,5 +159,61 @@
   .pricing-table td {
     padding: 0.75rem;
     font-size: 0.9rem;
+  }
+  
+  .btn-pricing {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .pricing-section {
+    padding: 2rem 0.5rem;
+  }
+  
+  .pricing-header h2 {
+    font-size: 1.75rem;
+  }
+  
+  .pricing-header p {
+    font-size: 1rem;
+  }
+  
+  .pricing-table th,
+  .pricing-table td {
+    padding: 0.6rem;
+    font-size: 0.85rem;
+  }
+  
+  .feature-highlight {
+    font-size: 0.9rem;
+  }
+  
+  .secondary-text {
+    font-size: 0.8rem;
+  }
+  
+  .savings-badge {
+    font-size: 0.75rem;
+    padding: 3px 6px;
+  }
+  
+  .pricing-table::-webkit-scrollbar {
+    height: 5px;
+  }
+  
+  .pricing-table::-webkit-scrollbar-track {
+    background: #1a1d23;
+    border-radius: 10px;
+  }
+  
+  .pricing-table::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 10px;
+  }
+  
+  .pricing-table::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
   }
 }

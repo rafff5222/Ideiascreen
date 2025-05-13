@@ -267,7 +267,7 @@ export default function PlansTablePage() {
                     <span className="check-icon">✓</span><span className="feature-highlight">Suporte prioritário 24/7</span><br />
                     <span className="check-icon">✓</span><span className="feature-highlight">Funcionalidades exclusivas para equipes</span>
                   </td>
-                  <td>Agências, produtoras de conteúdo</td>
+                  <td><span className="secondary-text">Ideal para: </span>Agências, produtoras de conteúdo</td>
                 </tr>
               </tbody>
             </table>
@@ -285,9 +285,9 @@ export default function PlansTablePage() {
             </div>
           </section>
           
-          <div className="text-center text-sm text-gray-400 mt-12">
-            <p>Todos os planos incluem acesso ao gerador de roteiros, atualizações regulares e suporte por email.</p>
-            <p className="mt-2">Dúvidas? Entre em contato conosco: suporte@plotmachine.com</p>
+          <div className="text-center text-sm text-gray-400 mt-12 bg-gray-800/50 py-6 px-4 rounded-lg max-w-3xl mx-auto">
+            <p className="mb-3">Todos os planos incluem acesso ao gerador de roteiros, atualizações regulares e suporte por email.</p>
+            <p className="font-medium">Dúvidas? Entre em contato conosco: <span className="text-amber-400">suporte@plotmachine.com</span></p>
           </div>
         </div>
       </div>
