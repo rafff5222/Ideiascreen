@@ -183,7 +183,7 @@ export default function Home() {
       <TimeBasedOffers />
       {/* MemoryChatbot também removido */}
       <SmartPricing />
-      <InteractiveComparison />
+      {/* <InteractiveComparison /> - Removido a pedido do cliente */}
 
       <PriorityLoading />
       <MicroConversionsTracker />
