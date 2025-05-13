@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { useSubscription } from '@/contexts/SubscriptionContext';
-import "./plans.css";
+import "./plans-new.css";
 
 interface PlanFeature {
   name: string;
