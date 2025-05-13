@@ -237,7 +237,7 @@ export default function SmartHelpButton() {
       
       modal.innerHTML = `
         <div class="smart-help-header">
-          <h3>Assistente ContentPro</h3>
+          <h3>Assistente IdeiaScreen</h3>
           <button class="smart-help-close" id="smart-help-close">✕</button>
         </div>
         <div class="smart-help-content" id="smart-help-content">
@@ -356,9 +356,9 @@ export default function SmartHelpButton() {
         context: string;
       }> = {
         '/': {
-          message: 'Olá! Seja bem-vindo(a) à ContentPro. Como posso ajudar você hoje?',
+          message: 'Olá! Seja bem-vindo(a) ao IdeiaScreen. Como posso ajudar você hoje?',
           options: [
-            { text: 'Como a ContentPro funciona?', action: 'how-it-works' },
+            { text: 'Como o IdeiaScreen funciona?', action: 'how-it-works' },
             { text: 'Quais planos estão disponíveis?', action: 'show-plans' },
             { text: 'Quanto tempo leva para criar conteúdo?', action: 'content-time' }
           ],
@@ -427,7 +427,7 @@ export default function SmartHelpButton() {
         options?: Array<{ text: string; action: string }>;
       }> = {
         'how-it-works': {
-          message: 'A ContentPro usa inteligência artificial para criar conteúdo otimizado para redes sociais. Você escolhe o tipo de conteúdo (script, legenda, ideia), a plataforma (Instagram, TikTok) e o estilo de comunicação. Nossa IA faz o resto, gerando conteúdo pronto para publicar!',
+          message: 'O IdeiaScreen usa inteligência artificial para criar roteiros profissionais personalizados. Você escolhe o gênero, tema e estilo de narrativa, informando suas preferências. Nossa IA faz o resto, gerando roteiros de alta qualidade prontos para seu projeto!',
           options: [
             { text: 'Que tipos de conteúdo posso criar?', action: 'content-types' },
             { text: 'Ver exemplos de conteúdo', action: 'see-examples' }
@@ -448,7 +448,7 @@ export default function SmartHelpButton() {
           ]
         },
         'content-time': {
-          message: 'Gerar conteúdo com a ContentPro é super rápido! Textos e legendas ficam prontos em segundos. Para vídeos nos planos Premium e Ultimate, a montagem automática leva aproximadamente 1-2 minutos para processar todos os elementos.',
+          message: 'Gerar roteiros com o IdeiaScreen é super rápido! Os roteiros ficam prontos em segundos. Nos planos Profissional e Estúdio, as análises avançadas pelo Modo Diretor e Crítico de Cinema levam aproximadamente 1-2 minutos para fornecer feedback completo.',
           options: [
             { text: 'Posso editar depois de gerar?', action: 'edit-content' },
             { text: 'Ver exemplos de conteúdo', action: 'see-examples' }

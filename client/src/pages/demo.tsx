@@ -1580,7 +1580,7 @@ export default function DemoPage() {
         <div className="max-w-3xl mx-auto mt-16 mb-12">
           <h2 className="text-2xl font-bold mb-6 text-center flex items-center justify-center">
             <FaUsers className="text-indigo-600 mr-2" />
-            Como 1.200+ criadores usam o ContentPro
+            Como 1.200+ roteiristas usam o IdeiaScreen
           </h2>
           
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
