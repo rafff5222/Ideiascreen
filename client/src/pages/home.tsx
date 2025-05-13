@@ -14,9 +14,11 @@ import { Helmet } from 'react-helmet';
 import OfferProgressBar from "@/components/conversion/OfferProgressBar";
 import OneClickCheckout from "@/components/conversion/OneClickCheckout";
 import TechnicalOptimizations from "@/components/conversion/TechnicalOptimizations";
-import SalesAiChatbot from "@/components/conversion/SalesAiChatbot";
+// Chatbots removidos a pedido do cliente
+// import SalesAiChatbot from "@/components/conversion/SalesAiChatbot";
+// import SalesChatbot from "@/components/conversion/SalesChatbot";
+// import MemoryChatbot from "@/components/conversion/MemoryChatbot";
 import SocialProof from "@/components/conversion/SocialProof";
-import SalesChatbot from "@/components/conversion/SalesChatbot";
 import MicroInteractions from "@/components/conversion/MicroInteractions";
 import NichePersonalization from "@/components/conversion/NichePersonalization";
 import AdvancedCheckout from "@/components/conversion/AdvancedCheckout";
@@ -43,7 +45,6 @@ import PrivateAnalytics from "@/components/analytics/PrivateAnalytics";
 import MicroConversionTracker from "@/components/analytics/MicroConversionTracker";
 import MetricsPanel from "@/components/admin/MetricsPanel-new";
 import TimeBasedOffers from "@/components/conversion/TimeBasedOffers";
-import MemoryChatbot from "@/components/conversion/MemoryChatbot";
 import SmartPricing from "@/components/conversion/SmartPricing";
 import PostInteractionUpsell from "@/components/conversion/PostInteractionUpsell";
 import InteractiveComparison from "@/components/conversion/InteractiveComparison";
@@ -131,8 +132,7 @@ export default function Home() {
       
       {/* Componentes de Conversão */}
       <OneClickCheckout />
-      <SalesAiChatbot />
-      <SalesChatbot />
+      {/* Chatbots removidos a pedido do cliente */}
       <SocialProof />
       <ClickHeatmap />
       <Heatmap3D />
@@ -158,7 +158,7 @@ export default function Home() {
       <ABTestCTA />
       <SmartFormOptimizer />
       <TimeBasedOffers />
-      <MemoryChatbot />
+      {/* MemoryChatbot também removido */}
       <SmartPricing />
       <PostInteractionUpsell />
       <InteractiveComparison />
