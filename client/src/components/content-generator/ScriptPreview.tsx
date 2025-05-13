@@ -271,6 +271,16 @@ export default function ScriptPreview({
   const handleGenerateVariation = async () => {
     if (!script || isLoading) return;
     
+    // Verificar limites por plano
+    if (user?.plan === 'free' && scriptVersions.length >= 1) {
+      toast({
+        title: "Limite atingido",
+        description: "Atualize para o plano Premium para gerar variações ilimitadas.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     // Guardar versão atual
     const currentVersion = {
       id: Date.now(),
@@ -591,28 +601,34 @@ export default function ScriptPreview({
             </>}
           </p>
           <div className="flex gap-2">
-            {/* Botão para Modo Diretor */}
+            {/* Botão para Modo Diretor - apenas para planos premium/profissional */}
             <Button 
               variant="outline" 
               size="sm"
               className="flex items-center gap-1 text-purple-500 hover:text-purple-400 bg-purple-500/10"
               onClick={handleDirectorMode}
-              disabled={isLoading || isLoadingAnalysis}
+              disabled={isLoading || isLoadingAnalysis || user?.plan === 'free'}
+              title={user?.plan === 'free' ? 'Disponível apenas em planos pagos' : 'Analise seu roteiro como um diretor profissional'}
             >
               <Clapperboard size={16} />
-              Modo Diretor
+              {user?.plan === 'free' ? 'Modo Diretor 🔒' : 'Modo Diretor'}
             </Button>
             
-            {/* Botão para gerar variação */}
+            {/* Botão para gerar variação - 1 para free, ilimitado para premium/profissional */}
             <Button 
               variant="outline" 
               size="sm"
               className="flex items-center gap-1 text-amber-500 hover:text-amber-400 bg-amber-500/10"
               onClick={handleGenerateVariation}
-              disabled={isLoading}
+              disabled={isLoading || (user?.plan === 'free' && scriptVersions.length >= 1)}
+              title={user?.plan === 'free' && scriptVersions.length >= 1 
+                ? 'Limite de 1 variação no plano gratuito' 
+                : 'Gere uma versão alternativa do roteiro'}
             >
               <Wand2 size={16} />
-              Gerar Variação
+              {user?.plan === 'free' && scriptVersions.length >= 1 
+                ? 'Variação 🔒' 
+                : 'Gerar Variação'}
             </Button>
             
             {/* Versões do roteiro */}
