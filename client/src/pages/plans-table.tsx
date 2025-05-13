@@ -202,21 +202,21 @@ export default function PlansTablePage() {
   return (
     <div>
       <Helmet>
-        <title>Gerador de Roteiros Inteligentes | Planos e Preços | PLOTMACHINE</title>
+        <title>Gerador de Roteiros Inteligentes | Planos e Preços | IdeiaScreen</title>
         <meta 
           name="description" 
-          content="Transforme suas ideias em roteiros profissionais com PLOTMACHINE. Escolha entre nossos planos Gratuito, Iniciante, Profissional ou Estúdio para criar roteiros de filmes, vídeos e histórias em minutos com nossa tecnologia de IA avançada."
+          content="Transforme suas ideias em roteiros profissionais com IdeiaScreen. Escolha entre nossos planos Gratuito, Iniciante, Profissional ou Estúdio para criar roteiros de filmes, vídeos e histórias em minutos com nossa tecnologia de IA avançada."
         />
         <meta
           name="keywords"
-          content="gerador de roteiros, roteiros com IA, inteligência artificial, criação de conteúdo, roteiros profissionais, redação de roteiros, script generator, planos, PLOTMACHINE"
+          content="gerador de roteiros, roteiros com IA, inteligência artificial, criação de conteúdo, roteiros profissionais, redação de roteiros, script generator, planos, IdeiaScreen"
         />
-        <meta property="og:title" content="PLOTMACHINE - Planos e Preços" />
+        <meta property="og:title" content="IdeiaScreen - Planos e Preços" />
         <meta property="og:description" content="Crie roteiros profissionais com IA. Economize até 24% com planos anuais." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://plotmachine.replit.app/planos" />
+        <meta property="og:url" content="https://ideiascreen.replit.app/planos" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="PLOTMACHINE - Planos e Preços" />
+        <meta name="twitter:title" content="IdeiaScreen - Planos e Preços" />
         <meta name="twitter:description" content="Crie roteiros profissionais com IA. Economize até 24% com planos anuais." />
       </Helmet>
 
@@ -433,7 +433,7 @@ export default function PlansTablePage() {
           
           <div className="text-center text-sm text-gray-400 mt-12 bg-gray-800/50 py-6 px-4 rounded-lg max-w-3xl mx-auto">
             <p className="mb-3">Todos os planos incluem acesso ao gerador de roteiros, atualizações regulares e suporte por email.</p>
-            <p className="font-medium">Dúvidas? Entre em contato conosco: <span className="text-amber-400">suporte@plotmachine.com</span></p>
+            <p className="font-medium">Dúvidas? Entre em contato conosco: <span className="text-amber-400">suporte@ideiascreen.com</span></p>
           </div>
           
           <footer className="mt-16 py-8 border-t border-gray-700 text-center">
