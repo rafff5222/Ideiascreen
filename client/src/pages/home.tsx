@@ -5,6 +5,7 @@ import Pricing from "@/components/home/Pricing";
 import NovoLayoutPrecos from "@/components/home/NovoLayoutPrecos";
 import PricingTable from "@/components/home/PricingTable";
 import SimplifiedPricingTable from "@/components/home/SimplifiedPricingTable";
+import UpdatedPricingSection from "@/components/home/UpdatedPricingSection";
 import Testimonials from "@/components/home/Testimonials";
 import FeaturedTestimonial from "@/components/home/FeaturedTestimonial";
 import FAQ from "@/components/home/FAQ";
@@ -98,11 +99,32 @@ export default function Home() {
             "applicationCategory": "CreativeWritingApplication",
             "operatingSystem": "Web",
             "description": "IA especializada em geração de roteiros profissionais com estrutura narrativa cinematográfica",
-            "offers": {
-              "@type": "Offer",
-              "price": "69.90",
-              "priceCurrency": "BRL"
-            },
+            "offers": [
+              {
+                "@type": "Offer",
+                "name": "Gratuito",
+                "price": "0",
+                "priceCurrency": "BRL"
+              },
+              {
+                "@type": "Offer",
+                "name": "Iniciante",
+                "price": "27.90",
+                "priceCurrency": "BRL"
+              },
+              {
+                "@type": "Offer",
+                "name": "Profissional",
+                "price": "79.90",
+                "priceCurrency": "BRL"
+              },
+              {
+                "@type": "Offer",
+                "name": "Estúdio",
+                "price": "249.90",
+                "priceCurrency": "BRL"
+              }
+            ],
             "aggregateRating": {
               "@type": "AggregateRating",
               "ratingValue": "4.8",
@@ -125,7 +147,7 @@ export default function Home() {
       <ScriptOfferPopup />
       <Diferenciais />
       <FeaturedTestimonial />
-      <SimplifiedPricingTable />
+      <UpdatedPricingSection />
       <Features />
       <HowItWorks />
       <FAQ />
