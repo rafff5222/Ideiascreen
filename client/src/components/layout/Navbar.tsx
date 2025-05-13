@@ -18,7 +18,7 @@ export default function Navbar() {
   const navLinks = [
     { name: "Recursos", href: "/#recursos" },
     { name: "Como Funciona", href: "/#como-funciona" },
-    { name: "Preços", href: "/#precos" },
+    { name: "Preços", href: "/planos" },
     { name: "Depoimentos", href: "/#depoimentos" },
     { name: "Gerador de Roteiros", href: "/roteiros", highlight: true },
     { name: "Dashboard", href: "/dashboard" },
@@ -70,7 +70,7 @@ export default function Navbar() {
               <Link href="/dashboard">
                 <div className="hidden md:block font-medium hover:text-primary transition cursor-pointer">Entrar</div>
               </Link>
-              <Link href="/dashboard">
+              <Link href="/roteiros">
                 <div className="bg-gradient-to-r from-accent to-primary text-white font-medium px-5 py-2 rounded-lg shadow-md hover:opacity-90 transition flex items-center gap-2 cursor-pointer">
                   <Sparkles className="h-4 w-4" />
                   <span>Começar Grátis</span>
@@ -146,7 +146,7 @@ export default function Navbar() {
                 )}
                 
                 {location === "/" ? (
-                  <Link href="/dashboard">
+                  <Link href="/roteiros">
                     <div 
                       className="py-2 text-lg font-medium text-primary hover:text-primary/90 transition cursor-pointer"
                       onClick={() => setIsMenuOpen(false)}
