@@ -445,16 +445,10 @@ export async function checkAllServices(): Promise<{
   };
 }> {
   const [
-    openai, elevenlabs, pexels,
-    edgeTts, pixabay, unsplash, huggingFace, ollama,
+    openai, huggingFace, ollama,
     ffmpeg
   ] = await Promise.all([
     checkOpenAI(),
-    checkElevenLabs(),
-    checkPexels(),
-    checkEdgeTTS(),
-    checkPixabay(),
-    checkUnsplash(),
     checkHuggingFace(),
     checkOllama(),
     checkFFmpeg()
@@ -462,27 +456,20 @@ export async function checkAllServices(): Promise<{
   
   // Serviços pagos
   const paid = {
-    openai,
-    elevenlabs,
-    pexels
+    openai
   };
   
   // Alternativas gratuitas
   const free = {
-    edgeTts,
-    pixabay,
-    unsplash,
     huggingFace,
     ollama
   };
   
   // Verificar se podemos usar apenas alternativas gratuitas
-  const hasWorkingFreeVoice = edgeTts.working;
-  const hasWorkingFreeImages = pixabay.working || unsplash.working;
   const hasWorkingFreeAI = huggingFace.working || ollama.working;
   
-  const canUseAllFree = hasWorkingFreeVoice && hasWorkingFreeImages && hasWorkingFreeAI;
-  const hasWorkingPaid = openai.working || elevenlabs.working || pexels.working;
+  const canUseAllFree = hasWorkingFreeAI;
+  const hasWorkingPaid = openai.working;
   
   // Gerar recomendação
   let recommendationText = '';
@@ -490,12 +477,6 @@ export async function checkAllServices(): Promise<{
   if (canUseAllFree) {
     recommendationText = 'Todas as alternativas gratuitas estão funcionando! Você pode usar o sistema sem nenhum custo.';
   } else if (!hasWorkingPaid) {
-    if (!hasWorkingFreeVoice && !edgeTts.working) {
-      recommendationText += 'Instale o Edge TTS para conversão de texto em fala gratuita: npm install -g edge-tts. ';
-    }
-    if (!hasWorkingFreeImages) {
-      recommendationText += 'Configure uma API gratuita de imagens (Pixabay ou Unsplash). ';
-    }
     if (!hasWorkingFreeAI && !ollama.working) {
       recommendationText += 'Considere instalar o Ollama para IA local gratuita: https://ollama.com. ';
     }

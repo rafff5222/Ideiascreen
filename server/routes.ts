@@ -9,9 +9,6 @@ import { z } from 'zod';
 import { checkAllServices } from './service-status';
 import { generateScript } from './generate-script';
 import { fallbackScriptGeneration } from './fallback-generator';
-import { generateVideo as generateAIVideo } from "./ai-service";
-import { generateTestVideo } from "./test-video-generator";
-import { generateCompatibleVideo, generateSimpleVideo, fixExistingVideo } from "./video-fix";
 import { analyzeAsCritic } from "./critics-analysis";
 import { nanoid } from 'nanoid';
 
@@ -115,8 +112,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       nodeVersion: process.version,
       apiIntegrations: {
         huggingface: !!process.env.HUGGINGFACE_API_KEY,
-        elevenlabs: !!process.env.ELEVENLABS_API_KEY,
-        pexels: !!process.env.PEXELS_API_KEY
+        openai: !!process.env.OPENAI_API_KEY
       }
     };
     
