@@ -60,7 +60,7 @@ export default function Home() {
   return (
     <>
       <Helmet>
-        <title>PLOTMACHINE - Crie Roteiros Profissionais e Cinematográficos com IA</title>
+        <title>IdeiaScreen - Crie Roteiros Profissionais e Cinematográficos com IA</title>
         <meta 
           name="description" 
           content="Crie roteiros profissionais para vídeos, podcasts e apresentações em segundos usando IA. Estrutura narrativa profissional e resultados impressionantes."
@@ -71,7 +71,7 @@ export default function Home() {
         />
         <meta 
           property="og:title" 
-          content="PLOTMACHINE - Roteiros Profissionais Gerados por IA" 
+          content="IdeiaScreen - Roteiros Profissionais Gerados por IA" 
         />
         <meta 
           property="og:description" 
@@ -92,7 +92,7 @@ export default function Home() {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            "name": "PLOTMACHINE",
+            "name": "IdeiaScreen",
             "applicationCategory": "CreativeWritingApplication",
             "operatingSystem": "Web",
             "description": "IA especializada em geração de roteiros profissionais com estrutura narrativa cinematográfica",
