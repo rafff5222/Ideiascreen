@@ -59,8 +59,8 @@ export default function Testimonials() {
     },
     {
       name: "Carla Mendes",
-      profession: "Agência de marketing digital",
-      text: "Gerenciamos contas de 15 clientes e o ContentPro é essencial para nossa operação. A ferramenta se paga em poucos dias e os resultados são consistentes.",
+      profession: "Produtora de conteúdo audiovisual",
+      text: "Gerenciamos projetos para 15 clientes e o IdeiaScreen é essencial para nossa operação. A ferramenta se paga em poucos dias e a qualidade dos roteiros é consistentemente excelente.",
       image: "https://randomuser.me/api/portraits/women/65.jpg",
       rating: 5
     }
@@ -73,7 +73,7 @@ export default function Testimonials() {
           O que nossos clientes dizem
         </h2>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Criadores de conteúdo como você estão transformando seus resultados
+          Roteiristas como você estão transformando seus projetos criativos
         </p>
       </div>
 

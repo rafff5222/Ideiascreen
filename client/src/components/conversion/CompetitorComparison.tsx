@@ -36,7 +36,7 @@ export default function CompetitorComparison() {
       // HTML da tabela de comparação
       comparisonContainer.innerHTML = `
         <div class="comparison-header">
-          <h3>Por que escolher a ContentPro?</h3>
+          <h3>Por que escolher o IdeiaScreen?</h3>
           <p>Veja como nos comparamos com outras soluções do mercado</p>
         </div>
         <div class="comparison-table-wrapper">
@@ -45,27 +45,27 @@ export default function CompetitorComparison() {
               <tr>
                 <th>Recurso</th>
                 <th>Outros</th>
-                <th class="highlight">ContentPro</th>
+                <th class="highlight">IdeiaScreen</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Vídeos Automáticos</td>
+                <td>Análise de Roteiro Profissional</td>
                 <td>❌</td>
                 <td class="highlight">✅</td>
               </tr>
               <tr>
-                <td>Montagem com IA</td>
+                <td>Modo Diretor</td>
                 <td>Limitado</td>
                 <td class="highlight">Completo</td>
               </tr>
               <tr>
-                <td>Conteúdo otimizado por nicho</td>
+                <td>Roteiros otimizados por gênero</td>
                 <td>❌</td>
                 <td class="highlight">✅</td>
               </tr>
               <tr>
-                <td>Efeitos Cinemáticos</td>
+                <td>Análise Crítica Cinematográfica</td>
                 <td>Extra $$$</td>
                 <td class="highlight">Incluído</td>
               </tr>
@@ -77,7 +77,7 @@ export default function CompetitorComparison() {
               <tr>
                 <td>Preço Mensal</td>
                 <td>R$ 149+</td>
-                <td class="highlight">A partir de R$ 59</td>
+                <td class="highlight">A partir de R$ 27,90</td>
               </tr>
             </tbody>
           </table>
