@@ -16,7 +16,7 @@ import { Helmet } from 'react-helmet';
 // Componentes de conversão avançada
 import OneClickCheckout from "@/components/conversion/OneClickCheckout";
 import TechnicalOptimizations from "@/components/conversion/TechnicalOptimizations";
-import ScriptOfferBanner from "@/components/conversion/ScriptOfferBanner";
+import ScriptOfferPopup from "@/components/conversion/ScriptOfferPopup";
 // Chatbots removidos a pedido do cliente
 // import SalesAiChatbot from "@/components/conversion/SalesAiChatbot";
 // import SalesChatbot from "@/components/conversion/SalesChatbot";
@@ -122,7 +122,7 @@ export default function Home() {
       
       {/* Componentes principais da página */}
       <Hero />
-      <ScriptOfferBanner />
+      <ScriptOfferPopup />
       <Diferenciais />
       <FeaturedTestimonial />
       <SimplifiedPricingTable />

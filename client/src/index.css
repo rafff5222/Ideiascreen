@@ -311,6 +311,88 @@ button:hover {
   color: white;
 }
 
+/* Estilos para o popup de oferta */
+.oferta-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.oferta-conteudo {
+  background-color: #1e1e1e;
+  padding: 30px;
+  border-radius: 10px;
+  position: relative;
+  max-width: 400px;
+  text-align: center;
+  color: white;
+  border: 1px solid #FFC107;
+  box-shadow: 0 0 20px rgba(255, 193, 7, 0.2);
+}
+
+.oferta-conteudo h2 {
+  margin-top: 0;
+  color: #FFC107;
+  font-size: 1.8rem;
+}
+
+.oferta-conteudo ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 20px 0;
+  text-align: left;
+}
+
+.oferta-conteudo li {
+  margin: 12px 0;
+  font-size: 1.1rem;
+}
+
+.btn-oferta {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 25px;
+  background: linear-gradient(to right, #f59e0b, #d97706);
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-oferta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+}
+
+.fechar {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+  transition: color 0.2s;
+}
+
+.fechar:hover {
+  color: #FFC107;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 @-webkit-keyframes shake {
   10%, 90% {
     -webkit-transform: translate3d(-1px, 0, 0);
