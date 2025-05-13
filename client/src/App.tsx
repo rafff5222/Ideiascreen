@@ -12,7 +12,7 @@ import Dashboard from "@/pages/dashboard";
 import Generator from "@/pages/generator";
 import ScriptGenerator from "@/pages/script-generator";
 import Settings from "@/pages/Settings";
-import PlansPage from "@/pages/plans-new";
+import PlansPage from "@/pages/plans-table";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ExitPopup from "@/components/ui/exit-popup";

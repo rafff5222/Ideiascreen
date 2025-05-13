@@ -1,0 +1,115 @@
+.pricing-section {
+  padding: 3rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pricing-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.pricing-header h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.pricing-header p {
+  font-size: 1.2rem;
+  color: #d1d5db;
+}
+
+.pricing-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  background-color: #282c34;
+  color: #fff;
+}
+
+.pricing-table th,
+.pricing-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #3e4451;
+}
+
+.pricing-table thead th {
+  background-color: #1a1d23;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.pricing-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.pricing-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.pricing-table tbody tr.popular {
+  background-color: rgba(245, 158, 11, 0.1);
+  position: relative;
+}
+
+.pricing-table tbody tr.popular td {
+  border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.pricing-table tbody tr.popular td strong {
+  color: #f59e0b;
+}
+
+.pricing-table tbody tr.popular small {
+  display: block;
+  color: #f59e0b;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.pricing-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.btn-pricing {
+  background-color: #f59e0b;
+  color: black;
+  padding: 0.75rem 2rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-pricing:hover {
+  background-color: #d97706;
+}
+
+@media (max-width: 768px) {
+  .pricing-table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  .pricing-header h2 {
+    font-size: 2rem;
+  }
+  
+  .pricing-table th,
+  .pricing-table td {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+}
