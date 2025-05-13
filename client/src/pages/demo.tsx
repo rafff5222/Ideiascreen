@@ -1277,7 +1277,7 @@ export default function DemoPage() {
                 </div>
                 
                 <button
-                  onClick={generateVideo}
+                  onClick={analyzeScript}
                   disabled={isLoading}
                   className="cta-pulse mt-2 cta-demo text-white py-4 px-6 rounded-md font-bold hover:from-orange-500 hover:to-yellow-500 transition-all shadow-md w-full flex flex-col items-center justify-center"
                   style={{animation: 'pulse 2s infinite'}}
@@ -1348,7 +1348,7 @@ export default function DemoPage() {
                               
                               <div className="flex justify-center gap-2 mb-4">
                                 <button 
-                                  onClick={generateVideo}
+                                  onClick={analyzeScript}
                                   className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-md shadow-sm transition-colors"
                                 >
                                   Tentar Novamente
