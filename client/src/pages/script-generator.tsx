@@ -11,6 +11,7 @@ import { Sparkles, MessageSquare } from "lucide-react";
 import { Helmet } from "react-helmet";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { LimitReachedModal } from "@/components/subscription/LimitReachedModal";
+import { SubscriptionBadge } from "@/components/subscription/SubscriptionBadge";
 
 // Tipos de roteiros suportados
 const scriptTypes = [
@@ -233,8 +234,11 @@ export default function ScriptGenerator() {
                 PLOTMACHINE
               </h1>
             </div>
-            <div className="bg-gray-800 text-white text-xs uppercase tracking-widest py-1 px-3 rounded-full inline-block mb-4 font-medium">
-              Gerador de Roteiros Profissionais
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="bg-gray-800 text-white text-xs uppercase tracking-widest py-1 px-3 rounded-full inline-block font-medium">
+                Gerador de Roteiros Profissionais
+              </div>
+              <SubscriptionBadge />
             </div>
             <p className="text-lg text-gray-400 max-w-xl mx-auto">
               Transforme suas ideias em roteiros cinematográficos, podcasts, tutoriais e histórias cativantes em segundos
