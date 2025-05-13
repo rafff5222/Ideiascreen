@@ -135,7 +135,7 @@ export default function DemoPage() {
     // Função para verificar o status das APIs e atualizar os indicadores
     const checkInitialAPIStatus = async () => {
       const indicatorEl = document.getElementById('api-status-indicator');
-      const elevenLabsEl = document.getElementById('elevenlabs-status');
+      const huggingfaceEl = document.getElementById('elevenlabs-status'); // Mantendo o ID para compatibilidade
       const openaiEl = document.getElementById('openai-status');
       
       try {
@@ -143,13 +143,13 @@ export default function DemoPage() {
         
         // Atualizar indicador de status geral
         if (indicatorEl) {
-          indicatorEl.className = `inline-block w-3 h-3 ${apiStatus.elevenlabs || apiStatus.openai ? 'bg-green-500' : 'bg-red-500'} rounded-full mr-2`;
+          indicatorEl.className = `inline-block w-3 h-3 ${apiStatus.huggingface || apiStatus.openai ? 'bg-green-500' : 'bg-red-500'} rounded-full mr-2`;
         }
         
-        // Atualizar status do ElevenLabs
-        if (elevenLabsEl) {
-          elevenLabsEl.className = apiStatus.elevenlabs ? 'text-green-600 font-medium' : 'text-red-600';
-          elevenLabsEl.textContent = apiStatus.elevenlabs ? '✓ Disponível' : '✗ Indisponível';
+        // Atualizar status do HuggingFace
+        if (huggingfaceEl) {
+          huggingfaceEl.className = apiStatus.huggingface ? 'text-green-600 font-medium' : 'text-red-600';
+          huggingfaceEl.textContent = apiStatus.huggingface ? '✓ Disponível' : '✗ Indisponível';
         }
         
         // Atualizar status do OpenAI
@@ -159,15 +159,15 @@ export default function DemoPage() {
         }
         
         // Se nenhuma API estiver disponível, mostrar alerta
-        if (!apiStatus.elevenlabs && !apiStatus.openai) {
+        if (!apiStatus.huggingface && !apiStatus.openai) {
           console.warn('Nenhuma API de geração está disponível. O sistema usará o modo de demonstração.');
         }
       } catch (error) {
         // Em caso de erro na verificação
         if (indicatorEl) indicatorEl.className = 'inline-block w-3 h-3 bg-red-500 rounded-full mr-2';
-        if (elevenLabsEl) {
-          elevenLabsEl.className = 'text-red-600';
-          elevenLabsEl.textContent = '✗ Erro';
+        if (huggingfaceEl) {
+          huggingfaceEl.className = 'text-red-600';
+          huggingfaceEl.textContent = '✗ Erro';
         }
         if (openaiEl) {
           openaiEl.className = 'text-red-600';
@@ -775,7 +775,7 @@ export default function DemoPage() {
         const tryAgainBtn = errorDiv.querySelector('.try-again-btn');
         if (tryAgainBtn) {
           tryAgainBtn.addEventListener('click', () => {
-            generateVideo();
+            analyzeScript();
             errorDiv.remove();
           });
         }
@@ -785,7 +785,7 @@ export default function DemoPage() {
           checkApiBtn.addEventListener('click', async () => {
             try {
               const apiStatus = await checkAPIStatus();
-              alert(`Status das APIs:\n\n- ElevenLabs: ${apiStatus.elevenlabs ? "✓ Disponível" : "✗ Indisponível"}\n- OpenAI: ${apiStatus.openai ? "✓ Disponível" : "✗ Indisponível"}`);
+              alert(`Status das APIs:\n\n- HuggingFace: ${apiStatus.huggingface ? "✓ Disponível" : "✗ Indisponível"}\n- OpenAI: ${apiStatus.openai ? "✓ Disponível" : "✗ Indisponível"}`);
             } catch (error: any) {
               alert("Não foi possível verificar o status das APIs: " + (error.message || "Erro desconhecido"));
             }
@@ -814,7 +814,7 @@ export default function DemoPage() {
    * 
    * @returns Objeto com status de cada API (true = configurada / false = não configurada)
    */
-  async function checkAPIStatus(): Promise<{elevenlabs: boolean, openai: boolean}> {
+  async function checkAPIStatus(): Promise<{huggingface: boolean, openai: boolean}> {
     try {
       // Chamada para o novo endpoint de verificação de status
       const response = await fetch('/api/sys-status');
@@ -823,7 +823,7 @@ export default function DemoPage() {
       console.log("Status das APIs:", data);
       
       return {
-        elevenlabs: data.apis.elevenlabs.configured,
+        huggingface: data.apis.huggingface?.configured || false,
         openai: data.apis.openai.configured
       };
     } catch (error) {
@@ -831,7 +831,7 @@ export default function DemoPage() {
       
       // Em caso de falha, assumimos que as APIs não estão disponíveis
       return {
-        elevenlabs: false,
+        huggingface: false,
         openai: false
       };
     }
@@ -1172,23 +1172,23 @@ export default function DemoPage() {
                     id="check-all-apis-btn"
                     onClick={async () => {
                       const indicatorEl = document.getElementById('api-status-indicator');
-                      const elevenLabsEl = document.getElementById('elevenlabs-status');
+                      const huggingfaceEl = document.getElementById('elevenlabs-status'); // Mantendo o ID para compatibilidade
                       const openaiEl = document.getElementById('openai-status');
                       
                       if (indicatorEl) indicatorEl.className = 'inline-block w-3 h-3 bg-yellow-400 rounded-full mr-2';
-                      if (elevenLabsEl) elevenLabsEl.textContent = 'verificando...';
+                      if (huggingfaceEl) huggingfaceEl.textContent = 'verificando...';
                       if (openaiEl) openaiEl.textContent = 'verificando...';
                       
                       try {
                         const apiStatus = await checkAPIStatus();
                         
                         if (indicatorEl) {
-                          indicatorEl.className = `inline-block w-3 h-3 ${apiStatus.elevenlabs || apiStatus.openai ? 'bg-green-500' : 'bg-red-500'} rounded-full mr-2`;
+                          indicatorEl.className = `inline-block w-3 h-3 ${apiStatus.huggingface || apiStatus.openai ? 'bg-green-500' : 'bg-red-500'} rounded-full mr-2`;
                         }
                         
-                        if (elevenLabsEl) {
-                          elevenLabsEl.className = apiStatus.elevenlabs ? 'text-green-600 font-medium' : 'text-red-600';
-                          elevenLabsEl.textContent = apiStatus.elevenlabs ? '✓ Disponível' : '✗ Indisponível';
+                        if (huggingfaceEl) {
+                          huggingfaceEl.className = apiStatus.huggingface ? 'text-green-600 font-medium' : 'text-red-600';
+                          huggingfaceEl.textContent = apiStatus.huggingface ? '✓ Disponível' : '✗ Indisponível';
                         }
                         
                         if (openaiEl) {
@@ -1197,9 +1197,9 @@ export default function DemoPage() {
                         }
                       } catch (error) {
                         if (indicatorEl) indicatorEl.className = 'inline-block w-3 h-3 bg-red-500 rounded-full mr-2';
-                        if (elevenLabsEl) {
-                          elevenLabsEl.className = 'text-red-600';
-                          elevenLabsEl.textContent = '✗ Erro';
+                        if (huggingfaceEl) {
+                          huggingfaceEl.className = 'text-red-600';
+                          huggingfaceEl.textContent = '✗ Erro';
                         }
                         if (openaiEl) {
                           openaiEl.className = 'text-red-600';
@@ -1418,8 +1418,8 @@ export default function DemoPage() {
                                       
                                       if (statusElement) {
                                         statusElement.innerHTML = `
-                                          <span class="${apiStatus.elevenlabs ? 'text-green-400' : 'text-red-400'}">
-                                            ElevenLabs: ${apiStatus.elevenlabs ? "✓ Disponível" : "✗ Indisponível"}
+                                          <span class="${apiStatus.huggingface ? 'text-green-400' : 'text-red-400'}">
+                                            HuggingFace: ${apiStatus.huggingface ? "✓ Disponível" : "✗ Indisponível"}
                                           </span>
                                           <br>
                                           <span class="${apiStatus.openai ? 'text-green-400' : 'text-red-400'}">
