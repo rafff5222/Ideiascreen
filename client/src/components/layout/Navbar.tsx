@@ -7,6 +7,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { MenuIcon, Sparkles } from "lucide-react";
+import { SubscriptionBadge } from "@/components/subscription/SubscriptionBadge";
 
 export default function Navbar() {
   const [location] = useLocation();
