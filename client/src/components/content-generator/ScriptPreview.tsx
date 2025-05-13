@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import CriticAnalysis from './CriticAnalysis';
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 type ScriptPreviewProps = {
   prompt: string;
@@ -34,6 +35,9 @@ export default function ScriptPreview({
   const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(false);
   const { toast } = useToast();
   
+  // Acessar dados da assinatura do usuário
+  const { user } = useSubscription();
+  
   // Carregar histórico de roteiros salvos
   useEffect(() => {
     try {
@@ -53,8 +57,12 @@ export default function ScriptPreview({
       setError(null);
       
       try {
-        // Chamada real à API
-        const response = await apiRequest("POST", "/api/generate-script", { prompt });
+        // Chamada real à API com informação de plano
+        const response = await apiRequest("POST", "/api/generate-script", { 
+          prompt, 
+          subscriptionPlan: user?.plan || 'free',
+          scriptType
+        });
         const data = await response.json();
         
         if (data.error) {
@@ -281,8 +289,12 @@ export default function ScriptPreview({
     setIsLoading(true);
     
     try {
-      // Chamada à API com o novo prompt
-      const response = await apiRequest("POST", "/api/generate-script", { prompt: variationPrompt });
+      // Chamada à API com o novo prompt e informação de plano
+      const response = await apiRequest("POST", "/api/generate-script", { 
+        prompt: variationPrompt,
+        subscriptionPlan: user?.plan || 'free',
+        scriptType
+      });
       const data = await response.json();
       
       if (data.error) {
