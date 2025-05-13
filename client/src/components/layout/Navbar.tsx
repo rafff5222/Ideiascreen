@@ -31,7 +31,7 @@ export default function Navbar() {
         <Link href="/">
           <div className="flex items-center space-x-2 cursor-pointer">
             <i className="ri-quill-pen-line text-primary text-2xl"></i>
-            <span className="font-poppins font-bold text-xl text-gray-900 gradient-text">ContentPro</span>
+            <span className="font-poppins font-bold text-xl text-gray-900 gradient-text">IdeiaScreen</span>
           </div>
         </Link>
         
