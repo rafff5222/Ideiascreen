@@ -63,8 +63,8 @@ export default function APIStatusChecker() {
     checkStatus();
   }, []);
 
-  const getStatusBadge = (apiStatus?: APIStatus) => {
-    if (!apiStatus) {
+  const getStatusBadge = (working?: boolean) => {
+    if (working === undefined) {
       return (
         <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">
           <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
@@ -73,7 +73,7 @@ export default function APIStatusChecker() {
       );
     }
   
-    if (apiStatus.working) {
+    if (working) {
       return (
         <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
           <CheckCircle className="h-3 w-3 mr-1" />
@@ -113,21 +113,24 @@ export default function APIStatusChecker() {
               <div className="border rounded-md p-3">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="font-semibold">OpenAI</h3>
-                  {getStatusBadge(status?.openai)}
+                  {getStatusBadge(status?.apis?.openai?.working)}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {status?.openai?.model ? `Modelo: ${status.openai.model}` : 
-                   status?.openai?.message || 'Serviço de IA para geração de conteúdo'}
+                  {status?.apis?.openai?.configured ? 
+                   'Configurado e pronto para geração de roteiros' : 
+                   'API Key não configurada - usando HuggingFace como alternativa'}
                 </p>
               </div>
               
               <div className="border rounded-md p-3">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="font-semibold">HuggingFace</h3>
-                  {getStatusBadge(status?.huggingface)}
+                  {getStatusBadge(status?.apis?.huggingface?.working)}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {status?.huggingface?.message || 'Serviço de IA alternativo gratuito'}
+                  {status?.apis?.huggingface?.configured ? 
+                   'Configurado - alternativa gratuita ao OpenAI' : 
+                   'API Key não configurada - configure para usar como backup'}
                 </p>
               </div>
               
@@ -135,12 +138,19 @@ export default function APIStatusChecker() {
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="font-semibold">Sistema</h3>
                   <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
-                    Status
+                    Informações
                   </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Versão: {status?.environment?.nodeVersion || 'N/A'}
+                  Node {status?.environment?.nodeVersion || 'N/A'} | Plataforma: {status?.environment?.platform || 'N/A'}
                 </p>
+                {status?.recommendations && (
+                  <div className="mt-2 text-xs border-t pt-2 border-gray-100">
+                    <p className={status?.recommendations.useFree ? "text-green-600" : "text-amber-600"}>
+                      {status.recommendations.text}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
             
