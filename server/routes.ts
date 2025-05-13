@@ -198,6 +198,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ success: false });
     }
   });
+  
+  /**
+   * Endpoint para verificação de status do sistema
+   * Retorna configuração das APIs disponíveis e estado do sistema
+   */
+  app.get("/api/sys-status", async (req: Request, res: Response) => {
+    try {
+      // Verificar status de todos os serviços
+      const servicesStatus = await checkAllServices();
+      
+      // Construir resposta com informações do ambiente
+      const systemStatus = {
+        apis: {
+          openai: {
+            configured: !!process.env.OPENAI_API_KEY,
+            working: servicesStatus.paid.openai.working,
+            status: servicesStatus.paid.openai.status
+          },
+          huggingface: {
+            configured: !!process.env.HUGGINGFACE_API_KEY,
+            working: servicesStatus.free.huggingFace.working,
+            status: servicesStatus.free.huggingFace.status
+          }
+        },
+        environment: {
+          nodeVersion: process.version,
+          platform: process.platform,
+          timestamp: new Date().toISOString(),
+          ffmpeg: servicesStatus.ffmpeg.working
+        },
+        recommendations: servicesStatus.recommendation
+      };
+      
+      return res.json(systemStatus);
+    } catch (error) {
+      console.error("Erro ao verificar status do sistema:", error);
+      
+      // Em caso de erro, retornar informações mínimas do sistema
+      return res.json({
+        apis: {
+          openai: { configured: !!process.env.OPENAI_API_KEY },
+          huggingface: { configured: !!process.env.HUGGINGFACE_API_KEY }
+        },
+        environment: {
+          nodeVersion: process.version,
+          timestamp: new Date().toISOString()
+        },
+        error: "Erro ao verificar status completo do sistema"
+      });
+    }
+  });
 
   // Criar HTTP server
   const httpServer = createServer(app);

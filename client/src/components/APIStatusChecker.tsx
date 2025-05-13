@@ -16,11 +16,28 @@ interface APIStatus {
 }
 
 interface SystemStatus {
-  openai: APIStatus;
-  elevenlabs: APIStatus;
-  pexels: APIStatus;
-  ffmpeg: APIStatus;
-  filesystem: APIStatus;
+  apis: {
+    openai: {
+      configured: boolean;
+      working: boolean;
+      status: string;
+    };
+    huggingface: {
+      configured: boolean;
+      working: boolean;
+      status: string;
+    };
+  };
+  environment: {
+    nodeVersion: string;
+    platform: string;
+    timestamp: string;
+    ffmpeg: boolean;
+  };
+  recommendations?: {
+    text: string;
+    useFree: boolean;
+  };
 }
 
 export default function APIStatusChecker() {
@@ -106,43 +123,24 @@ export default function APIStatusChecker() {
               
               <div className="border rounded-md p-3">
                 <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-semibold">ElevenLabs</h3>
-                  {getStatusBadge(status?.elevenlabs)}
+                  <h3 className="font-semibold">HuggingFace</h3>
+                  {getStatusBadge(status?.huggingface)}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {status?.elevenlabs?.subscription ? 
-                    `Plano: ${status.elevenlabs.subscription.tier}` :
-                    status?.elevenlabs?.message || 'Serviço de síntese de voz'}
+                  {status?.huggingface?.message || 'Serviço de IA alternativo gratuito'}
                 </p>
               </div>
               
               <div className="border rounded-md p-3">
                 <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-semibold">Pexels</h3>
-                  {getStatusBadge(status?.pexels)}
+                  <h3 className="font-semibold">Sistema</h3>
+                  <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
+                    Status
+                  </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {status?.pexels?.message || 'Biblioteca de imagens e vídeos'}
+                  Versão: {status?.environment?.nodeVersion || 'N/A'}
                 </p>
-              </div>
-              
-              <div className="border rounded-md p-3">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-semibold">FFmpeg</h3>
-                  {getStatusBadge(status?.ffmpeg)}
-                </div>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <p className="text-sm text-muted-foreground truncate">
-                        {status?.ffmpeg?.version || status?.ffmpeg?.message || 'Processador de vídeo'}
-                      </p>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-xs">
-                      <p>{status?.ffmpeg?.version || status?.ffmpeg?.message || 'Processador de vídeo'}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
               </div>
             </div>
             
