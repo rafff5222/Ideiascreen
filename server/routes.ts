@@ -103,6 +103,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/analyze-script', analyzeAsCritic);
   
   /**
+   * Endpoint para obter dados dos planos de assinatura
+   */
+  app.get("/api/pricing-data", (req: Request, res: Response) => {
+    try {
+      // Definição dos planos e seus recursos
+      const pricingData = {
+        plans: [
+          {
+            id: 'free',
+            name: 'Gratuito',
+            price: 0,
+            description: 'Para criadores iniciantes',
+            badge: '',
+            requestLimit: 3,
+            exportFormats: ['txt'],
+            features: [
+              { name: 'Geração básica de roteiros', included: true },
+              { name: 'Até 3 roteiros por mês', included: true },
+              { name: 'Exportação em TXT', included: true },
+              { name: 'Salvar roteiros localmente', included: true },
+              { name: 'Personalização avançada', included: false },
+              { name: 'Modos criativos especiais', included: false },
+              { name: 'Exportação profissional (PDF, FDX)', included: false },
+              { name: 'Análise de roteiro com IA', included: false },
+            ]
+          },
+          {
+            id: 'starter',
+            name: 'Iniciante',
+            price: 27.9,
+            description: 'Para criadores regulares',
+            popular: true,
+            badge: 'Mais Popular',
+            requestLimit: 30,
+            exportFormats: ['txt', 'pdf'],
+            features: [
+              { name: 'Geração avançada de roteiros', included: true },
+              { name: 'Até 30 roteiros por mês', included: true },
+              { name: 'Exportação em TXT e PDF', included: true },
+              { name: 'Salvar roteiros localmente', included: true },
+              { name: 'Personalização avançada', included: true },
+              { name: 'Modos criativos especiais', included: true },
+              { name: 'Exportação profissional (FDX)', included: false },
+              { name: 'Análise de roteiro com IA', included: false },
+            ]
+          },
+          {
+            id: 'pro',
+            name: 'Profissional',
+            price: 79.9,
+            monthlyPrice: 99.9,
+            description: 'Para criadores profissionais',
+            badge: 'Desconto de 20%',
+            requestLimit: Infinity,
+            exportFormats: ['txt', 'pdf', 'fdx'],
+            features: [
+              { name: 'Geração avançada de roteiros', included: true },
+              { name: 'Roteiros ilimitados', included: true },
+              { name: 'Exportação em TXT, PDF e FDX', included: true },
+              { name: 'Salvar roteiros localmente', included: true },
+              { name: 'Personalização avançada', included: true },
+              { name: 'Modos criativos especiais', included: true },
+              { name: 'Exportação profissional (FDX)', included: true },
+              { name: 'Análise de roteiro com IA', included: true },
+            ]
+          }
+        ],
+        currency: 'BRL',
+        vatIncluded: true
+      };
+      
+      return res.json(pricingData);
+    } catch (error) {
+      console.error("Erro ao obter dados de preços:", error);
+      return res.status(500).json({ error: "Erro ao obter dados de preços" });
+    }
+  });
+  
+  /**
    * Endpoint para estatísticas do servidor - utilizado para monitoramento e debugging
    */
   app.get("/api/server-stats", async (req: Request, res: Response) => {
