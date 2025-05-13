@@ -55,7 +55,7 @@ export default function Pricing() {
                   <span className="text-lg text-gray-500 mt-1">/mês</span>
                 </div>
               </div>
-              <p className="text-gray-600 mb-6">Ideal para criadores de conteúdo iniciantes.</p>
+              <p className="text-gray-600 mb-6">Ideal para criadores de roteiros iniciantes.</p>
               
               <Button 
                 className="btn-basic w-full py-6 text-lg font-semibold" 
@@ -123,7 +123,7 @@ export default function Pricing() {
                   <span className="text-lg text-gray-500 mt-1">/mês</span>
                 </div>
               </div>
-              <p className="text-gray-600 mb-4">Ideal para criadores que desejam automação.</p>
+              <p className="text-gray-600 mb-4">Ideal para criadores que desejam roteiros profissionais.</p>
               
               <CountdownSpots />
               
@@ -183,7 +183,7 @@ export default function Pricing() {
                   <span className="text-lg text-gray-500 mt-1">/mês</span>
                 </div>
               </div>
-              <p className="text-gray-600 mb-6">Para produtores de conteúdo profissionais.</p>
+              <p className="text-gray-600 mb-6">Para roteiristas e produtores de conteúdo profissionais.</p>
               
               <Button 
                 className="btn-pro w-full py-6 text-lg font-semibold pricing-btn"
@@ -239,7 +239,7 @@ export default function Pricing() {
                   <span className="text-lg text-gray-500 mt-1">/mês</span>
                 </div>
               </div>
-              <p className="text-gray-600 mb-6">Para profissionais e agências de marketing.</p>
+              <p className="text-gray-600 mb-6">Para agências e estúdios de criação de conteúdo.</p>
               
               <AnnualPriceAnchor monthlyPrice={149} className="mt-2 mb-2" />
               
@@ -267,13 +267,13 @@ export default function Pricing() {
               <div className="flex items-start">
                 <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
                 <span className="ml-3 text-gray-700">
-                  <strong>Edição profissional</strong> com IA
+                  <strong>Roteiros profissionais</strong> com IA avançada
                 </span>
               </div>
               <div className="flex items-start">
                 <Check className="text-green-500 mt-1 flex-shrink-0" size={18} />
                 <span className="ml-3 text-gray-700">
-                  Efeitos e transitions cinemáticas
+                  Modos criativos ilimitados
                 </span>
               </div>
               <div className="flex items-start">
