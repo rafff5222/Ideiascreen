@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation, useRoute } from "wouter";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, KeyRound, ArrowRight, CheckCircle2 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Esquema de validação
 const resetPasswordSchema = z.object({
@@ -30,10 +31,18 @@ export default function ResetPassword() {
   const [success, setSuccess] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  
+  // Redirecionar se já estiver autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      setLocation("/");
+    }
+  }, [isAuthenticated, setLocation]);
 
-  // Pegar token da URL (em uma implementação real)
-  // const [, params] = useRoute('/reset-password/:token');
-  // const token = params?.token;
+  // Pegar token da URL
+  const [matched, params] = useRoute('/reset-password/:token');
+  const token = params?.token;
 
   // Inicializar form
   const form = useForm<ResetPasswordFormValues>({
@@ -44,16 +53,28 @@ export default function ResetPassword() {
     }
   });
 
-  // Esta função será implementada quando tivermos o serviço completo
-  // Por enquanto, apenas simula a redefinição de senha
+  // Função para lidar com o envio do formulário
   const onSubmit = async (values: ResetPasswordFormValues) => {
     try {
       setIsLoading(true);
       setError(null);
       
-      // Simulando uma chamada de API (será implementada futuramente)
-      // Neste momento apenas mostraremos mensagem de sucesso
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Verificar se o token está disponível
+      if (!token) {
+        throw new Error("Token de redefinição inválido ou ausente");
+      }
+      
+      // Enviar requisição para o backend
+      const response = await apiRequest("POST", "/api/auth/reset-password", {
+        ...values,
+        token
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || "Erro ao redefinir senha");
+      }
       
       // Mostrar mensagem de sucesso
       setSuccess(true);

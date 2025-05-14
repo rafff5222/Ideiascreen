@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
 import { SubscriptionProvider } from "./contexts/SubscriptionContext";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, RequireAuth } from "./contexts/AuthContext";
 import { initModelPreloader } from "./lib/modelPreloader";
 import { plausibleAnalytics } from "./lib/analytics-plausible";
 import NotFound from "@/pages/not-found";
@@ -34,12 +34,8 @@ function Router() {
 
   return (
     <Switch>
+      {/* Rotas públicas */}
       <Route path="/" component={Home} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/generator" component={Generator} />
-      <Route path="/roteiros" component={ScriptGenerator} />
-      <Route path="/script-generator" component={ScriptGenerator} />
-      <Route path="/settings" component={Settings} />
       <Route path="/plans" component={PlansPage} />
       <Route path="/planos" component={PlansPage} />
       <Route path="/login" component={Login} />
@@ -49,6 +45,35 @@ function Router() {
       <Route path="/forgot-password" component={ForgotPassword} />
       <Route path="/reset-password" component={ResetPassword} />
       <Route path="/reset-password/:token" component={ResetPassword} />
+      
+      {/* Rotas protegidas - requerem autenticação */}
+      <Route path="/dashboard">
+        <RequireAuth>
+          <Dashboard />
+        </RequireAuth>
+      </Route>
+      <Route path="/generator">
+        <RequireAuth>
+          <Generator />
+        </RequireAuth>
+      </Route>
+      <Route path="/roteiros">
+        <RequireAuth>
+          <ScriptGenerator />
+        </RequireAuth>
+      </Route>
+      <Route path="/script-generator">
+        <RequireAuth>
+          <ScriptGenerator />
+        </RequireAuth>
+      </Route>
+      <Route path="/settings">
+        <RequireAuth>
+          <Settings />
+        </RequireAuth>
+      </Route>
+      
+      {/* Rota de fallback */}
       <Route component={NotFound} />
     </Switch>
   );

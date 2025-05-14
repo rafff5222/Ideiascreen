@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, KeyRound, ArrowRight, CheckCircle2 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Esquema de validação
 const forgotPasswordSchema = z.object({
@@ -24,7 +25,16 @@ export default function ForgotPassword() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  
+  // Redirecionar se já estiver autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      setLocation("/");
+    }
+  }, [isAuthenticated, setLocation]);
 
   // Inicializar form
   const form = useForm<ForgotPasswordFormValues>({
@@ -34,16 +44,19 @@ export default function ForgotPassword() {
     }
   });
 
-  // Esta função será implementada quando tivermos o serviço de e-mail
-  // Por enquanto, apenas simula o envio de e-mail
+  // Função para lidar com o envio do formulário
   const onSubmit = async (values: ForgotPasswordFormValues) => {
     try {
       setIsLoading(true);
       setError(null);
       
-      // Simulando uma chamada de API (será implementada futuramente)
-      // Neste momento apenas mostraremos mensagem de sucesso
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Enviar requisição para o backend
+      const response = await apiRequest("POST", "/api/auth/forgot-password", values);
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || "Erro ao processar a solicitação");
+      }
       
       // Mostrar mensagem de sucesso
       setSuccess(true);
