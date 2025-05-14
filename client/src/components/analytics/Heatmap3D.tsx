@@ -8,42 +8,47 @@ export default function Heatmap3D() {
   useEffect(() => {
     // Adiciona estilos CSS
     const addStyles = () => {
-      if (document.getElementById('heatmap-styles')) return;
-      
-      const styleElement = document.createElement('style');
-      styleElement.id = 'heatmap-styles';
-      styleElement.textContent = `
-        .heat-point {
-          position: absolute;
-          width: 20px;
-          height: 20px;
-          background: radial-gradient(circle, rgba(255,0,0,0.5), transparent);
-          border-radius: 50%;
-          pointer-events: none;
-          transform: translate(-50%, -50%);
-          opacity: 0.7;
-          z-index: 9999;
-        }
+      try {
+        // Verifica se os estilos já existem
+        if (document.getElementById('heatmap-styles')) return;
         
-        .heat-point.click {
-          width: 30px;
-          height: 30px;
-          background: radial-gradient(circle, rgba(255,0,0,0.8) 0%, rgba(255,165,0,0.6) 40%, transparent 80%);
-          animation: heat-pulse 1s ease-out;
-        }
-        
-        @keyframes heat-pulse {
-          0% {
-            transform: translate(-50%, -50%) scale(0.5);
-            opacity: 1;
+        const styleElement = document.createElement('style');
+        styleElement.id = 'heatmap-styles';
+        styleElement.textContent = `
+          .heat-point {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, rgba(255,0,0,0.5), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            opacity: 0.7;
+            z-index: 9999;
           }
-          100% {
-            transform: translate(-50%, -50%) scale(1.5);
-            opacity: 0;
+          
+          .heat-point.click {
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, rgba(255,0,0,0.8) 0%, rgba(255,165,0,0.6) 40%, transparent 80%);
+            animation: heat-pulse 1s ease-out;
           }
-        }
-      `;
-      document.head.appendChild(styleElement);
+          
+          @keyframes heat-pulse {
+            0% {
+              transform: translate(-50%, -50%) scale(0.5);
+              opacity: 1;
+            }
+            100% {
+              transform: translate(-50%, -50%) scale(1.5);
+              opacity: 0;
+            }
+          }
+        `;
+        document.head.appendChild(styleElement);
+      } catch (error) {
+        console.error('Erro ao adicionar estilos do heatmap:', error);
+      }
     };
     
     // Armazena dados de cliques e movimentos
@@ -110,16 +115,28 @@ export default function Heatmap3D() {
     
     // Cria um ponto de calor visual
     const createHeatPoint = (x: number, y: number, isClick: boolean) => {
-      const heat = document.createElement('div');
-      heat.className = isClick ? 'heat-point click' : 'heat-point';
-      heat.style.left = `${x}px`;
-      heat.style.top = `${y}px`;
-      document.body.appendChild(heat);
-      
-      // Remove o ponto após um tempo
-      setTimeout(() => {
-        heat.remove();
-      }, isClick ? 1000 : 400);
+      try {
+        // Cria o elemento de ponto de calor
+        const heat = document.createElement('div');
+        heat.className = isClick ? 'heat-point click' : 'heat-point';
+        heat.style.left = `${x}px`;
+        heat.style.top = `${y}px`;
+        document.body.appendChild(heat);
+        
+        // Remove o ponto após um tempo
+        setTimeout(() => {
+          try {
+            // Verifica se o elemento ainda existe no DOM
+            if (document.body.contains(heat)) {
+              document.body.removeChild(heat);
+            }
+          } catch (error) {
+            console.error('Erro ao remover ponto de calor:', error);
+          }
+        }, isClick ? 1000 : 400);
+      } catch (error) {
+        console.error('Erro ao criar ponto de calor:', error);
+      }
     };
     
     // Envia dados periodicamente para o servidor
@@ -196,9 +213,13 @@ export default function Heatmap3D() {
       clearInterval(sendInterval);
       
       if (isDevelopment) {
-        const toggleButton = document.querySelector('button[innerText="Toggle Heatmap"]');
-        if (toggleButton) {
-          toggleButton.remove();
+        try {
+          const toggleButton = document.querySelector('button[innerText="Toggle Heatmap"]');
+          if (toggleButton && document.body.contains(toggleButton)) {
+            document.body.removeChild(toggleButton);
+          }
+        } catch (error) {
+          console.error('Erro ao remover botão de toggle do heatmap:', error);
         }
       }
     };
