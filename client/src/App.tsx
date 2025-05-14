@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
 import { SubscriptionProvider } from "./contexts/SubscriptionContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import { initModelPreloader } from "./lib/modelPreloader";
 import { plausibleAnalytics } from "./lib/analytics-plausible";
 import NotFound from "@/pages/not-found";
@@ -59,20 +60,22 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <SubscriptionProvider>
-        <TooltipProvider>
-          <Toaster />
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <main className="flex-grow">
-              <Router />
-            </main>
-            <Footer />
-            
-            {/* Analytics e Componentes de Conversão */}
-            <ErrorMonitor />
-            <LimitedTimeOffer />
-          </div>
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <div className="flex flex-col min-h-screen">
+              <Navbar />
+              <main className="flex-grow">
+                <Router />
+              </main>
+              <Footer />
+              
+              {/* Analytics e Componentes de Conversão */}
+              <ErrorMonitor />
+              <LimitedTimeOffer />
+            </div>
+          </TooltipProvider>
+        </AuthProvider>
       </SubscriptionProvider>
     </QueryClientProvider>
   );

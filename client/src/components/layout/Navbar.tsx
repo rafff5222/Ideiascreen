@@ -2,10 +2,13 @@ import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
 import LogoSvg from "./LogoSvg";
 import "./Navbar.css";
+import { useAuth } from "@/contexts/AuthContext"; 
+import { Button } from "@/components/ui/button";
 
 export default function Navbar() {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isAuthenticated, user, logout } = useAuth();
   
   const toggleMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -52,16 +55,35 @@ export default function Navbar() {
 
           {/* Botões CTA */}
           <div className="cta-button">
-            <Link href="/login">
-              <div className="btn-login">
-                Entrar
-              </div>
-            </Link>
-            <Link href="/plans">
-              <div className="btn-signup">
-                Assinar Agora
-              </div>
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link href="/generator">
+                  <div className="btn-login">
+                    Gerador
+                  </div>
+                </Link>
+                <div 
+                  className="btn-signup" 
+                  onClick={logout}
+                  style={{ cursor: 'pointer' }}
+                >
+                  Sair
+                </div>
+              </>
+            ) : (
+              <>
+                <Link href="/login">
+                  <div className="btn-login">
+                    Entrar
+                  </div>
+                </Link>
+                <Link href="/plans">
+                  <div className="btn-signup">
+                    Assinar Agora
+                  </div>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Hamburger para Mobile */}
@@ -88,6 +110,20 @@ export default function Navbar() {
               </div>
             </Link>
           </li>
+          
+          {isAuthenticated && (
+            <li>
+              <Link href="/generator">
+                <div 
+                  style={{ color: 'white', textDecoration: 'none', fontSize: '16px', display: 'block', padding: '8px 0', cursor: 'pointer' }}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Gerador de Roteiros
+                </div>
+              </Link>
+            </li>
+          )}
+          
           <li>
             <Link href="/plans">
               <div 
@@ -98,26 +134,43 @@ export default function Navbar() {
               </div>
             </Link>
           </li>
-          <li>
-            <Link href="/login">
-              <div 
-                style={{ color: 'white', textDecoration: 'none', fontSize: '16px', display: 'block', padding: '8px 0', cursor: 'pointer' }}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Entrar
-              </div>
-            </Link>
-          </li>
-          <li>
-            <Link href="/plans">
+          
+          {isAuthenticated ? (
+            <li>
               <div 
                 style={{ color: '#FFC107', textDecoration: 'none', fontSize: '16px', display: 'block', padding: '8px 0', fontWeight: 'bold', cursor: 'pointer' }}
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => {
+                  logout();
+                  setMobileMenuOpen(false);
+                }}
               >
-                Assinar Agora
+                Sair
               </div>
-            </Link>
-          </li>
+            </li>
+          ) : (
+            <>
+              <li>
+                <Link href="/login">
+                  <div 
+                    style={{ color: 'white', textDecoration: 'none', fontSize: '16px', display: 'block', padding: '8px 0', cursor: 'pointer' }}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Entrar
+                  </div>
+                </Link>
+              </li>
+              <li>
+                <Link href="/plans">
+                  <div 
+                    style={{ color: '#FFC107', textDecoration: 'none', fontSize: '16px', display: 'block', padding: '8px 0', fontWeight: 'bold', cursor: 'pointer' }}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Assinar Agora
+                  </div>
+                </Link>
+              </li>
+            </>
+          )}
         </ul>
       </div>
     </header>

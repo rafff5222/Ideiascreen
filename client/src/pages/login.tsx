@@ -175,8 +175,16 @@ export default function Login() {
                     <Button 
                       type="submit"
                       className="w-full py-5 mt-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+                      disabled={isLoading}
                     >
-                      Entrar
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Processando...
+                        </>
+                      ) : (
+                        "Entrar"
+                      )}
                     </Button>
                   </form>
                 </Form>
