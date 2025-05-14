@@ -3,9 +3,14 @@ import { useLocation } from 'wouter';
 
 // Defina o tipo do usuário
 interface User {
-  id?: string;
-  name?: string;
-  email?: string;
+  id: number;
+  username: string;
+  name: string | null;
+  email: string;
+  profileImageUrl: string | null;
+  planType: string;
+  requestsUsed?: number;
+  requestsLimit?: number;
 }
 
 // Defina o tipo do contexto de autenticação
@@ -35,43 +40,91 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Verificar se o usuário está autenticado ao carregar a página
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    const fetchCurrentUser = async () => {
       try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        setIsAuthenticated(true);
+        // Primeiro verificar se há usuário armazenado localmente para UI rápida
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          try {
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+            setIsAuthenticated(true);
+          } catch (error) {
+            console.error('Erro ao analisar usuário armazenado:', error);
+            localStorage.removeItem('user');
+          }
+        }
+        
+        // Verificar com o servidor para garantir que a sessão ainda é válida
+        const response = await fetch('/api/auth/me', {
+          credentials: 'include', // Importante para cookies de sessão
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.user) {
+            // Atualizar o usuário com dados do servidor
+            localStorage.setItem('user', JSON.stringify(data.user));
+            setUser(data.user);
+            setIsAuthenticated(true);
+          } else {
+            // Se o servidor não reconhecer o usuário, fazer logout local
+            localStorage.removeItem('user');
+            setUser(null);
+            setIsAuthenticated(false);
+          }
+        } else {
+          // Se houver erro de autenticação no servidor
+          if (response.status === 401) {
+            localStorage.removeItem('user');
+            setUser(null);
+            setIsAuthenticated(false);
+          }
+          // Outros erros: manter estado atual, tentar novamente mais tarde
+        }
       } catch (error) {
-        console.error('Erro ao analisar usuário armazenado:', error);
-        localStorage.removeItem('user');
+        console.error('Erro ao verificar autenticação:', error);
+        // Em caso de erro de rede, manter o estado atual do usuário
       }
-    }
+    };
+    
+    fetchCurrentUser();
   }, []);
 
   // Função de login
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      // Em um aplicativo real, você faria uma chamada à API aqui
-      // Este é apenas um mock para fins de demonstração
+      // Fazer a chamada à API real
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include', // Importante para cookies de sessão
+      });
       
-      // Simula um atraso de 1 segundo para parecer uma chamada à API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Verificar se a resposta foi bem-sucedida
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Falha na autenticação');
+      }
       
-      // Simula um usuário autenticado (para desenvolvimento)
-      const mockUser = {
-        id: '123',
-        name: email.split('@')[0], // Usa a parte do e-mail antes do @ como nome
-        email,
-      };
+      // Obter dados do usuário da resposta
+      const data = await response.json();
       
-      // Armazena o usuário no localStorage para persistência
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      
-      // Atualiza o estado
-      setUser(mockUser);
-      setIsAuthenticated(true);
-      
-      return true;
+      if (data.success && data.user) {
+        // Armazenar usuário no localStorage para persistência entre refreshes
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Atualizar o estado
+        setUser(data.user);
+        setIsAuthenticated(true);
+        
+        return true;
+      } else {
+        throw new Error('Dados de usuário inválidos na resposta');
+      }
     } catch (error) {
       console.error('Erro de login:', error);
       return false;
@@ -79,11 +132,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Função de logout
-  const logout = () => {
-    localStorage.removeItem('user');
-    setUser(null);
-    setIsAuthenticated(false);
-    setLocation('/login');
+  const logout = async () => {
+    try {
+      // Chamar a API para fazer logout
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include', // Importante para cookies de sessão
+      });
+      
+      if (!response.ok) {
+        console.error('Erro ao fazer logout na API');
+      }
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    } finally {
+      // Mesmo que a API falhe, limpar a sessão localmente
+      localStorage.removeItem('user');
+      setUser(null);
+      setIsAuthenticated(false);
+      setLocation('/login');
+    }
   };
 
   return (

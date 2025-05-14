@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, LogIn, ArrowRight } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Esquema de validação
 const loginSchema = z.object({
@@ -43,25 +43,25 @@ export default function Login() {
       setIsLoading(true);
       setError(null);
       
-      // Enviar dados para a API
-      const response = await apiRequest("POST", "/api/auth/login", values);
-      const data = await response.json();
+      // Utilizar função de login do contexto de autenticação
+      const { login } = useAuth();
+      const success = await login(values.email, values.password);
       
-      if (!response.ok) {
-        throw new Error(data.message || "Credenciais inválidas");
+      if (success) {
+        // Login bem-sucedido
+        toast({
+          title: "Login realizado com sucesso!",
+          description: "Redirecionando para a página inicial...",
+          variant: "default"
+        });
+        
+        // Redirecionar para a página principal
+        setTimeout(() => {
+          setLocation("/");
+        }, 1000);
+      } else {
+        throw new Error("Falha na autenticação. Verifique seu email e senha.");
       }
-      
-      // Login bem-sucedido
-      toast({
-        title: "Login realizado com sucesso!",
-        description: "Redirecionando para a página inicial...",
-        variant: "default"
-      });
-      
-      // Redirecionar para a página principal
-      setTimeout(() => {
-        setLocation("/");
-      }, 1000);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Erro ao fazer login";
       setError(errorMessage);
