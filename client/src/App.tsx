@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect } from "react";
 import { SubscriptionProvider } from "./contexts/SubscriptionContext";
 import { initModelPreloader } from "./lib/modelPreloader";
+import { plausibleAnalytics } from "./lib/analytics-plausible";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
@@ -36,7 +37,22 @@ function Router() {
 function App() {
   // Inicializa o pré-carregamento de modelos
   useEffect(() => {
+    // Inicializa o pré-carregamento de modelos
     initModelPreloader();
+    
+    // Inicializa o Plausible Analytics
+    plausibleAnalytics.init();
+    plausibleAnalytics.trackPageView();
+    
+    // Monitorar mudanças de rota para analytics
+    const handleRouteChange = () => {
+      plausibleAnalytics.trackPageView();
+    };
+    
+    // Cleanup
+    return () => {
+      // Cleanup se necessário
+    };
   }, []);
   
   return (
