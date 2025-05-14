@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+import { Star, Sparkles } from "lucide-react";
 import amandaAvatar from "@/assets/testimonials/amanda.svg";
 import carlosAvatar from "@/assets/testimonials/carlos.svg";
 import julianaAvatar from "@/assets/testimonials/juliana.svg";
@@ -97,9 +97,15 @@ export default function Testimonials() {
         <div className="text-center mt-12">
           <a 
             href="/script-generator" 
-            className="inline-block px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg font-semibold transition-all hover:shadow-lg hover:shadow-amber-500/20 hover:-translate-y-1"
+            className="inline-block px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-semibold transition-all hover:shadow-lg hover:shadow-green-500/30 hover:-translate-y-1 relative overflow-hidden group"
           >
-            Experimente grátis
+            {/* Efeito de brilho animado */}
+            <div className="absolute inset-0 w-1/4 h-full bg-white opacity-20 transform -skew-x-12 -translate-x-full group-hover:translate-x-[400%] transition-transform duration-1000 ease-in-out"></div>
+            
+            <span className="flex items-center justify-center relative z-10">
+              <Sparkles className="w-5 h-5 mr-2 text-yellow-300" />
+              Experimente grátis
+            </span>
           </a>
         </div>
       </div>

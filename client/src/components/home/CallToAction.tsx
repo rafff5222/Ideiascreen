@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles, Zap } from "lucide-react";
 import SmartForm from "@/components/conversion/SmartForm";
 import { useState } from "react";
 
@@ -32,11 +32,17 @@ export default function CallToAction() {
               {!showForm && (
                 <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                   <Button 
-                    className="btn-premium text-lg px-8 py-6 flex items-center"
+                    className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-lg px-8 py-6 flex items-center relative overflow-hidden group border-0"
                     onClick={() => setShowForm(true)}
                   >
-                    Começar agora
-                    <ArrowRight size={20} className="ml-2" />
+                    {/* Efeito de brilho animado */}
+                    <div className="absolute inset-0 w-1/4 h-full bg-white opacity-20 transform -skew-x-12 -translate-x-full group-hover:translate-x-[400%] transition-transform duration-1000 ease-in-out"></div>
+                    
+                    <div className="relative z-10 flex items-center">
+                      <Zap size={20} className="mr-2 text-yellow-300 animate-pulse" />
+                      Começar agora
+                      <ArrowRight size={20} className="ml-2" />
+                    </div>
                   </Button>
                   
                   <Button 

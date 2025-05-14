@@ -44,9 +44,12 @@ export default function Hero() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-5">
             <Link href="/script-generator">
-              <div className="btn btn-primary bg-gradient-to-r from-amber-500 to-amber-600 text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-amber-500/20 transition-all duration-300 inline-block transform hover:-translate-y-1 cursor-pointer">
-                <span className="flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 mr-2" />
+              <div className="btn btn-primary bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-green-500/30 transition-all duration-300 inline-block transform hover:-translate-y-1 cursor-pointer relative overflow-hidden group">
+                {/* Efeito de brilho animado */}
+                <div className="absolute inset-0 w-1/4 h-full bg-white opacity-20 transform -skew-x-12 -translate-x-full group-hover:translate-x-[400%] transition-transform duration-1000 ease-in-out"></div>
+                
+                <span className="flex items-center justify-center relative z-10">
+                  <Sparkles className="w-6 h-6 mr-2 text-yellow-300 animate-pulse" />
                   Começar Grátis
                 </span>
               </div>
