@@ -46,13 +46,13 @@ import MiniMetricsWidget from "@/components/admin/MiniMetricsWidget";
 import ClickHeatmap from "@/components/analytics/ClickHeatmap";
 import Heatmap3D from "@/components/analytics/Heatmap3D";
 import PrivateAnalytics from "@/components/analytics/PrivateAnalytics";
-import MicroConversionTracker from "@/components/analytics/MicroConversionTracker";
 import MetricsPanel from "@/components/admin/MetricsPanel-new";
 import TimeBasedOffers from "@/components/conversion/TimeBasedOffers";
 import SmartPricing from "@/components/conversion/SmartPricing";
 import InteractiveComparison from "@/components/conversion/InteractiveComparison";
 import PriorityLoading from "@/components/optimization/PriorityLoading";
 
+// Usando apenas o MicroConversionsTracker corrigido
 import MicroConversionsTracker from "@/components/analytics/MicroConversionsTracker";
 export default function Home() {
   // Scroll to top when navigating to home page
@@ -167,7 +167,7 @@ export default function Home() {
       <ContextualUpsell />
       <AdvancedCheckout />
       <PrivateAnalytics />
-      <MicroConversionTracker />
+      {/* MicroConversionTracker removido para evitar duplicação */}
       <RealTimeScarcity />
       <Comparador3DPlanos />
 

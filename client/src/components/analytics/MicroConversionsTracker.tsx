@@ -1,5 +1,13 @@
 import { useEffect } from 'react';
 
+// Definições de tipagem para interface global
+declare global {
+  interface Window {
+    microConversionsInitialized?: boolean;
+    trackMicroConversion?: (event: string, data: any) => void;
+  }
+}
+
 /**
  * Componente aprimorado para rastreamento de micro-conversões
  * Monitora interações sutis que demonstram interesse, engajamento
@@ -7,14 +15,14 @@ import { useEffect } from 'react';
  */
 export default function MicroConversionsTracker() {
   useEffect(() => {
+    // Configura endpoint para envio de eventos - precisa estar no escopo global do useEffect
+    const analyticsEndpoint = '/api/analytics';
+    
     // Configuração e inicialização do rastreador
     const initializeTracker = () => {
       // Evita duplicar o rastreamento
       if (window.microConversionsInitialized) return;
       window.microConversionsInitialized = true;
-      
-      // Configura endpoint para envio de eventos
-      const analyticsEndpoint = '/api/analytics';
       
       // Rastreia tempo na página
       let pageLoadTime = Date.now();
