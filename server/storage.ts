@@ -32,6 +32,11 @@ export class DatabaseStorage implements IStorage {
       return undefined;
     }
   }
+  
+  // Alias para getUser (para compatibilidade)
+  async getUserById(id: number): Promise<User | undefined> {
+    return this.getUser(id);
+  }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     try {
