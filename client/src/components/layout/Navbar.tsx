@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import LogoSvg from "./LogoSvg";
 import "./Navbar.css";
 
 export default function Navbar() {
@@ -17,7 +18,8 @@ export default function Navbar() {
           {/* Logo */}
           <div className="logo">
             <Link href="/">
-              <div style={{ textDecoration: 'none', fontSize: '1.5rem', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', fontSize: '1.5rem', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>
+                <LogoSvg />
                 <span style={{ color: '#FFC107' }}>Ideia</span><strong>Screen</strong>
               </div>
             </Link>

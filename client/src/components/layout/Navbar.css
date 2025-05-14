@@ -67,15 +67,20 @@
 .btn-login:hover {
   background-color: white;
   color: black;
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 .btn-signup {
   background-color: #FFC107;
   color: black;
+  border: none;
 }
 
 .btn-signup:hover {
   background-color: #ffd65e;
+  box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+  transform: translateY(-2px);
 }
 
 /* Mobile */
