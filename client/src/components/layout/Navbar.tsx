@@ -21,7 +21,7 @@ export default function Navbar() {
           {/* Logo */}
           <div className="logo">
             <Link href="/">
-              <a className="logo-container">
+              <div className="logo-container" style={{ cursor: 'pointer' }}>
                 {/* Logo circular em dispositivos móveis */}
                 <div className="logo-mobile">
                   <LogoSvg width={40} height={40} />
@@ -31,7 +31,7 @@ export default function Navbar() {
                 <div className="logo-desktop">
                   <LogoSvg showText={true} width={180} height={50} />
                 </div>
-              </a>
+              </div>
             </Link>
           </div>
 
@@ -39,16 +39,16 @@ export default function Navbar() {
           <ul className="menu-desktop">
             <li>
               <Link href="/">
-                <a style={{ color: 'white', textDecoration: 'none', fontWeight: 500, cursor: 'pointer' }}>
+                <div style={{ color: 'white', textDecoration: 'none', fontWeight: 500, cursor: 'pointer' }}>
                   Home
-                </a>
+                </div>
               </Link>
             </li>
             <li>
               <Link href="/plans">
-                <a style={{ color: 'white', textDecoration: 'none', fontWeight: 500, cursor: 'pointer' }}>
+                <div style={{ color: 'white', textDecoration: 'none', fontWeight: 500, cursor: 'pointer' }}>
                   Planos
-                </a>
+                </div>
               </Link>
             </li>
           </ul>
@@ -58,9 +58,9 @@ export default function Navbar() {
             {isAuthenticated ? (
               <>
                 <Link href="/generator">
-                  <a className="btn-login">
+                  <div className="btn-login">
                     Gerador
-                  </a>
+                  </div>
                 </Link>
                 <div 
                   className="btn-signup" 
@@ -73,14 +73,14 @@ export default function Navbar() {
             ) : (
               <>
                 <Link href="/login">
-                  <a className="btn-login">
+                  <div className="btn-login">
                     Entrar
-                  </a>
+                  </div>
                 </Link>
                 <Link href="/plans">
-                  <a className="btn-signup">
+                  <div className="btn-signup">
                     Assinar Agora
-                  </a>
+                  </div>
                 </Link>
               </>
             )}
@@ -102,36 +102,36 @@ export default function Navbar() {
         >
           <li>
             <Link href="/">
-              <a 
+              <div 
                 style={{ color: 'white', textDecoration: 'none', fontSize: '16px', display: 'block', padding: '8px 0', cursor: 'pointer' }}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Home
-              </a>
+              </div>
             </Link>
           </li>
           
           {isAuthenticated && (
             <li>
               <Link href="/generator">
-                <a 
+                <div 
                   style={{ color: 'white', textDecoration: 'none', fontSize: '16px', display: 'block', padding: '8px 0', cursor: 'pointer' }}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Gerador de Roteiros
-                </a>
+                </div>
               </Link>
             </li>
           )}
           
           <li>
             <Link href="/plans">
-              <a 
+              <div 
                 style={{ color: 'white', textDecoration: 'none', fontSize: '16px', display: 'block', padding: '8px 0', cursor: 'pointer' }}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Planos
-              </a>
+              </div>
             </Link>
           </li>
           
@@ -151,22 +151,22 @@ export default function Navbar() {
             <>
               <li>
                 <Link href="/login">
-                  <a 
+                  <div 
                     style={{ color: 'white', textDecoration: 'none', fontSize: '16px', display: 'block', padding: '8px 0', cursor: 'pointer' }}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Entrar
-                  </a>
+                  </div>
                 </Link>
               </li>
               <li>
                 <Link href="/plans">
-                  <a 
+                  <div 
                     style={{ color: '#FFC107', textDecoration: 'none', fontSize: '16px', display: 'block', padding: '8px 0', fontWeight: 'bold', cursor: 'pointer' }}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Assinar Agora
-                  </a>
+                  </div>
                 </Link>
               </li>
             </>
