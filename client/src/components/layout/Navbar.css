@@ -1,0 +1,117 @@
+.site-header {
+  background-color: #282c34;
+  padding: 20px 10px;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo a {
+  text-decoration: none;
+  font-size: 1.5rem;
+  color: white;
+  font-weight: bold;
+}
+
+.logo a span {
+  color: #FFC107;
+}
+
+.menu-desktop {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.menu-desktop li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.cta-button {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-login,
+.btn-signup {
+  text-decoration: none;
+  padding: 10px 18px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.btn-login {
+  background-color: transparent;
+  color: white;
+  border: 1px solid white;
+}
+
+.btn-login:hover {
+  background-color: white;
+  color: black;
+}
+
+.btn-signup {
+  background-color: #FFC107;
+  color: black;
+}
+
+.btn-signup:hover {
+  background-color: #ffd65e;
+}
+
+/* Mobile */
+.hamburger {
+  display: none;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+}
+
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  background-color: #282c34;
+  padding: 10px;
+  gap: 10px;
+  list-style: none;
+}
+
+.mobile-menu li a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  display: block;
+  padding: 8px 0;
+}
+
+@media (max-width: 768px) {
+  .menu-desktop, .cta-button {
+    display: none;
+  }
+  .hamburger {
+    display: block;
+  }
+  
+  .mobile-menu.active {
+    display: flex;
+  }
+}
