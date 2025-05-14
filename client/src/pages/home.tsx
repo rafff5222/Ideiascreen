@@ -138,18 +138,10 @@ export default function Home() {
             ]
           })}
         </script>
-        
-        {/* Preload de recursos críticos */}
-        <link 
-          rel="preload" 
-          href="https://cdn-icons-png.flaticon.com/512/196/196578.png" 
-          as="image"
-        />
       </Helmet>
       
       {/* Componentes principais da página */}
       <Hero />
-      <ScriptOfferPopup />
       <Diferenciais />
       <FeaturedTestimonial />
       <UpdatedPricingSection />
@@ -158,43 +150,10 @@ export default function Home() {
       <FAQ />
       <CallToAction />
       
-      {/* Componentes de Conversão */}
-      <OneClickCheckout />
-      {/* Chatbots removidos a pedido do cliente */}
+      {/* Componentes de Conversão Essenciais */}
       <SocialProof />
-      <ClickHeatmap />
-      <Heatmap3D />
-      <MetricsPanel />
-      <TechnicalOptimizations />
-      <MicroInteractions />
-      <NichePersonalization />
-      <BehavioralPricing />
-      <ContextualUpsell />
-      <AdvancedCheckout />
-      <PrivateAnalytics />
-      {/* MicroConversionTracker removido para evitar duplicação */}
-      <RealTimeScarcity />
-      <Comparador3DPlanos />
-
-      <EngagementPersonalization />
-      <ExpressCheckout />
-      <MagicButton />
-      <DynamicSocialProof />
       <CompetitorComparison />
-      <SmartHelpButton />
-      <PurchaseCounter />
-      <ABTestCTA />
-      <SmartFormOptimizer />
-      <TimeBasedOffers />
-      {/* MemoryChatbot também removido */}
-      <SmartPricing />
-      {/* <InteractiveComparison /> - Removido a pedido do cliente */}
-
-      <PriorityLoading />
       <MicroConversionsTracker />
-      <MiniMetricsWidget />
-      <StagedLoading />
-      <TurboLinks />
     </>
   );
 }

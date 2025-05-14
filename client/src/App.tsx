@@ -15,22 +15,7 @@ import Settings from "@/pages/Settings";
 import PlansPage from "@/pages/plans-table";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import ExitPopup from "@/components/ui/exit-popup";
-import UnificadorPrecos from "./components/home/UnificadorPrecos";
-
-// Componentes de analytics e conversão
-import ClickTracker from "@/components/analytics/ClickTracker";
-import RetentionPixel from "@/components/analytics/RetentionPixel";
-import UpsellModal from "@/components/upsell/UpsellModal";
-import SocialProof from "@/components/conversion/SocialProof";
-import OneClickCheckout from "@/components/conversion/OneClickCheckout";
 import ErrorMonitor from "@/components/ErrorMonitor";
-import DiagnosticTool from "@/components/debug/DiagnosticTool";
-
-// Novos componentes de conversão
-import ProgressBarOffer from "@/components/conversion/ProgressBarOffer";
-import PurchaseCounter from "@/components/conversion/PurchaseCounter";
-import DynamicSocialProof from "@/components/conversion/DynamicSocialProof";
 
 function Router() {
   return (
@@ -66,25 +51,8 @@ function App() {
             </main>
             <Footer />
             
-            {/* Unificador de preços em toda a aplicação */}
-            <UnificadorPrecos />
-            
             {/* Analytics e Componentes de Conversão */}
-            <ClickTracker />
-            <RetentionPixel />
-            <UpsellModal />
-            <SocialProof />
-            <OneClickCheckout />
             <ErrorMonitor />
-            <DiagnosticTool />
-            <PurchaseCounter />
-            
-            {/* Exibe componentes apenas na página inicial */}
-            <Route path="/">
-              <ProgressBarOffer />
-              <ExitPopup />
-              <DynamicSocialProof />
-            </Route>
           </div>
         </TooltipProvider>
       </SubscriptionProvider>

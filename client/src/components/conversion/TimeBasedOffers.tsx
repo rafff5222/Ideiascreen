@@ -156,12 +156,11 @@ export default function TimeBasedOffers() {
         bannerElement.id = 'dynamic-time-banner';
         bannerElement.className = `time-based-banner ${bannerClass}`;
         
-        // Insere no topo do body (após qualquer header fixo que possa existir)
-        const header = document.querySelector('header');
-        if (header && header.nextElementSibling) {
-          document.body.insertBefore(bannerElement, header.nextElementSibling);
-        } else {
+        // Insere no topo do body com verificação mais segura
+        try {
           document.body.prepend(bannerElement);
+        } catch (error) {
+          console.error('Erro ao inserir banner:', error);
         }
       } else {
         // Atualiza classes se já existir
