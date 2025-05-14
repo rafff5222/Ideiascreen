@@ -14,8 +14,8 @@ export default function Navbar() {
   // Menu links
   const navLinks = [
     { name: "Home", href: "/", active: location === "/" },
-    { name: "Planos", href: "/planos", active: location === "/planos" },
-    { name: "Roteiros", href: "/roteiros", active: location === "/roteiros" },
+    { name: "Planos", href: "/plans", active: location === "/plans" },
+    { name: "Gerador", href: "/generator", active: location === "/generator" },
   ];
 
   return (
@@ -46,12 +46,19 @@ export default function Navbar() {
             ))}
           </ul>
           
-          {/* Botão de login */}
-          <Link href="/login">
-            <Button className="btn-login bg-amber-500 hover:bg-amber-600 text-white">
-              Login
-            </Button>
-          </Link>
+          {/* Botões de ação */}
+          <div className="flex items-center space-x-2">
+            <Link href="/generator">
+              <Button className="hidden sm:flex bg-gradient-to-r from-amber-500 to-amber-400 text-white font-bold px-4 py-2 rounded-md transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/30 transform hover:-translate-y-0.5">
+                <span className="mr-1">✨</span> Começar Grátis
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button className="btn-login bg-amber-400 hover:bg-amber-300 text-black font-bold px-5 py-2 rounded-md transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/30 transform hover:-translate-y-0.5">
+                Login
+              </Button>
+            </Link>
+          </div>
           
           {/* Menu mobile */}
           <div className="md:hidden">
@@ -86,9 +93,10 @@ export default function Navbar() {
                     {/* Link para começar grátis */}
                     <li>
                       <Link 
-                        href="/roteiros"
+                        href="/generator"
                         className="flex items-center py-2 text-lg text-amber-400 font-medium hover:text-amber-300"
                       >
+                        <span className="mr-2">✨</span>
                         Começar Grátis
                       </Link>
                     </li>
@@ -96,7 +104,7 @@ export default function Navbar() {
                   
                   <div className="pt-4 mt-auto">
                     <Link href="/login">
-                      <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white">
+                      <Button className="w-full bg-amber-400 hover:bg-amber-300 text-black font-bold py-2 rounded-md transition-all duration-300 hover:shadow-lg">
                         Login
                       </Button>
                     </Link>
