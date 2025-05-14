@@ -201,9 +201,14 @@ export default function Generator() {
               
               {/* Estado de carregamento - controlado pelo estado isGenerating */}
               {isGenerating && (
-                <div className="w-full bg-gray-900/80 py-7 rounded-xl mt-4 text-center flex items-center justify-center">
-                  <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-3"></div>
-                  <span className="text-white text-lg">Gerando roteiro profissional...</span>
+                <div className="w-full bg-gray-900/80 py-7 rounded-xl mt-4 text-center flex flex-col items-center justify-center">
+                  <div className="flex items-center mb-3">
+                    <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-3"></div>
+                    <span className="text-white text-lg font-medium">Gerando roteiro profissional...</span>
+                  </div>
+                  <div className="text-gray-400 text-sm max-w-md px-4">
+                    Estamos aplicando técnicas de narrativa cinematográfica para criar um roteiro otimizado para {platforms.find(p => p.id === platform)?.label || platform}
+                  </div>
                 </div>
               )}
               
