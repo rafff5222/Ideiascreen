@@ -14,6 +14,7 @@ export default function Generator() {
   const [showPreview, setShowPreview] = useState(false);
 
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   
   const handleGenerate = () => {
     if (!prompt) {
@@ -22,20 +23,29 @@ export default function Generator() {
     
     // Mostra o estado de carregamento
     setIsGenerating(true);
+    setShowSuccessMessage(false);
     
     // Simula um pequeno atraso para mostrar o carregamento (pode ser removido em produção)
     setTimeout(() => {
       setShowPreview(true);
       setIsGenerating(false);
+      
+      // Mostra mensagem de sucesso
+      setShowSuccessMessage(true);
+      
+      // Esconde a mensagem de sucesso após 5 segundos
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 5000);
     }, 1500);
   };
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10 relative">
           {/* Botão de assinatura secundário */}
-          <div className="absolute top-0 right-0 md:right-4">
+          <div className="absolute top-0 right-0 md:right-4 hidden sm:block">
             <a href="/planos" className="inline-flex items-center gap-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 group relative overflow-hidden">
               <span className="relative z-10">Experimente GRÁTIS por 7 dias</span>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -44,6 +54,16 @@ export default function Generator() {
               
               {/* Efeito de destaque */}
               <div className="absolute -inset-px rounded-full bg-gradient-to-r from-amber-400 to-amber-600 opacity-40 blur-sm group-hover:opacity-60 transition-opacity"></div>
+            </a>
+          </div>
+          
+          {/* Botão de assinatura para mobile (visível apenas em telas pequenas) */}
+          <div className="sm:hidden mb-4">
+            <a href="/planos" className="inline-flex items-center justify-center w-full gap-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 group relative overflow-hidden">
+              <span className="relative z-10">Experimente GRÁTIS</span>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
             </a>
           </div>
           
@@ -222,7 +242,7 @@ export default function Generator() {
             Por que escolher o IDEIASCREEN?
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             <div className="bg-gray-900/50 p-6 rounded-xl border border-gray-700/50 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-amber-500/5 group">
               <div className="w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center mb-4 group-hover:bg-amber-500/30 transition-colors">
                 <Film className="w-6 h-6 text-amber-400" />
@@ -284,7 +304,7 @@ export default function Generator() {
         
         {/* Footer com informações adicionais */}
         <div className="mt-16 border-t border-gray-800 pt-8 pb-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             <div>
               <h3 className="text-amber-400 font-bold text-lg mb-3">Plataformas Suportadas</h3>
               <ul className="text-gray-400 space-y-2 text-sm">
