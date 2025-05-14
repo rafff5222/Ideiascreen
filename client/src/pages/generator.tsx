@@ -114,7 +114,7 @@ export default function Generator() {
                     onValueChange={setPlatform}
                   >
                     <SelectTrigger id="platform" className="bg-gray-900 border-gray-700 text-white focus:ring-amber-500">
-                      <SelectValue placeholder="Escolha a rede social" />
+                      <SelectValue placeholder="Instagram, TikTok, YouTube..." />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-900 border-gray-700 text-white">
                       {platforms.map((item) => (
@@ -142,7 +142,7 @@ export default function Generator() {
                   onValueChange={setStyle}
                 >
                   <SelectTrigger id="style" className="bg-gray-900 border-gray-700 text-white focus:ring-amber-500">
-                    <SelectValue placeholder="Escolha o gênero ou tema" />
+                    <SelectValue placeholder="Dramático, Casual, Humorístico..." />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-900 border-gray-700 text-white">
                     {communicationStyles.map((item) => (
