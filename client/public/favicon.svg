@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="64" height="64">
+  <!-- Definições de gradientes e efeitos -->
+  <defs>
+    <linearGradient id="circleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFC107" />
+      <stop offset="100%" stop-color="#FF9800" />
+    </linearGradient>
+    
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#00000044" />
+    </filter>
+    
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#222222" />
+      <stop offset="100%" stop-color="#000000" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Círculo principal com gradiente -->
+  <circle 
+    cx="50" 
+    cy="50" 
+    r="42" 
+    fill="url(#circleGradient)" 
+    filter="url(#shadow)"
+  />
+  
+  <!-- Círculo interno (estilo carretel de filme) -->
+  <circle cx="50" cy="50" r="36" fill="rgba(255,255,255,0.15)" />
+  
+  <!-- Elementos decorativos - marcadores de quadros de filme -->
+  <rect x="48" y="20" width="4" height="6" rx="1" fill="#00000033" transform="rotate(0, 50, 50)" />
+  <rect x="48" y="20" width="4" height="6" rx="1" fill="#00000033" transform="rotate(45, 50, 50)" />
+  <rect x="48" y="20" width="4" height="6" rx="1" fill="#00000033" transform="rotate(90, 50, 50)" />
+  <rect x="48" y="20" width="4" height="6" rx="1" fill="#00000033" transform="rotate(135, 50, 50)" />
+  <rect x="48" y="20" width="4" height="6" rx="1" fill="#00000033" transform="rotate(180, 50, 50)" />
+  <rect x="48" y="20" width="4" height="6" rx="1" fill="#00000033" transform="rotate(225, 50, 50)" />
+  <rect x="48" y="20" width="4" height="6" rx="1" fill="#00000033" transform="rotate(270, 50, 50)" />
+  <rect x="48" y="20" width="4" height="6" rx="1" fill="#00000033" transform="rotate(315, 50, 50)" />
+  
+  <!-- Texto estilizado "IS" -->
+  <text 
+    x="50" 
+    y="63" 
+    text-anchor="middle" 
+    fill="url(#textGradient)" 
+    font-size="34" 
+    font-family="Arial, sans-serif" 
+    font-weight="bold"
+    letter-spacing="-1"
+    style="text-shadow: 0px 1px 2px rgba(0,0,0,0.3);"
+  >IS</text>
+  
+  <!-- Marca de acento de abertura da câmera -->
+  <circle cx="50" cy="50" r="8" fill="none" stroke="#00000033" stroke-width="2" />
+</svg>

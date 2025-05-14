@@ -3,11 +3,12 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SubscriptionProvider } from "./contexts/SubscriptionContext";
 import { initModelPreloader } from "./lib/modelPreloader";
 import { plausibleAnalytics } from "./lib/analytics-plausible";
 import NotFound from "@/pages/not-found";
+import LimitedTimeOffer from "@/components/conversion/LimitedTimeOffer";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import Generator from "@/pages/generator";
@@ -67,6 +68,7 @@ function App() {
             
             {/* Analytics e Componentes de Conversão */}
             <ErrorMonitor />
+            <LimitedTimeOffer />
           </div>
         </TooltipProvider>
       </SubscriptionProvider>
