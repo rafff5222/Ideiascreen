@@ -16,7 +16,7 @@ export default function Generator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!prompt) {
       return;
     }
@@ -25,10 +25,35 @@ export default function Generator() {
     setIsGenerating(true);
     setShowSuccessMessage(false);
     
-    // Simula um pequeno atraso para mostrar o carregamento (pode ser removido em produção)
-    setTimeout(() => {
+    try {
+      // Fazendo a chamada real para a API
+      const response = await fetch('/api/generate-script', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt,
+          platform,
+          style,
+          // Enviar dados fictícios de subscriptionCheck - em produção isso seria baseado no perfil do usuário
+          subscriptionCheck: {
+            plan: 'free',
+            requestsUsed: 0,
+            requestLimit: 5
+          }
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Falha ao gerar o roteiro. Por favor, tente novamente.');
+      }
+      
+      // Processar resposta (não precisamos neste momento, pois o ContentPreview usa dados simulados)
+      await response.json();
+      
+      // Mostrar a pré-visualização
       setShowPreview(true);
-      setIsGenerating(false);
       
       // Mostra mensagem de sucesso
       setShowSuccessMessage(true);
@@ -37,7 +62,13 @@ export default function Generator() {
       setTimeout(() => {
         setShowSuccessMessage(false);
       }, 5000);
-    }, 1500);
+    } catch (error) {
+      console.error('Erro ao gerar roteiro:', error);
+      // Em um ambiente de produção, você mostraria uma mensagem de erro adequada
+      alert('Ocorreu um erro ao gerar o roteiro. Por favor, tente novamente.');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
