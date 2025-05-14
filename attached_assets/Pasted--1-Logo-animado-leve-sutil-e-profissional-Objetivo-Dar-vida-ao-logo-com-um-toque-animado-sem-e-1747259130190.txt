@@ -1,0 +1,71 @@
+ 1. Logo animado (leve, sutil e profissional)
+Objetivo: Dar vida ao logo com um toque animado (sem exagero).
+
+Sugestão:
+
+Uma pequena rotação da claquete ao passar o mouse (hover).
+
+Alternativa: efeito de “bater claquete”, como se o topo dela fechasse levemente (ótimo para o tema cinema).
+
+Como aplicar no Replit:
+Se seu logo for um SVG (ou tiver uma div específica com classe tipo .logo-icon), adicione este CSS:
+
+css
+Copiar
+Editar
+.logo-icon:hover {
+  animation: clap 0.5s ease-in-out;
+}
+
+@keyframes clap {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+  75% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+Se quiser, posso adaptar o código para sua estrutura exata, só me diga o HTML/SVG da logo que você está usando.
+
+✅ 2. Favicon personalizado (ícone da aba do navegador)
+Objetivo: Reforçar a marca em cada aba do navegador.
+
+Passo a passo no Replit:
+
+Crie ou exporte sua claquete como PNG (quadrado, 64x64px ou 32x32px).
+
+Renomeie como favicon.ico ou favicon.png.
+
+No index.html, dentro do <head>, adicione:
+
+html
+Copiar
+Editar
+<link rel="icon" href="/favicon.png" type="image/png">
+Se quiser, posso gerar um favicon para você com base no visual atual.
+
+✅ 3. Seção de Depoimentos ou Carrossel (“Quem já usou aprova”)
+Objetivo: Dar prova social e aumentar conversão.
+
+Modelo simples em React/HTML:
+
+jsx
+Copiar
+Editar
+<section className="bg-gray-900 py-12 text-white">
+  <h2 className="text-2xl font-bold text-center mb-8">Quem já usou aprova</h2>
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-6 max-w-5xl mx-auto">
+    <div className="bg-gray-800 p-6 rounded-xl shadow-md">
+      <p>"Ferramenta incrível! Me ajudou a escrever meu roteiro em 15 minutos."</p>
+      <span className="block mt-4 font-semibold">🎬 Pedro R., estudante de cinema</span>
+    </div>
+    <div className="bg-gray-800 p-6 rounded-xl shadow-md">
+      <p>"Nunca pensei que IA pudesse entender minha ideia tão bem. Show!"</p>
+      <span className="block mt-4 font-semibold">📽️ Ana C., roteirista independente</span>
+    </div>
+    <div className="bg-gray-800 p-6 rounded-xl shadow-md">
+      <p>"Uso para testar ideias de vídeos pro YouTube. Muito útil!"</p>
+      <span className="block mt-4 font-semibold">🎥 Lucas M., criador de conteúdo</span>
+    </div>
+  </div>
+</section>
+Posso montar o código completo conforme o estilo que você já usa.

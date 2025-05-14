@@ -31,6 +31,23 @@
   cursor: pointer;
 }
 
+/* Animação de claquete para o logo */
+.logo-icon {
+  transition: transform 0.3s ease;
+}
+
+.logo-icon:hover {
+  animation: clap 0.7s ease-in-out;
+}
+
+@keyframes clap {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
+  75% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
 .logo-mobile {
   display: block;
 }

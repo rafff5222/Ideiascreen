@@ -12,12 +12,34 @@ import julianaAvatar from "@/assets/testimonials/juliana.svg";
 
 export default function Hero() {
   return (
-    <section className="hero-section bg-gradient-to-b from-gray-800 to-gray-900 text-white py-20 md:py-28 relative overflow-hidden">
-      {/* Elementos decorativos */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10">
-        <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-amber-400 blur-3xl"></div>
-        <div className="absolute bottom-40 right-10 w-40 h-40 rounded-full bg-blue-600 blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/3 w-20 h-20 rounded-full bg-purple-500 blur-3xl"></div>
+    <section className="hero-section bg-gradient-to-b from-gray-900 to-gray-950 text-white py-20 md:py-28 relative overflow-hidden">
+      {/* Elementos decorativos cinematográficos */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
+        {/* Gradient backdrop */}
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-900/20 via-gray-900/40 to-gray-950 opacity-70"></div>
+        
+        {/* Lens flare effect */}
+        <div className="absolute top-20 -left-20 w-96 h-96 rounded-full bg-amber-500 blur-3xl opacity-20 animate-pulse"></div>
+        <div className="absolute bottom-40 right-10 w-64 h-64 rounded-full bg-blue-600 blur-3xl opacity-10"></div>
+        
+        {/* Film grain overlay */}
+        <div className="absolute inset-0 opacity-30 mix-blend-overlay">
+          <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+            <filter id="noise">
+              <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" />
+              <feColorMatrix type="saturate" values="0" />
+            </filter>
+            <rect width="100%" height="100%" filter="url(#noise)" />
+          </svg>
+        </div>
+        
+        {/* Film frame lines */}
+        <div className="absolute left-0 top-0 w-2 h-full bg-gradient-to-b from-amber-500/0 via-amber-500/20 to-amber-500/0"></div>
+        <div className="absolute right-0 top-0 w-2 h-full bg-gradient-to-b from-amber-500/0 via-amber-500/20 to-amber-500/0"></div>
+        
+        {/* Cinematic widescreen bars */}
+        <div className="absolute top-0 left-0 right-0 h-8 bg-black opacity-80"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-8 bg-black opacity-80"></div>
       </div>
       
       <div className="container mx-auto px-4 relative z-10">
@@ -27,12 +49,23 @@ export default function Hero() {
             <span className="text-amber-400 px-4 py-1 bg-amber-400/10 rounded-full text-sm font-medium">✨ Sua melhor ferramenta para roteiros</span>
           </div>
           
-          <h1 className="mb-6 text-5xl md:text-7xl font-extrabold tracking-tight">
-            <span className="block text-white">Ideia</span>
-            <span className="text-amber-400 relative">
-              Screen
-              <span className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-amber-300 rounded-full transform translate-y-2 opacity-70"></span>
-            </span>
+          <h1 className="mb-8 text-5xl md:text-7xl font-extrabold tracking-tight relative">
+            {/* Decoração de fundo cinemática */}
+            <div className="absolute -left-4 -top-4 w-16 h-16 bg-amber-500 rounded-full filter blur-2xl opacity-20"></div>
+            <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-blue-500 rounded-full filter blur-2xl opacity-10"></div>
+            
+            {/* Título com efeito de profundidade */}
+            <div className="relative">
+              <span className="block text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+                Ideia<span className="text-amber-400">Screen</span>
+              </span>
+              
+              {/* Linha decorativa abaixo do texto */}
+              <div className="h-1 w-32 md:w-48 bg-gradient-to-r from-amber-500 to-amber-300 rounded-full mx-auto mt-4 shadow-lg shadow-amber-500/20"></div>
+              
+              {/* Tagline */}
+              <p className="text-sm md:text-base text-gray-400 mt-3 font-normal">Sua sala de roteiro com IA</p>
+            </div>
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-300 mb-4 max-w-2xl mx-auto leading-relaxed">
