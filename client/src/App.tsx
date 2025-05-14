@@ -17,6 +17,7 @@ import ScriptGenerator from "@/pages/script-generator";
 import Settings from "@/pages/Settings";
 import PlansPage from "@/pages/plans-table";
 import Login from "@/pages/login";
+import Register from "@/pages/register";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ErrorMonitor from "@/components/ErrorMonitor";
@@ -40,6 +41,9 @@ function Router() {
       <Route path="/plans" component={PlansPage} />
       <Route path="/planos" component={PlansPage} />
       <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      <Route path="/signup" component={Register} />
+      <Route path="/cadastro" component={Register} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -77,6 +77,11 @@ export default function Navbar() {
                     Entrar
                   </div>
                 </Link>
+                <Link href="/register">
+                  <div className="btn-register" style={{ margin: '0 10px', color: 'white', fontWeight: 500, cursor: 'pointer' }}>
+                    Criar Conta
+                  </div>
+                </Link>
                 <Link href="/plans">
                   <div className="btn-signup">
                     Assinar Agora

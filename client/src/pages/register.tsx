@@ -11,54 +11,70 @@ import { useToast } from "@/hooks/use-toast";
 import { Sparkles, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
-// Esquema para validação do formulário de login
-const loginSchema = z.object({
+// Esquema para validação do formulário de registro
+const registerSchema = z.object({
+  name: z.string().min(2, { message: "Nome deve ter pelo menos 2 caracteres" }),
   email: z.string().email({ message: "E-mail inválido" }),
   password: z.string().min(6, { message: "Senha deve ter pelo menos 6 caracteres" }),
+  confirmPassword: z.string().min(6, { message: "Confirmação de senha deve ter pelo menos 6 caracteres" }),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "As senhas não coincidem",
+  path: ["confirmPassword"],
 });
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
-export default function Login() {
+export default function Register() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   
-  // Formulário de login
-  const loginForm = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  // Formulário de registro
+  const registerForm = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
-  const onLoginSubmit = async (values: LoginFormValues) => {
+  const onRegisterSubmit = async (values: RegisterFormValues) => {
     try {
       setIsLoading(true);
+      
+      // Simulando um cadastro (em produção, você enviaria para o backend)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Após o cadastro bem-sucedido, fazemos login automaticamente
       const success = await login(values.email, values.password);
       
       if (success) {
         toast({
-          title: "Login realizado com sucesso!",
-          description: "Redirecionando para o gerador de roteiros...",
+          title: "Conta criada com sucesso!",
+          description: "Bem-vindo ao IDEIASCREEN. Redirecionando para o gerador...",
         });
         
-        // Redirecionamento após o login
+        // Redirecionamento após o registro e login
         setTimeout(() => {
           setLocation("/generator");
         }, 1500);
       } else {
         toast({
-          title: "Erro ao fazer login",
-          description: "Verifique suas credenciais e tente novamente.",
+          title: "Conta criada, mas falha ao fazer login automático",
+          description: "Por favor, tente fazer login manualmente.",
           variant: "destructive",
         });
+        
+        setTimeout(() => {
+          setLocation("/login");
+        }, 1500);
       }
     } catch (error) {
       toast({
-        title: "Erro ao fazer login",
+        title: "Erro ao criar conta",
         description: "Ocorreu um erro ao processar sua solicitação.",
         variant: "destructive",
       });
@@ -68,35 +84,51 @@ export default function Login() {
     }
   };
 
-  // A função onRegisterSubmit foi removida pois agora temos uma página dedicada para registro
-
   return (
     <div className="container mx-auto px-4 sm:px-6 py-12">
       <div className="max-w-md mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-amber-600">
-              Acesse
+              Crie
             </span>{" "}
             sua conta
           </h1>
           <p className="text-gray-400 mt-2">
-            Faça login para acessar o gerador de roteiros profissionais
+            Registre-se para acessar o gerador de roteiros profissionais
           </p>
         </div>
 
         <Card className="bg-gray-800/80 backdrop-blur-sm border border-gray-700/50 shadow-xl">
           <CardHeader>
-            <CardTitle className="text-white">Login</CardTitle>
+            <CardTitle className="text-white">Criar Conta</CardTitle>
             <CardDescription>
-              Entre com seu e-mail e senha para acessar sua conta
+              Preencha os dados abaixo para criar sua conta
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Form {...loginForm}>
-              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+            <Form {...registerForm}>
+              <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
                 <FormField
-                  control={loginForm.control}
+                  control={registerForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-white">Nome</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Seu nome completo"
+                          className="bg-gray-900 border-gray-700 text-white"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={registerForm.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
@@ -114,7 +146,7 @@ export default function Login() {
                 />
                 
                 <FormField
-                  control={loginForm.control}
+                  control={registerForm.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
@@ -132,9 +164,28 @@ export default function Login() {
                   )}
                 />
                 
+                <FormField
+                  control={registerForm.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-white">Confirmar Senha</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          className="bg-gray-900 border-gray-700 text-white"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
                 <Button 
                   type="submit"
-                  className="w-full py-5 mt-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+                  className="w-full py-5 mt-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -143,19 +194,20 @@ export default function Login() {
                       Processando...
                     </>
                   ) : (
-                    "Entrar"
+                    <>
+                      <Sparkles className="w-5 h-5 mr-2" />
+                      Criar Conta
+                    </>
                   )}
                 </Button>
               </form>
             </Form>
           </CardContent>
           <CardFooter className="flex justify-center border-t border-gray-700/50 pt-4">
-            <div className="text-sm text-gray-400 flex justify-between w-full">
-              <a href="#" className="text-amber-400 hover:underline">
-                Esqueci minha senha
-              </a>
-              <a href="/register" className="text-amber-400 hover:underline">
-                Criar conta
+            <div className="text-sm text-gray-400">
+              Já tem uma conta?{" "}
+              <a href="/login" className="text-amber-400 hover:underline">
+                Faça login
               </a>
             </div>
           </CardFooter>
