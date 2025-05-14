@@ -152,10 +152,11 @@ export default function Home() {
       {/* Componentes principais da página */}
       <Hero />
       <Diferenciais />
-      <FeaturedTestimonial />
-      <UpdatedPricingSection />
-      <Features />
       <HowItWorks />
+      <Features />
+      <FeaturedTestimonial />
+      <Testimonials />
+      <UpdatedPricingSection />
       <FAQ />
       <CallToAction />
       

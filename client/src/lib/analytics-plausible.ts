@@ -1,107 +1,72 @@
 /**
- * Integração com Plausible Analytics 
- * Uma alternativa ao Google Analytics que respeita privacidade
- * e não requer consentimento de cookies
+ * Analytics utilizando Plausible.io - alternativa leve e respeitosa com privacidade
+ * Não requer cookies e é compatível com bloqueadores de anúncios
  */
 
-// Definição do tipo de envio para o Plausible Analytics
-interface PlausibleEvent {
-  n: string; // nome do evento
-  u: string; // URL
-  d?: string; // domínio (opcional)
-  r?: string; // referenciador (opcional)
-  p?: any; // propriedades personalizadas (opcional)
+// Interface para encapsular as funcionalidades do Plausible
+interface PlausibleInterface {
+  init: () => void;
+  trackPageView: (url?: string) => void;
+  trackEvent: (name: string, props?: Record<string, string | number | boolean>) => void;
 }
 
-// Configuração
-const PLAUSIBLE_URL = 'https://plausible.io/api/event';
-const DOMAIN = window.location.hostname;
-
-// Inicializa o script Plausible
-export function initPlausible(): void {
-  if (document.getElementById('plausible-script')) return;
-  
-  // Adiciona o script ao head
-  const script = document.createElement('script');
-  script.id = 'plausible-script';
-  script.defer = true;
-  script.dataset.domain = DOMAIN;
-  script.src = 'https://plausible.io/js/script.js';
-  
-  document.head.appendChild(script);
-  
-  console.log('Plausible Analytics inicializado');
-}
-
-// Envia um evento personalizado para o Plausible
-export function trackPlausibleEvent(eventName: string, props?: Record<string, any>): void {
-  // Tenta encontrar o objeto plausible global injetado pelo script
-  const plausible = (window as any).plausible;
-  
-  if (typeof plausible === 'function') {
-    // Se o script estiver carregado, usa o método oficial
-    plausible(eventName, { props });
-    return;
-  }
-  
-  // Implementação de fallback enviando diretamente para a API
-  try {
-    const eventData: PlausibleEvent = {
-      n: eventName,
-      u: window.location.href,
-      d: DOMAIN,
-      r: document.referrer || undefined
-    };
-    
-    // Adiciona propriedades personalizadas se existirem
-    if (props) {
-      eventData.p = props;
-    }
-    
-    // Envia o evento para a API do Plausible
-    navigator.sendBeacon(
-      PLAUSIBLE_URL,
-      JSON.stringify(eventData)
-    );
-  } catch (error) {
-    console.error('Erro ao enviar evento para Plausible:', error);
-  }
-}
-
-// Rastreia visualização de página
-export function trackPageView(): void {
-  trackPlausibleEvent('pageview');
-}
-
-// Rastreia conversões e objetivos
-export function trackConversion(goal: string, value?: number): void {
-  trackPlausibleEvent('conversion', { goal, value });
-}
-
-// Rastreia engajamento
-export function trackEngagement(type: string, data?: any): void {
-  trackPlausibleEvent('engagement', { type, ...data });
-}
-
-// Rastreia cliques em CTA
-export function trackCTAClick(ctaId: string, ctaText: string): void {
-  trackPlausibleEvent('CTA Click', { id: ctaId, text: ctaText });
-}
-
-// Rastreia eventos de compra
-export function trackPurchase(planId: string, price: number, currency: string = 'BRL'): void {
-  trackPlausibleEvent('purchase', { planId, price, currency });
-}
-
-// Exporta um único objeto com todos os métodos
-export const plausibleAnalytics = {
-  init: initPlausible,
-  trackEvent: trackPlausibleEvent,
-  trackPageView,
-  trackConversion,
-  trackEngagement,
-  trackCTAClick,
-  trackPurchase
+// Função auxiliar para verificar se estamos em produção
+const isProduction = (): boolean => {
+  return window.location.hostname !== 'localhost' && 
+         !window.location.hostname.includes('127.0.0.1') &&
+         !window.location.hostname.includes('.repl.co');
 };
 
-export default plausibleAnalytics;
+// Implementação do Analytics
+export const plausibleAnalytics: PlausibleInterface = {
+  // Inicializa o Plausible
+  init: () => {
+    // Se não estiver em produção, apenas log para debug
+    if (!isProduction()) {
+      console.log('Plausible Analytics inicializado');
+      return;
+    }
+
+    // Carrega o script do Plausible (versão hospedada pela própria página)
+    const script = document.createElement('script');
+    script.defer = true;
+    script.dataset.domain = window.location.hostname;
+    script.src = "https://plausible.io/js/script.js";
+    document.head.appendChild(script);
+  },
+
+  // Rastreia visualização de página
+  trackPageView: (url?: string) => {
+    // Se não estiver em produção, apenas log para debug
+    if (!isProduction()) {
+      console.log(`Plausible: Página visualizada: ${url || window.location.pathname}`);
+      return;
+    }
+
+    // Se o script do Plausible estiver carregado, rastreia a visualização
+    if (window.plausible) {
+      window.plausible('pageview', { u: url });
+    }
+  },
+
+  // Rastreia evento personalizado
+  trackEvent: (name: string, props?: Record<string, string | number | boolean>) => {
+    // Se não estiver em produção, apenas log para debug
+    if (!isProduction()) {
+      console.log(`Plausible: Evento "${name}"`, props);
+      return;
+    }
+
+    // Se o script do Plausible estiver carregado, rastreia o evento
+    if (window.plausible) {
+      window.plausible(name, { props });
+    }
+  }
+};
+
+// Adiciona o tipo ao objeto Window global
+declare global {
+  interface Window {
+    plausible?: (event: string, options?: { u?: string, props?: Record<string, any> }) => void;
+  }
+}

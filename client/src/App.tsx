@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -19,6 +19,13 @@ import Footer from "@/components/layout/Footer";
 import ErrorMonitor from "@/components/ErrorMonitor";
 
 function Router() {
+  const [location] = useLocation();
+  
+  // Monitorar mudanças de rota para analytics
+  useEffect(() => {
+    plausibleAnalytics.trackPageView(location);
+  }, [location]);
+
   return (
     <Switch>
       <Route path="/" component={Home} />
@@ -42,17 +49,8 @@ function App() {
     
     // Inicializa o Plausible Analytics
     plausibleAnalytics.init();
-    plausibleAnalytics.trackPageView();
     
-    // Monitorar mudanças de rota para analytics
-    const handleRouteChange = () => {
-      plausibleAnalytics.trackPageView();
-    };
-    
-    // Cleanup
-    return () => {
-      // Cleanup se necessário
-    };
+    // Não é necessário chamar trackPageView aqui pois o Router já o faz
   }, []);
   
   return (

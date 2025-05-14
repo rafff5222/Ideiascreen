@@ -1,87 +1,108 @@
-import React from 'react';
-import { FaStar, FaQuoteLeft } from 'react-icons/fa';
-import './TestimonialsStyle.css';
+import { Star } from "lucide-react";
+import amandaAvatar from "@/assets/testimonials/amanda.svg";
+import carlosAvatar from "@/assets/testimonials/carlos.svg";
+import julianaAvatar from "@/assets/testimonials/juliana.svg";
+import marciaAvatar from "@/assets/testimonials/marcia.svg";
 
-interface TestimonialProps {
+// Tipo para os depoimentos
+interface Testimonial {
+  id: number;
   name: string;
-  profession: string;
+  role: string;
   text: string;
-  image: string;
   rating: number;
+  avatar: string;
 }
 
-const Testimonial: React.FC<TestimonialProps> = ({ name, profession, text, image, rating }) => {
-  return (
-    <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-100 flex flex-col h-full testimonial-card">
-      <div className="flex items-center mb-4">
-        <div className="w-12 h-12 rounded-full overflow-hidden mr-4 border-2 border-purple-100">
-          <img src={image} alt={`Foto de ${name}`} className="w-full h-full object-cover testimonial-image" />
-        </div>
-        <div>
-          <h3 className="font-bold text-gray-800">{name}</h3>
-          <p className="text-gray-600 text-sm">{profession}</p>
-        </div>
-      </div>
-      
-      <div className="flex mb-4 testimonial-stars">
-        {[...Array(5)].map((_, i) => (
-          <FaStar 
-            key={i} 
-            className={`${i < rating ? 'star' : 'star-empty'} mr-1`} 
-            size={16} 
-          />
-        ))}
-      </div>
-      
-      <div className="flex-grow">
-        <FaQuoteLeft className="testimonial-quote" size={24} />
-        <p className="text-gray-700 italic">{text}</p>
-      </div>
-    </div>
-  );
-};
+// Array de depoimentos
+const testimonials: Testimonial[] = [
+  {
+    id: 1,
+    name: "Amanda Santos",
+    role: "Influenciadora Digital",
+    text: "Criei roteiros incríveis em questão de minutos! Economizo pelo menos 5 horas por semana e meu engajamento aumentou 40%. Vale cada centavo!",
+    rating: 5,
+    avatar: amandaAvatar,
+  },
+  {
+    id: 2,
+    name: "Carlos Ferreira",
+    role: "Produtor de Conteúdo",
+    text: "Os roteiros gerados pelo plano Premium são incríveis, parecem escritos por um roteirista profissional. A análise do Modo Diretor me ajudou a melhorar a estrutura narrativa.",
+    rating: 5,
+    avatar: carlosAvatar,
+  },
+  {
+    id: 3,
+    name: "Juliana Mendes",
+    role: "YouTuber",
+    text: "O IdeiaScreen transformou minha produção de conteúdo. A funcionalidade de análise de narrativa do plano Profissional é fantástica para quem busca qualidade cinematográfica.",
+    rating: 5,
+    avatar: julianaAvatar,
+  },
+  {
+    id: 4,
+    name: "Márcia Silva",
+    role: "Produtora de Conteúdo",
+    text: "Nunca imaginei que poderia criar roteiros tão profissionais sem experiência prévia. O IdeiaScreen é uma ferramenta indispensável para qualquer criador de conteúdo.",
+    rating: 5,
+    avatar: marciaAvatar,
+  },
+];
 
 export default function Testimonials() {
-  const testimonials: TestimonialProps[] = [
-    {
-      name: "Mariana Silva",
-      profession: "Roteirista independente",
-      text: "O IdeiaScreen revolucionou a forma como escrevo roteiros. Economizo pelo menos 5 horas por semana e a qualidade dos meus projetos melhorou significativamente!",
-      image: "https://randomuser.me/api/portraits/women/12.jpg",
-      rating: 5
-    },
-    {
-      name: "Pedro Almeida",
-      profession: "Diretor de curta-metragens",
-      text: "Minha produtividade dobrou desde que comecei a usar o IdeiaScreen. Os roteiros gerados são incrivelmente bons e as análises do Modo Diretor ajudaram a elevar a qualidade das minhas produções.",
-      image: "https://randomuser.me/api/portraits/men/32.jpg",
-      rating: 4
-    },
-    {
-      name: "Carla Mendes",
-      profession: "Produtora de conteúdo audiovisual",
-      text: "Gerenciamos projetos para 15 clientes e o IdeiaScreen é essencial para nossa operação. A ferramenta se paga em poucos dias e a qualidade dos roteiros é consistentemente excelente.",
-      image: "https://randomuser.me/api/portraits/women/65.jpg",
-      rating: 5
-    }
-  ];
-
   return (
-    <div className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="text-center mb-12">
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-6">
-          O que nossos clientes dizem
-        </h2>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Roteiristas como você estão transformando seus projetos criativos
-        </p>
-      </div>
+    <section className="py-20 bg-gray-900">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
+            O que nossos <span className="text-amber-400">clientes</span> dizem
+          </h2>
+          <p className="text-gray-400 max-w-2xl mx-auto">
+            Veja como o IdeiaScreen tem ajudado criadores de conteúdo a elevar a qualidade de seus roteiros
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        {testimonials.map((testimonial, index) => (
-          <Testimonial key={index} {...testimonial} />
-        ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {testimonials.map((testimonial) => (
+            <div 
+              key={testimonial.id} 
+              className="bg-gray-800 rounded-xl p-6 border border-gray-700 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10 hover:-translate-y-1"
+            >
+              <div className="flex items-center mb-4">
+                <img 
+                  src={testimonial.avatar} 
+                  alt={`Avatar de ${testimonial.name}`} 
+                  className="w-12 h-12 rounded-full mr-3 border-2 border-amber-500"
+                />
+                <div>
+                  <h4 className="text-white font-semibold">{testimonial.name}</h4>
+                  <p className="text-gray-400 text-sm">{testimonial.role}</p>
+                </div>
+              </div>
+
+              <div className="flex mb-4">
+                {[...Array(testimonial.rating)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                ))}
+              </div>
+
+              <p className="text-gray-300 text-sm leading-relaxed">
+                "{testimonial.text}"
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="text-center mt-12">
+          <a 
+            href="/script-generator" 
+            className="inline-block px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg font-semibold transition-all hover:shadow-lg hover:shadow-amber-500/20 hover:-translate-y-1"
+          >
+            Experimente grátis
+          </a>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
