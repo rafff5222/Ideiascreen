@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/sheet";
 import { MenuIcon, Sparkles } from "lucide-react";
 import { SubscriptionBadge } from "@/components/subscription/SubscriptionBadge";
+import { smoothScrollToElement } from "@/lib/scroll-utils";
 
 export default function Navbar() {
   const [location] = useLocation();
@@ -15,12 +16,24 @@ export default function Navbar() {
   
   const isHomePage = location === "/";
   
+  // Efeito para rolar para um elemento se houver um hash na URL ao carregar a página
+  useEffect(() => {
+    if (isHomePage && window.location.hash) {
+      const targetId = window.location.hash.substring(1);
+      
+      // Pequeno atraso para garantir que a página já está totalmente carregada
+      setTimeout(() => {
+        smoothScrollToElement(targetId, { offsetY: 80 });
+      }, 500);
+    }
+  }, [isHomePage, location]);
+  
   // Apenas os itens de menu principais solicitados
   const navLinks = [
-    { name: "Recursos", href: "/#recursos", icon: "📋" },
-    { name: "Como Funciona", href: "/#como-funciona", icon: "🔄" },
+    { name: "Recursos", href: "#recursos", icon: "📋" },
+    { name: "Como Funciona", href: "#como-funciona", icon: "🔄" },
     { name: "Preços", href: "/plans", icon: "💰" },
-    { name: "Depoimentos", href: "/#depoimentos", icon: "💬" },
+    { name: "Depoimentos", href: "#depoimentos", icon: "💬" },
   ];
 
   // Fixed DOM nesting by using div instead of a when using Link component
@@ -39,6 +52,14 @@ export default function Navbar() {
             <a 
               key={link.name}
               href={link.href}
+              onClick={(e) => {
+                // Se for um link de âncora, faça a rolagem suave
+                if (link.href.startsWith('#')) {
+                  e.preventDefault();
+                  const targetId = link.href.substring(1);
+                  smoothScrollToElement(targetId, { offsetY: 80 }); // Compensa altura do cabeçalho
+                }
+              }}
               className="font-black text-2xl px-4 py-3 text-amber-600 hover:text-amber-700 transition border-b-2 border-transparent hover:border-amber-500 mx-2 tracking-wide text-shadow uppercase"
             >
               {link.icon} {link.name}
@@ -101,7 +122,17 @@ export default function Navbar() {
                     key={link.name}
                     href={link.href}
                     className="py-3 text-2xl font-black text-amber-600 hover:text-amber-700 transition flex items-center tracking-wide text-shadow uppercase"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={(e) => {
+                      // Fechar o menu
+                      setIsMenuOpen(false);
+                      
+                      // Se for um link de âncora, faça a rolagem suave
+                      if (link.href.startsWith('#')) {
+                        e.preventDefault();
+                        const targetId = link.href.substring(1);
+                        smoothScrollToElement(targetId, { offsetY: 80 }); // Compensa altura do cabeçalho
+                      }
+                    }}
                   >
                     <span className="mr-3 bg-amber-100 text-amber-600 rounded-full w-12 h-12 flex items-center justify-center">{link.icon}</span>
                     {link.name}
