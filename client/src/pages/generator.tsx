@@ -345,7 +345,7 @@ export default function Generator() {
             </div>
             <p className="text-gray-300 mb-3">Gere roteiros profissionais em segundos, não horas.</p>
             <div className="bg-gray-900/70 p-3 rounded-md text-xs text-gray-400 border border-gray-700/50">
-              <strong className="text-amber-400">Exemplo:</strong> Um roteiro que demoraria 2 horas para escrever manualmente é gerado em apenas 5 segundos.
+              <strong className="text-amber-400">Impacto:</strong> Redução de <span className="text-white font-medium">97%</span> no tempo de criação de conteúdo (de 2 horas para apenas 5 segundos por roteiro).
             </div>
           </div>
           
@@ -360,7 +360,7 @@ export default function Generator() {
             </div>
             <p className="text-gray-300 mb-3">Conteúdo otimizado para os algoritmos das redes sociais.</p>
             <div className="bg-gray-900/70 p-3 rounded-md text-xs text-gray-400 border border-gray-700/50">
-              <strong className="text-amber-400">Exemplo:</strong> Nossos usuários reportam aumento médio de 47% em engajamento após adotar roteiros estruturados.
+              <strong className="text-amber-400">Impacto:</strong> Aumento médio de <span className="text-white font-medium">47%</span> em likes, comentários e compartilhamentos com roteiros estruturados.
             </div>
           </div>
           
@@ -375,11 +375,89 @@ export default function Generator() {
             </div>
             <p className="text-gray-300 mb-3">Nunca mais fique sem ideias para seu conteúdo.</p>
             <div className="bg-gray-900/70 p-3 rounded-md text-xs text-gray-400 border border-gray-700/50">
-              <strong className="text-amber-400">Exemplo:</strong> Transforme um simples conceito como "café da manhã" em 5 abordagens diferentes para 3 plataformas distintas.
+              <strong className="text-amber-400">Impacto:</strong> Aumento de <span className="text-white font-medium">180%</span> na produtividade criativa - transforme um único conceito em múltiplos conteúdos para diferentes plataformas.
             </div>
           </div>
         </div>
         
+        {/* Comparação de Tempo */}
+        <div className="bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-700/50 p-6 mt-12 mb-8 relative overflow-hidden">
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Comparação: Manual vs. IDEIASCREEN
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-900/70 p-4 rounded-lg border border-gray-700/50 relative">
+              <div className="absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-red-500/20 text-red-400">
+                Tradicional
+              </div>
+              <h4 className="text-white font-medium mb-3">Criação Manual de Roteiros</h4>
+              <ul className="space-y-3 text-sm">
+                <li className="flex items-start text-gray-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span>Tempo médio: <span className="text-white font-medium">120-180 minutos</span> por roteiro</span>
+                </li>
+                <li className="flex items-start text-gray-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span>Bloqueio criativo frequente</span>
+                </li>
+                <li className="flex items-start text-gray-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span>Inconsistência na estrutura narrativa</span>
+                </li>
+                <li className="flex items-start text-gray-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span>Apenas 3-5 roteiros por dia</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div className="bg-gray-900/70 p-4 rounded-lg border border-amber-500/20 relative">
+              <div className="absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-green-500/20 text-green-400">
+                IDEIASCREEN
+              </div>
+              <h4 className="text-white font-medium mb-3">Geração com IA Cinematográfica</h4>
+              <ul className="space-y-3 text-sm">
+                <li className="flex items-start text-gray-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Tempo médio: <span className="text-white font-medium">5 segundos</span> por roteiro</span>
+                </li>
+                <li className="flex items-start text-gray-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Inspiração ilimitada com diferentes variações</span>
+                </li>
+                <li className="flex items-start text-gray-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Estrutura narrativa cinematográfica profissional</span>
+                </li>
+                <li className="flex items-start text-gray-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Capacidade para <span className="text-white font-medium">100+</span> roteiros por dia</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
         <div className="bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-700/50 p-8 mt-12 relative overflow-hidden">
           {/* Efeito visual de fundo */}
           <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-blue-500 rounded-full filter blur-3xl opacity-5 pointer-events-none"></div>
