@@ -16,6 +16,14 @@ export default function Navbar() {
   
   const isHomePage = location === "/";
   
+  // Função para verificar se um link está ativo com base na localização atual
+  const isLinkActive = (href: string) => {
+    if (href === '/') {
+      return location === '/';
+    }
+    return location.startsWith(href);
+  };
+  
   // Efeito para rolar para um elemento se houver um hash na URL ao carregar a página
   useEffect(() => {
     if (isHomePage && window.location.hash) {
@@ -28,12 +36,18 @@ export default function Navbar() {
     }
   }, [isHomePage, location]);
   
-  // Apenas os itens de menu principais solicitados
+  // Links principais do menu
   const navLinks = [
-    { name: "Recursos", href: "#recursos", icon: "📋" },
-    { name: "Como Funciona", href: "#como-funciona", icon: "🔄" },
-    { name: "Preços", href: "/plans", icon: "💰" },
-    { name: "Depoimentos", href: "#depoimentos", icon: "💬" },
+    { name: "Início", href: "/", icon: "🏠" },
+    { name: "Gerador de Roteiros", href: "/generator", icon: "✨" },
+    { name: "Dashboard", href: "/dashboard", icon: "📊", badge: { count: 3, color: "bg-amber-500" } },
+    { name: "Configurações", href: "/settings", icon: "⚙️" },
+    
+    // Links secundários
+    { name: "Recursos", href: "#recursos", icon: "📋", secondary: true },
+    { name: "Como Funciona", href: "#como-funciona", icon: "🔄", secondary: true },
+    { name: "Preços", href: "/plans", icon: "💰", secondary: true },
+    { name: "Depoimentos", href: "#depoimentos", icon: "💬", secondary: true },
   ];
 
   // Fixed DOM nesting by using div instead of a when using Link component
@@ -47,24 +61,57 @@ export default function Navbar() {
           </div>
         </Link>
         
-        <div className="hidden md:flex items-center space-x-16">
-          {isHomePage && navLinks.map((link) => (
-            <a 
-              key={link.name}
-              href={link.href}
-              onClick={(e) => {
-                // Se for um link de âncora, faça a rolagem suave
-                if (link.href.startsWith('#')) {
-                  e.preventDefault();
-                  const targetId = link.href.substring(1);
-                  smoothScrollToElement(targetId, { offsetY: 80 }); // Compensa altura do cabeçalho
-                }
-              }}
-              className="font-black text-2xl px-4 py-3 text-amber-600 hover:text-amber-700 transition border-b-2 border-transparent hover:border-amber-500 mx-2 tracking-wide text-shadow uppercase"
-            >
-              {link.icon} {link.name}
-            </a>
-          ))}
+        <div className="hidden md:flex items-center space-x-4">
+          <div className="flex bg-gray-100 rounded-xl p-1 shadow-inner">
+            {navLinks.filter(link => !link.secondary).map((link) => (
+              <Link 
+                key={link.name}
+                href={link.href}
+                className={`font-bold text-lg px-4 py-3 transition mx-1 rounded-lg flex items-center space-x-2 ${
+                  isLinkActive(link.href) 
+                    ? 'bg-white text-amber-700 shadow-md' 
+                    : 'text-amber-600 hover:text-amber-700 hover:bg-white hover:shadow-md'
+                }`}
+              >
+                <div className="relative">
+                  <span className={`rounded-full w-8 h-8 flex items-center justify-center ${
+                    isLinkActive(link.href)
+                      ? 'bg-amber-200 text-amber-700'
+                      : 'bg-amber-100 text-amber-600'
+                  }`}>{link.icon}</span>
+                  
+                  {link.badge && (
+                    <span className={`absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center rounded-full text-xs text-white ${link.badge.color}`}>
+                      {link.badge.count}
+                    </span>
+                  )}
+                </div>
+                <span>{link.name}</span>
+              </Link>
+            ))}
+          </div>
+          
+          {isHomePage && (
+            <div className="flex items-center ml-8 space-x-2">
+              {navLinks.filter(link => link.secondary).map((link) => (
+                <a 
+                  key={link.name}
+                  href={link.href}
+                  onClick={(e) => {
+                    // Se for um link de âncora, faça a rolagem suave
+                    if (link.href.startsWith('#')) {
+                      e.preventDefault();
+                      const targetId = link.href.substring(1);
+                      smoothScrollToElement(targetId, { offsetY: 80 }); // Compensa altura do cabeçalho
+                    }
+                  }}
+                  className="font-medium text-sm px-3 py-2 text-gray-600 hover:text-amber-700 transition border-b-2 border-transparent hover:border-amber-500"
+                >
+                  {link.icon} {link.name}
+                </a>
+              ))}
+            </div>
+          )}
           
           {!isHomePage && (
             <>
@@ -116,28 +163,68 @@ export default function Navbar() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
-              <div className="flex flex-col space-y-6 mt-8">
-                {isHomePage && navLinks.map((link, index) => (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    className="py-3 text-2xl font-black text-amber-600 hover:text-amber-700 transition flex items-center tracking-wide text-shadow uppercase"
-                    onClick={(e) => {
-                      // Fechar o menu
-                      setIsMenuOpen(false);
-                      
-                      // Se for um link de âncora, faça a rolagem suave
-                      if (link.href.startsWith('#')) {
-                        e.preventDefault();
-                        const targetId = link.href.substring(1);
-                        smoothScrollToElement(targetId, { offsetY: 80 }); // Compensa altura do cabeçalho
-                      }
-                    }}
-                  >
-                    <span className="mr-3 bg-amber-100 text-amber-600 rounded-full w-12 h-12 flex items-center justify-center">{link.icon}</span>
-                    {link.name}
-                  </a>
-                ))}
+              <div className="flex flex-col space-y-2 mt-8">
+                <div className="bg-gray-100 rounded-xl p-4 shadow-inner mb-6">
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3 ml-2">Menu Principal</h3>
+                  <div className="space-y-2">
+                    {navLinks.filter(link => !link.secondary).map((link, index) => (
+                      <Link
+                        key={link.name}
+                        href={link.href}
+                        className={`py-3 px-4 rounded-lg text-xl font-bold transition flex items-center ${
+                          isLinkActive(link.href)
+                            ? 'bg-white text-amber-700 shadow-md'
+                            : 'text-amber-600 hover:text-amber-700 hover:bg-white'
+                        }`}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <div className="relative mr-4">
+                          <span className={`rounded-full w-12 h-12 flex items-center justify-center ${
+                            isLinkActive(link.href)
+                              ? 'bg-amber-200 text-amber-700'
+                              : 'bg-amber-100 text-amber-600'
+                          }`}>{link.icon}</span>
+                          
+                          {link.badge && (
+                            <span className={`absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center rounded-full text-xs text-white ${link.badge.color}`}>
+                              {link.badge.count}
+                            </span>
+                          )}
+                        </div>
+                        {link.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+                
+                {isHomePage && (
+                  <div className="bg-gray-100 rounded-xl p-4 shadow-inner">
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3 ml-2">Informações</h3>
+                    <div className="space-y-2">
+                      {navLinks.filter(link => link.secondary).map((link, index) => (
+                        <a
+                          key={link.name}
+                          href={link.href}
+                          className="py-2 px-4 rounded-lg text-lg font-medium text-gray-700 hover:text-amber-700 hover:bg-white transition flex items-center"
+                          onClick={(e) => {
+                            // Fechar o menu
+                            setIsMenuOpen(false);
+                            
+                            // Se for um link de âncora, faça a rolagem suave
+                            if (link.href.startsWith('#')) {
+                              e.preventDefault();
+                              const targetId = link.href.substring(1);
+                              smoothScrollToElement(targetId, { offsetY: 80 }); // Compensa altura do cabeçalho
+                            }
+                          }}
+                        >
+                          <span className="mr-3 bg-gray-200 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center">{link.icon}</span>
+                          {link.name}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 
                 {!isHomePage && (
                   <>
