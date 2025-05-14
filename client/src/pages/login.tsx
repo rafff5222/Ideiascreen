@@ -27,6 +27,14 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { login, isAuthenticated } = useAuth();
+  
+  // Redirecionar se já estiver autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      setLocation("/");
+    }
+  }, [isAuthenticated, setLocation]);
 
   // Inicializar form
   const form = useForm<LoginFormValues>({
@@ -44,7 +52,6 @@ export default function Login() {
       setError(null);
       
       // Utilizar função de login do contexto de autenticação
-      const { login } = useAuth();
       const success = await login(values.email, values.password);
       
       if (success) {

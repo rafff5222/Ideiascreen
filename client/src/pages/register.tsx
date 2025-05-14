@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,6 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle2, ArrowRight, UserPlus } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Esquema de validação
 const registerSchema = z.object({
@@ -40,6 +41,14 @@ export default function Register() {
   const [success, setSuccess] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  
+  // Redirecionar se já estiver autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      setLocation("/");
+    }
+  }, [isAuthenticated, setLocation]);
 
   // Inicializar form
   const form = useForm<RegisterFormValues>({
@@ -78,10 +87,18 @@ export default function Register() {
         variant: "default"
       });
       
-      // Redirecionar após 2 segundos
-      setTimeout(() => {
-        setLocation("/");
-      }, 2000);
+      // Se o registro incluir login automático, verificamos o retorno da API
+      if (data.success && data.autoLogin) {
+        // Fazer login automático após cadastro
+        setTimeout(() => {
+          setLocation("/login");
+        }, 2000);
+      } else {
+        // Redirecionar para login após 2 segundos
+        setTimeout(() => {
+          setLocation("/login");
+        }, 2000);
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Erro ao registrar usuário";
       setError(errorMessage);
