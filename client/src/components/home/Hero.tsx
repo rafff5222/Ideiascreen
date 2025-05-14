@@ -35,8 +35,11 @@ export default function Hero() {
             </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Transforme ideias em roteiros <span className="font-semibold text-amber-300">cinematográficos</span> prontos em <span className="font-semibold text-amber-300">segundos</span>. Com estrutura narrativa profissional e análise de especialistas.
+          <p className="text-xl md:text-2xl text-gray-300 mb-4 max-w-2xl mx-auto leading-relaxed">
+            Crie roteiros incríveis com inteligência artificial.
+          </p>
+          <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+            Transforme suas ideias em histórias prontas para a tela — <span className="font-semibold text-amber-300">rápido</span>, <span className="font-semibold text-amber-300">intuitivo</span> e <span className="font-semibold text-amber-300">profissional</span>. Com estrutura narrativa cinematográfica e análise de especialistas.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-5">
