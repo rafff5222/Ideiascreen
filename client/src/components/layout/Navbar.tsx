@@ -6,7 +6,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { MenuIcon, Sparkles } from "lucide-react";
+import { MenuIcon, Sparkles, Home, Settings, LayoutDashboard } from "lucide-react";
 import { SubscriptionBadge } from "@/components/subscription/SubscriptionBadge";
 import { smoothScrollToElement } from "@/lib/scroll-utils";
 
@@ -38,10 +38,20 @@ export default function Navbar() {
   
   // Links principais do menu
   const navLinks = [
-    { name: "Início", href: "/", icon: "🏠" },
-    { name: "Gerador de Roteiros", href: "/generator", icon: "✨" },
-    { name: "Dashboard", href: "/dashboard", icon: "📊", badge: { count: 3, color: "bg-amber-500" } },
-    { name: "Configurações", href: "/settings", icon: "⚙️" },
+    { name: "Início", href: "/", icon: <Home size={20} /> },
+    { 
+      name: "Gerador de Roteiros", 
+      href: "/generator", 
+      icon: <Sparkles size={22} className="text-white" />,
+      highlight: true
+    },
+    { 
+      name: "Dashboard", 
+      href: "/dashboard", 
+      icon: <LayoutDashboard size={20} />,
+      badge: { count: 3, color: "bg-amber-500" } 
+    },
+    { name: "Configurações", href: "/settings", icon: <Settings size={20} /> },
     
     // Links secundários
     { name: "Recursos", href: "#recursos", icon: "📋", secondary: true },
@@ -53,40 +63,46 @@ export default function Navbar() {
   // Fixed DOM nesting by using div instead of a when using Link component
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center relative">
         <Link href="/">
           <div className="flex items-center space-x-2 cursor-pointer mr-16">
-            <i className="ri-quill-pen-line text-primary text-3xl"></i>
+            <span className="text-3xl">🎬</span>
             <span className="font-poppins font-bold text-2xl text-gray-900 gradient-text">IdeiaScreen</span>
           </div>
         </Link>
         
-        <div className="hidden md:flex items-center space-x-4">
-          <div className="flex bg-gray-100 rounded-xl p-1 shadow-inner">
+        <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2">
+          <span className="text-xs text-gray-500">Assistente IA de Roteiros Profissionais</span>
+        </div>
+        
+        <div className="hidden md:flex items-center space-x-1">
+          <div className="flex bg-gray-100 rounded-xl shadow-inner">
             {navLinks.filter(link => !link.secondary).map((link) => (
               <Link 
                 key={link.name}
                 href={link.href}
-                className={`font-bold text-lg px-4 py-3 transition mx-1 rounded-lg flex items-center space-x-2 ${
-                  isLinkActive(link.href) 
-                    ? 'bg-white text-amber-700 shadow-md' 
-                    : 'text-amber-600 hover:text-amber-700 hover:bg-white hover:shadow-md'
+                className={`relative font-medium text-base transition flex items-center space-x-1 mx-0.5 px-3 py-2.5 ${
+                  link.highlight 
+                    ? 'bg-amber-600 text-white rounded-lg shadow-lg hover:bg-amber-700'
+                    : isLinkActive(link.href) 
+                      ? 'bg-white text-gray-800 rounded-lg shadow-sm' 
+                      : 'text-gray-700 hover:bg-white hover:text-gray-800 hover:rounded-lg hover:shadow-sm'
                 }`}
               >
-                <div className="relative">
-                  <span className={`rounded-full w-8 h-8 flex items-center justify-center ${
-                    isLinkActive(link.href)
-                      ? 'bg-amber-200 text-amber-700'
-                      : 'bg-amber-100 text-amber-600'
-                  }`}>{link.icon}</span>
+                <div className="relative flex items-center justify-center">
+                  {link.icon}
                   
                   {link.badge && (
-                    <span className={`absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center rounded-full text-xs text-white ${link.badge.color}`}>
+                    <span className={`absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-xs text-white ${link.badge.color}`}>
                       {link.badge.count}
                     </span>
                   )}
                 </div>
-                <span>{link.name}</span>
+                <span className="ml-1.5">{link.name}</span>
+                
+                {link.highlight && (
+                  <span className="absolute top-0 right-0 w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
+                )}
               </Link>
             ))}
           </div>
@@ -171,27 +187,29 @@ export default function Navbar() {
                       <Link
                         key={link.name}
                         href={link.href}
-                        className={`py-3 px-4 rounded-lg text-xl font-bold transition flex items-center ${
-                          isLinkActive(link.href)
-                            ? 'bg-white text-amber-700 shadow-md'
-                            : 'text-amber-600 hover:text-amber-700 hover:bg-white'
+                        className={`py-3 px-4 rounded-lg text-lg font-medium transition flex items-center relative ${
+                          link.highlight 
+                            ? 'bg-amber-600 text-white shadow-md hover:bg-amber-700'
+                            : isLinkActive(link.href)
+                              ? 'bg-white text-gray-800 shadow-md'
+                              : 'text-gray-700 hover:text-gray-800 hover:bg-white'
                         }`}
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        <div className="relative mr-4">
-                          <span className={`rounded-full w-12 h-12 flex items-center justify-center ${
-                            isLinkActive(link.href)
-                              ? 'bg-amber-200 text-amber-700'
-                              : 'bg-amber-100 text-amber-600'
-                          }`}>{link.icon}</span>
+                        <div className="relative mr-4 flex items-center justify-center">
+                          {link.icon}
                           
                           {link.badge && (
-                            <span className={`absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center rounded-full text-xs text-white ${link.badge.color}`}>
+                            <span className={`absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-xs text-white ${link.badge.color}`}>
                               {link.badge.count}
                             </span>
                           )}
                         </div>
                         {link.name}
+                        
+                        {link.highlight && (
+                          <span className="absolute top-0 right-0 w-2 h-2 bg-amber-300 rounded-full animate-pulse"></span>
+                        )}
                       </Link>
                     ))}
                   </div>
