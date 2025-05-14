@@ -28,9 +28,9 @@ export default function Navbar() {
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link href="/">
-          <div className="flex items-center space-x-2 cursor-pointer">
-            <i className="ri-quill-pen-line text-primary text-2xl"></i>
-            <span className="font-poppins font-bold text-xl text-gray-900 gradient-text">IdeiaScreen</span>
+          <div className="flex items-center space-x-2 cursor-pointer mr-16">
+            <i className="ri-quill-pen-line text-primary text-3xl"></i>
+            <span className="font-poppins font-bold text-2xl text-gray-900 gradient-text">IdeiaScreen</span>
           </div>
         </Link>
         
@@ -39,7 +39,7 @@ export default function Navbar() {
             <a 
               key={link.name}
               href={link.href}
-              className="font-black text-2xl px-4 py-3 hover:text-primary transition border-b-2 border-transparent hover:border-primary/50 mx-2 tracking-wide text-shadow uppercase"
+              className="font-black text-2xl px-4 py-3 text-amber-600 hover:text-amber-700 transition border-b-2 border-transparent hover:border-amber-500 mx-2 tracking-wide text-shadow uppercase"
             >
               {link.icon} {link.name}
             </a>
@@ -100,10 +100,10 @@ export default function Navbar() {
                   <a
                     key={link.name}
                     href={link.href}
-                    className="py-3 text-2xl font-black hover:text-primary transition flex items-center tracking-wide text-shadow uppercase"
+                    className="py-3 text-2xl font-black text-amber-600 hover:text-amber-700 transition flex items-center tracking-wide text-shadow uppercase"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <span className="mr-3 bg-gray-100 text-primary rounded-full w-10 h-10 flex items-center justify-center">{link.icon}</span>
+                    <span className="mr-3 bg-amber-100 text-amber-600 rounded-full w-12 h-12 flex items-center justify-center">{link.icon}</span>
                     {link.name}
                   </a>
                 ))}
