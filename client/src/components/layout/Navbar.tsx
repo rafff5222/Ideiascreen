@@ -16,12 +16,12 @@ export default function Navbar() {
   const isHomePage = location === "/";
   
   const navLinks = [
-    { name: "Recursos", href: "/#recursos" },
-    { name: "Como Funciona", href: "/#como-funciona" },
-    { name: "Preços", href: "/planos" },
-    { name: "Depoimentos", href: "/#depoimentos" },
-    { name: "Gerador de Roteiros", href: "/roteiros", highlight: true },
-    { name: "Dashboard", href: "/dashboard" },
+    { name: "Recursos", href: "/#recursos", icon: "📋" },
+    { name: "Como Funciona", href: "/#como-funciona", icon: "🔄" },
+    { name: "Preços", href: "/planos", icon: "💰" },
+    { name: "Depoimentos", href: "/#depoimentos", icon: "💬" },
+    { name: "Gerador de Roteiros", href: "/roteiros", highlight: true, icon: "✨" },
+    { name: "Dashboard", href: "/dashboard", icon: "📊" },
   ];
 
   // Fixed DOM nesting by using div instead of a when using Link component
@@ -35,12 +35,12 @@ export default function Navbar() {
           </div>
         </Link>
         
-        <div className="hidden md:flex items-center space-x-8">
+        <div className="hidden md:flex items-center space-x-12">
           {isHomePage && navLinks.map((link) => (
             <a 
               key={link.name}
               href={link.href}
-              className={`font-medium hover:text-primary transition ${link.highlight ? 'text-purple-600 font-semibold' : ''}`}
+              className={`font-semibold text-lg px-3 py-2 hover:text-primary transition border-b-2 border-transparent hover:border-primary/50 ${link.highlight ? 'text-purple-600 font-bold' : ''}`}
             >
               {link.name}
             </a>
@@ -96,14 +96,17 @@ export default function Navbar() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
-              <div className="flex flex-col space-y-4 mt-8">
-                {isHomePage && navLinks.map((link) => (
+              <div className="flex flex-col space-y-6 mt-8">
+                {isHomePage && navLinks.map((link, index) => (
                   <a
                     key={link.name}
                     href={link.href}
-                    className={`py-2 text-lg font-medium hover:text-primary transition ${link.highlight ? 'text-purple-600 font-semibold' : ''}`}
+                    className={`py-3 text-xl font-semibold hover:text-primary transition flex items-center ${
+                      link.highlight ? 'text-purple-600 font-bold' : ''
+                    }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
+                    <span className="mr-3 bg-gray-100 text-primary rounded-full w-10 h-10 flex items-center justify-center">{link.icon}</span>
                     {link.name}
                   </a>
                 ))}
