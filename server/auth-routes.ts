@@ -3,6 +3,13 @@ import { authService } from './auth-service';
 import { registerUserSchema, loginUserSchema } from '@shared/schema';
 import { ZodError } from 'zod';
 
+// Estender o tipo SessionData para incluir o userId
+declare module 'express-session' {
+  interface SessionData {
+    userId: number;
+  }
+}
+
 const router = express.Router();
 
 // Middleware para verificar se o usuário está autenticado
@@ -22,7 +29,7 @@ router.post('/register', async (req, res) => {
     // Registrar o usuário
     const result = await authService.registerUser(userData);
     
-    if (result.success) {
+    if (result.success && result.userId) {
       // Definir o ID do usuário na sessão
       req.session.userId = result.userId;
       

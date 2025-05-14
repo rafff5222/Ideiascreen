@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import dotenv from "dotenv";
+import { createTables } from "./migrations/create-tables";
 
 // Carregando variáveis de ambiente
 dotenv.config();
@@ -48,6 +49,16 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Iniciar migração do banco de dados
+  try {
+    await createTables();
+    console.log('Migração de banco de dados concluída com sucesso!');
+  } catch (error) {
+    console.error('Erro ao realizar migração do banco de dados:', error);
+    // Continuamos mesmo em caso de erro, pois o servidor pode funcionar 
+    // com armazenamento alternativo
+  }
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

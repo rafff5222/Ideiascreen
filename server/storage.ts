@@ -20,77 +20,169 @@ export interface IStorage {
   updateContent(id: number, content: Partial<InsertContent>): Promise<ContentItem | undefined>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private contentItems: Map<number, ContentItem>;
-  private userId: number;
-  private contentId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.contentItems = new Map();
-    this.userId = 1;
-    this.contentId = 1;
-  }
-
-  // User methods (from the existing code)
+export class DatabaseStorage implements IStorage {
+  // User methods
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    try {
+      const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
+      return user;
+    } catch (error) {
+      console.error("Erro ao buscar usuário por ID:", error);
+      return undefined;
+    }
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username
-    );
+    try {
+      const [user] = await db.select().from(users).where(eq(users.username, username)).limit(1);
+      return user;
+    } catch (error) {
+      console.error("Erro ao buscar usuário por nome de usuário:", error);
+      return undefined;
+    }
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.userId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    try {
+      const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+      return user;
+    } catch (error) {
+      console.error("Erro ao buscar usuário por email:", error);
+      return undefined;
+    }
   }
 
-  // Content methods (new)
-  async saveContent(insertContent: InsertContent): Promise<ContentItem> {
-    const id = this.contentId++;
-    const now = new Date();
-    const contentItem: ContentItem = {
-      ...insertContent,
-      id,
-      userId: insertContent.userId ?? null,
-      createdAt: now,
-    };
-    this.contentItems.set(id, contentItem);
-    return contentItem;
+  async createUser(user: InsertUser): Promise<User> {
+    try {
+      const [newUser] = await db.insert(users).values(user).returning();
+      return newUser;
+    } catch (error) {
+      console.error("Erro ao criar usuário:", error);
+      throw new Error("Erro ao criar usuário");
+    }
   }
 
-  async getContentHistory(): Promise<ContentItem[]> {
-    // Sort by most recent first
-    return Array.from(this.contentItems.values()).sort((a, b) => {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
+  async updateUserPlan(userId: number, planType: string, requestsLimit: number): Promise<boolean> {
+    try {
+      await db.update(users)
+        .set({ 
+          planType, 
+          requestsLimit, 
+          updatedAt: new Date() 
+        })
+        .where(eq(users.id, userId));
+      return true;
+    } catch (error) {
+      console.error("Erro ao atualizar plano do usuário:", error);
+      return false;
+    }
+  }
+
+  async incrementUserRequests(userId: number): Promise<boolean> {
+    try {
+      const [user] = await db.select({ requestsUsed: users.requestsUsed })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      if (!user) return false;
+
+      await db.update(users)
+        .set({ 
+          requestsUsed: user.requestsUsed + 1,
+          updatedAt: new Date()
+        })
+        .where(eq(users.id, userId));
+
+      return true;
+    } catch (error) {
+      console.error("Erro ao incrementar requisições do usuário:", error);
+      return false;
+    }
+  }
+
+  async checkUserRequestsAvailable(userId: number): Promise<boolean> {
+    try {
+      const [user] = await db.select({
+        requestsUsed: users.requestsUsed,
+        requestsLimit: users.requestsLimit
+      })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      if (!user) return false;
+
+      return user.requestsUsed < user.requestsLimit;
+    } catch (error) {
+      console.error("Erro ao verificar requisições disponíveis:", error);
+      return false;
+    }
+  }
+
+  // Content methods
+  async saveContent(content: InsertContent): Promise<ContentItem> {
+    try {
+      const [newContent] = await db.insert(contentItems).values(content).returning();
+      return newContent;
+    } catch (error) {
+      console.error("Erro ao salvar conteúdo:", error);
+      throw new Error("Erro ao salvar conteúdo");
+    }
+  }
+
+  async getContentHistory(userId?: number): Promise<ContentItem[]> {
+    try {
+      if (userId) {
+        return await db.select()
+          .from(contentItems)
+          .where(eq(contentItems.userId, userId))
+          .orderBy(contentItems.createdAt);
+      } else {
+        return await db.select()
+          .from(contentItems)
+          .orderBy(contentItems.createdAt);
+      }
+    } catch (error) {
+      console.error("Erro ao obter histórico de conteúdo:", error);
+      return [];
+    }
   }
 
   async getContentById(id: number): Promise<ContentItem | undefined> {
-    return this.contentItems.get(id);
+    try {
+      const [content] = await db.select()
+        .from(contentItems)
+        .where(eq(contentItems.id, id))
+        .limit(1);
+      return content;
+    } catch (error) {
+      console.error("Erro ao buscar conteúdo por ID:", error);
+      return undefined;
+    }
   }
 
   async deleteContent(id: number): Promise<void> {
-    this.contentItems.delete(id);
+    try {
+      await db.delete(contentItems).where(eq(contentItems.id, id));
+    } catch (error) {
+      console.error("Erro ao excluir conteúdo:", error);
+      throw new Error("Erro ao excluir conteúdo");
+    }
   }
 
   async updateContent(id: number, content: Partial<InsertContent>): Promise<ContentItem | undefined> {
-    const existingContent = this.contentItems.get(id);
-    if (!existingContent) return undefined;
-
-    const updatedContent: ContentItem = {
-      ...existingContent,
-      ...content,
-    };
-    this.contentItems.set(id, updatedContent);
-    return updatedContent;
+    try {
+      const [updatedContent] = await db.update(contentItems)
+        .set(content)
+        .where(eq(contentItems.id, id))
+        .returning();
+      return updatedContent;
+    } catch (error) {
+      console.error("Erro ao atualizar conteúdo:", error);
+      return undefined;
+    }
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
