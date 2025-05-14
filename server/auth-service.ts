@@ -132,7 +132,8 @@ export const authService = {
     }
   },
 
-  // Obter informações do usuário
+  // Obter informações do usuário - em auth-service.ts e storage.ts
+  // Esta função existe nas duas classes por compatibilidade e para não quebrar o código existente
   async getUserById(userId: number): Promise<any> {
     try {
       const [foundUser] = await db.select()

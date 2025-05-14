@@ -5,6 +5,7 @@ import { db } from "./db";
 export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
+  getUserById(id: number): Promise<User | undefined>; // Alias para getUser para compatibilidade
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;

@@ -235,7 +235,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.session.userId as number;
       
       // Obter os dados do usuário autenticado
-      const user = await storage.getUserById(userId);
+      const user = await storage.getUser(userId);
       
       if (!user) {
         return res.status(404).json({ error: "Usuário não encontrado" });
@@ -297,7 +297,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Obter usuário atualizado
-      const updatedUser = await storage.getUserById(userId);
+      const updatedUser = await storage.getUser(userId);
       
       if (!updatedUser) {
         return res.status(404).json({ error: "Usuário não encontrado" });
