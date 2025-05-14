@@ -52,32 +52,68 @@ const testimonials: Testimonial[] = [
 
 export default function Testimonials() {
   return (
-    <section className="py-20 bg-gray-900">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
-            O que nossos <span className="text-amber-400">clientes</span> dizem
+    <section className="py-20 bg-gray-900 relative overflow-hidden">
+      {/* Background visual elements */}
+      <div className="absolute inset-0 opacity-10">
+        <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" className="absolute top-0 left-0 opacity-10">
+          <defs>
+            <pattern id="dots-pattern" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="1" fill="white" />
+            </pattern>
+          </defs>
+          <rect x="0" y="0" width="100%" height="100%" fill="url(#dots-pattern)" />
+        </svg>
+        
+        {/* Gradient blobs */}
+        <div className="absolute top-20 -right-32 w-96 h-96 bg-amber-600 opacity-20 rounded-full filter blur-3xl"></div>
+        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-blue-600 opacity-20 rounded-full filter blur-3xl"></div>
+      </div>
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-16">
+          <span className="inline-block px-3 py-1 bg-amber-900/30 text-amber-400 rounded-full text-sm font-medium mb-4">EXPERIÊNCIAS REAIS</span>
+          <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white">
+            O que nossos <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-amber-600">clientes</span> dizem
           </h2>
-          <p className="text-gray-400 max-w-2xl mx-auto">
+          <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-amber-600 mx-auto mb-8 rounded-full"></div>
+          <p className="text-gray-300 max-w-2xl mx-auto text-lg">
             Veja como o IdeiaScreen tem ajudado criadores de conteúdo a elevar a qualidade de seus roteiros
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {testimonials.map((testimonial) => (
             <div 
               key={testimonial.id} 
-              className="bg-gray-800 rounded-xl p-6 border border-gray-700 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10 hover:-translate-y-1"
+              className="bg-gray-800/80 backdrop-blur-sm rounded-xl p-8 border border-gray-700/50 transition-all duration-500 hover:shadow-xl hover:shadow-amber-500/20 hover:-translate-y-2 group relative overflow-hidden"
             >
-              <div className="flex items-center mb-4">
-                <img 
-                  src={testimonial.avatar} 
-                  alt={`Avatar de ${testimonial.name}`} 
-                  className="w-12 h-12 rounded-full mr-3 border-2 border-amber-500"
-                />
+              {/* Card decoration - corner accent */}
+              <div className="absolute -top-1 -right-1 w-20 h-20">
+                <div className="absolute transform rotate-45 bg-gradient-to-r from-amber-500 to-amber-600 text-xs text-black font-bold py-1 right-[-35px] top-[12px] w-[115px] text-center">
+                  Verificado
+                </div>
+              </div>
+              
+              {/* Quote icon */}
+              <div className="absolute top-4 right-6 text-amber-500/30 select-none text-6xl font-serif">"</div>
+              
+              {/* Avatar and user info with better styling */}
+              <div className="flex items-center mb-5">
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-500/70 p-0.5 shadow-lg shadow-amber-500/10 mr-4">
+                    <img 
+                      src={testimonial.avatar} 
+                      alt={`Avatar de ${testimonial.name}`} 
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 bg-green-500 w-5 h-5 rounded-full border-2 border-gray-800 flex items-center justify-center">
+                    <div className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></div>
+                  </div>
+                </div>
                 <div>
-                  <h4 className="text-white font-semibold">{testimonial.name}</h4>
-                  <p className="text-gray-400 text-sm">{testimonial.role}</p>
+                  <h4 className="text-white font-bold">{testimonial.name}</h4>
+                  <p className="text-amber-400 text-sm">{testimonial.role}</p>
                 </div>
               </div>
 
