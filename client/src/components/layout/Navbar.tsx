@@ -18,9 +18,16 @@ export default function Navbar() {
           {/* Logo */}
           <div className="logo">
             <Link href="/">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', fontSize: '1.5rem', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>
-                <LogoSvg />
-                <span style={{ color: '#FFC107' }}>Ideia</span><strong>Screen</strong>
+              <div className="logo-container">
+                {/* Logo circular em dispositivos móveis */}
+                <div className="logo-mobile">
+                  <LogoSvg width={40} height={40} />
+                </div>
+                
+                {/* Logo completo em dispositivos maiores */}
+                <div className="logo-desktop">
+                  <LogoSvg showText={true} width={180} height={50} />
+                </div>
               </div>
             </Link>
           </div>

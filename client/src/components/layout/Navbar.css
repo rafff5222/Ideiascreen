@@ -25,8 +25,29 @@
   font-weight: bold;
 }
 
-.logo a span {
-  color: #FFC107;
+.logo-container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.logo-mobile {
+  display: block;
+}
+
+.logo-desktop {
+  display: none;
+}
+
+/* Em telas maiores, mostramos o logo completo */
+@media (min-width: 768px) {
+  .logo-mobile {
+    display: none;
+  }
+  
+  .logo-desktop {
+    display: block;
+  }
 }
 
 .menu-desktop {
