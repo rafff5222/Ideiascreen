@@ -1,5 +1,7 @@
 import { ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { format, formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 /**
  * Utilitário para combinar classes do Tailwind de forma otimizada
@@ -45,3 +47,47 @@ export const contentTypes = [
   { id: 'storyboard', label: 'Storyboard' },
   { id: 'ideia', label: 'Ideia de conteúdo' }
 ];
+
+/**
+ * Formata data para exibição
+ * @param date - Data para formatar
+ * @param formatStr - String de formato (opcional)
+ */
+export function formatDate(date: Date | string | number, formatStr = 'dd/MM/yyyy') {
+  if (!date) return '';
+  return format(new Date(date), formatStr, { locale: ptBR });
+}
+
+/**
+ * Formata data relativa (ex: "há 5 minutos")
+ * @param date - Data para formatar
+ */
+export function formatRelativeDate(date: Date | string | number) {
+  if (!date) return '';
+  return formatDistanceToNow(new Date(date), { 
+    addSuffix: true,
+    locale: ptBR
+  });
+}
+
+/**
+ * Formata número para moeda (BRL)
+ * @param value - Valor para formatar
+ */
+export function formatCurrency(value: number) {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(value);
+}
+
+/**
+ * Trunca um texto com ... se exceder o tamanho máximo
+ * @param text - Texto para truncar
+ * @param maxLength - Tamanho máximo
+ */
+export function truncateText(text: string, maxLength: number) {
+  if (!text) return '';
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + '...';
+}
