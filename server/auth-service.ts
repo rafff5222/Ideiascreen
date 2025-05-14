@@ -1,6 +1,6 @@
 import { db } from './db';
-import { users, RegisterUser, LoginUser, InsertUser } from '@shared/schema';
-import { eq, and, or } from 'drizzle-orm';
+import { users, RegisterUser, LoginUser, InsertUser, ForgotPassword, ResetPassword } from '@shared/schema';
+import { eq, and, or, isNull, gt } from 'drizzle-orm';
 import * as crypto from 'crypto';
 
 // Função para gerar um hash de senha usando SHA-256 com sal
@@ -214,6 +214,103 @@ export const authService = {
     } catch (error) {
       console.error('Erro ao verificar requisições disponíveis:', error);
       return false;
+    }
+  },
+
+  // Criar token para redefinição de senha
+  async createPasswordResetToken(email: string): Promise<{ success: boolean; message?: string }> {
+    try {
+      // Verificar se o usuário existe
+      const [foundUser] = await db.select({ id: users.id })
+        .from(users)
+        .where(eq(users.email, email))
+        .limit(1);
+
+      if (!foundUser) {
+        // Por questões de segurança, não informamos se o email existe ou não
+        return { 
+          success: true, 
+          message: 'Se o email existir, um link de redefinição será enviado.' 
+        };
+      }
+
+      // Gerar token
+      const token = crypto.randomBytes(32).toString('hex');
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 1); // Token válido por 1 hora
+
+      // Salvar o token e a data de expiração no banco de dados
+      await db.update(users)
+        .set({ 
+          resetPasswordToken: token,
+          resetPasswordExpires: expiresAt,
+          updatedAt: new Date()
+        })
+        .where(eq(users.id, foundUser.id));
+
+      // Aqui implementaríamos o envio de email (em uma aplicação real)
+      // Por enquanto apenas retornamos sucesso
+      console.log(`[DEBUG] Token de redefinição gerado para ${email}: ${token}`);
+
+      return { 
+        success: true, 
+        message: 'Se o email existir, um link de redefinição será enviado.' 
+      };
+
+    } catch (error) {
+      console.error('Erro ao criar token de redefinição:', error);
+      return { 
+        success: false, 
+        message: 'Erro ao processar a solicitação' 
+      };
+    }
+  },
+
+  // Verificar token e redefinir senha
+  async resetPassword(token: string, newPassword: string): Promise<{ success: boolean; message?: string }> {
+    try {
+      // Buscar usuário com o token fornecido
+      const now = new Date();
+      const [foundUser] = await db.select()
+        .from(users)
+        .where(
+          and(
+            eq(users.resetPasswordToken, token),
+            gt(users.resetPasswordExpires!, now) // Token ainda não expirou
+          )
+        )
+        .limit(1);
+
+      if (!foundUser) {
+        return { 
+          success: false, 
+          message: 'Token inválido ou expirado' 
+        };
+      }
+
+      // Criar hash da nova senha
+      const { hash, salt } = hashPassword(newPassword);
+
+      // Atualizar a senha e limpar o token
+      await db.update(users)
+        .set({ 
+          password: `${hash}:${salt}`,
+          resetPasswordToken: null,
+          resetPasswordExpires: null,
+          updatedAt: new Date()
+        })
+        .where(eq(users.id, foundUser.id));
+
+      return { 
+        success: true, 
+        message: 'Senha redefinida com sucesso' 
+      };
+    } catch (error) {
+      console.error('Erro ao redefinir senha:', error);
+      return { 
+        success: false, 
+        message: 'Erro ao redefinir senha' 
+      };
     }
   }
 };

@@ -1,7 +1,8 @@
 import express from 'express';
 import { authService } from './auth-service';
-import { registerUserSchema, loginUserSchema } from '@shared/schema';
+import { registerUserSchema, loginUserSchema, forgotPasswordSchema, resetPasswordSchema } from '@shared/schema';
 import { ZodError } from 'zod';
+import crypto from 'crypto';
 
 // Estender o tipo SessionData para incluir o userId
 declare module 'express-session' {
