@@ -11,6 +11,9 @@ import { generateScript } from './generate-script';
 import { fallbackScriptGeneration } from './fallback-generator';
 import { analyzeAsCritic } from "./critics-analysis";
 import { nanoid } from 'nanoid';
+import session from 'express-session';
+import authRoutes, { isAuthenticated, incrementUserRequests } from './auth-routes';
+import connectPgSimple from 'connect-pg-simple';
 
 // Diretórios padrão para armazenamento de arquivos
 const TMP_DIR = path.join(process.cwd(), 'tmp');
@@ -93,14 +96,39 @@ function broadcastTaskUpdate(task: ProcessingTask) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Adicionar rota para o gerador de roteiros
-  app.post('/api/generate-script', generateScript);
+  // Configurar sessões usando PostgreSQL para armazenamento
+  const PgSessionStore = connectPgSimple(session);
+  const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 semana
+  
+  // Configurar sessão
+  app.use(session({
+    store: new PgSessionStore({
+      conString: process.env.DATABASE_URL,
+      createTableIfMissing: true, // Criar a tabela de sessões se não existir
+      tableName: 'sessions',
+      ttl: sessionTtl
+    }),
+    secret: process.env.SESSION_SECRET || 'desenvolvimento_apenas',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: sessionTtl
+    }
+  }));
+  
+  // Incluir rotas de autenticação
+  app.use('/api/auth', authRoutes);
+  
+  // Adicionar rota para o gerador de roteiros (protegida)
+  app.post('/api/generate-script', isAuthenticated, generateScript, incrementUserRequests);
   
   // Rota alternativa que usa o gerador de fallback (sem depender de APIs externas)
-  app.post('/api/generate-script/fallback', fallbackScriptGeneration);
+  app.post('/api/generate-script/fallback', isAuthenticated, fallbackScriptGeneration, incrementUserRequests);
   
-  // Rota para análise de roteiro por crítico de cinema
-  app.post('/api/analyze-script', analyzeAsCritic);
+  // Rota para análise de roteiro por crítico de cinema (protegida)
+  app.post('/api/analyze-script', isAuthenticated, analyzeAsCritic, incrementUserRequests);
   
   /**
    * Endpoint para obter dados dos planos de assinatura
@@ -201,19 +229,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   /**
    * Endpoint para obter dados da assinatura do usuário
    */
-  app.get("/api/user/subscription", async (req: Request, res: Response) => {
+  app.get("/api/user/subscription", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      // Em uma implementação real, você obteria os dados do usuário autenticado
-      // Por exemplo: const user = await storage.getUserById(req.user.id);
+      // Obter ID do usuário da sessão
+      const userId = req.session.userId as number;
       
-      // Para fins de demonstração, retornamos um usuário com plano gratuito
+      // Obter os dados do usuário autenticado
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+      
+      // Obter informações de assinatura do usuário
       const subscription = {
-        plan: 'free',
-        requestsUsed: 0,
-        requestLimit: 3,
-        exportFormats: ['txt'],
-        planStartDate: new Date().toISOString(),
-        planRenewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 dias
+        plan: user.planType,
+        requestsUsed: user.requestsUsed,
+        requestLimit: user.requestsLimit,
+        exportFormats: user.planType === 'free' 
+          ? ['txt'] 
+          : user.planType === 'starter' 
+            ? ['txt', 'pdf'] 
+            : ['txt', 'pdf', 'fdx'],
+        planStartDate: user.createdAt.toISOString(),
+        planRenewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 dias a partir de agora (simplificação)
       };
       
       return res.json(subscription);
@@ -226,9 +265,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   /**
    * Endpoint para atualizar dados da assinatura
    */
-  app.post("/api/user/subscription", async (req: Request, res: Response) => {
+  app.post("/api/user/subscription", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const { plan } = req.body;
+      const userId = req.session.userId as number;
       
       if (!plan) {
         return res.status(400).json({ error: "Dados da assinatura inválidos" });
@@ -240,26 +280,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Plano inválido" });
       }
       
-      // Em uma implementação real, você atualizaria os dados do usuário no banco de dados
-      // Por exemplo: await storage.updateUserSubscription(req.user.id, plan);
-      
       // Determinar limite de requisições com base no plano
       let requestLimit = 3;
-      let exportFormats = ['txt'];
       
       if (plan === 'starter') {
         requestLimit = 30;
-        exportFormats = ['txt', 'pdf'];
       } else if (plan === 'pro') {
-        requestLimit = -1; // Ilimitado
-        exportFormats = ['txt', 'pdf', 'fdx'];
+        requestLimit = 1000; // Um valor alto para representar quase ilimitado
       }
+      
+      // Atualizar o plano do usuário no banco de dados
+      const success = await storage.updateUserPlan(userId, plan, requestLimit);
+      
+      if (!success) {
+        return res.status(500).json({ error: "Erro ao atualizar assinatura" });
+      }
+      
+      // Obter usuário atualizado
+      const updatedUser = await storage.getUserById(userId);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+      
+      // Determinar formatos de exportação disponíveis
+      const exportFormats = plan === 'free' 
+        ? ['txt'] 
+        : plan === 'starter' 
+          ? ['txt', 'pdf'] 
+          : ['txt', 'pdf', 'fdx'];
       
       // Retornar dados atualizados da assinatura
       const subscription = {
-        plan,
-        requestsUsed: 0, // Reset ao mudar de plano
-        requestLimit,
+        plan: updatedUser.planType,
+        requestsUsed: updatedUser.requestsUsed,
+        requestLimit: updatedUser.requestsLimit,
         exportFormats,
         planStartDate: new Date().toISOString(),
         planRenewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 dias

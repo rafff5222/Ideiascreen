@@ -1,14 +1,20 @@
-import { users, type User, type InsertUser, ContentItem, InsertContent } from "@shared/schema";
+import { users, type User, type InsertUser, contentItems, ContentItem, InsertContent } from "@shared/schema";
+import { eq } from "drizzle-orm";
+import { db } from "./db";
 
 export interface IStorage {
-  // User methods (from the existing code)
+  // User methods
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUserPlan(userId: number, planType: string, requestsLimit: number): Promise<boolean>;
+  incrementUserRequests(userId: number): Promise<boolean>;
+  checkUserRequestsAvailable(userId: number): Promise<boolean>;
   
-  // Content methods (new)
+  // Content methods
   saveContent(content: InsertContent): Promise<ContentItem>;
-  getContentHistory(): Promise<ContentItem[]>;
+  getContentHistory(userId?: number): Promise<ContentItem[]>;
   getContentById(id: number): Promise<ContentItem | undefined>;
   deleteContent(id: number): Promise<void>;
   updateContent(id: number, content: Partial<InsertContent>): Promise<ContentItem | undefined>;

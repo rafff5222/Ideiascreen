@@ -1,6 +1,6 @@
 import { db } from './db';
 import { users, RegisterUser, LoginUser, InsertUser } from '@shared/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, or } from 'drizzle-orm';
 import * as crypto from 'crypto';
 
 // Função para gerar um hash de senha usando SHA-256 com sal
