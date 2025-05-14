@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import dotenv from "dotenv";
 import { createTables } from "./migrations/create-tables";
+import addResetPasswordFields from "./migrations/add-reset-password-fields";
 
 // Carregando variáveis de ambiente
 dotenv.config();
@@ -52,6 +53,8 @@ app.use((req, res, next) => {
   // Iniciar migração do banco de dados
   try {
     await createTables();
+    // Adicionar campos de redefinição de senha
+    await addResetPasswordFields();
     console.log('Migração de banco de dados concluída com sucesso!');
   } catch (error) {
     console.error('Erro ao realizar migração do banco de dados:', error);

@@ -38,12 +38,5 @@ async function main() {
   }
 }
 
-main()
-  .then(() => {
-    console.log("Migração concluída com sucesso!");
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error("Erro na migração:", error);
-    process.exit(1);
-  });
+// Exportando a função main para que possa ser chamada de forma controlada
+export default main;
