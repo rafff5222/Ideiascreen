@@ -34,3 +34,14 @@ export const communicationStyles = [
   { id: 'motivacional', label: 'Motivacional' },
   { id: 'storytelling', label: 'Storytelling' }
 ];
+
+/**
+ * Tipos de conteúdo disponíveis
+ */
+export const contentTypes = [
+  { id: 'roteiro', label: 'Roteiro' },
+  { id: 'legenda', label: 'Legenda' },
+  { id: 'script', label: 'Script' },
+  { id: 'storyboard', label: 'Storyboard' },
+  { id: 'ideia', label: 'Ideia de conteúdo' }
+];
