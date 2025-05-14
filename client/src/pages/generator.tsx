@@ -548,12 +548,35 @@ export default function Generator() {
               </div>
               <p className="text-gray-300">Crie roteiros profissionais em segundos, não horas — diga adeus ao bloqueio criativo</p>
               
-              {/* Ilustração de economia de tempo */}
-              <div className="mt-4 flex items-center space-x-2">
-                <div className="h-2 w-16 bg-red-500/50 rounded"></div>
-                <div className="text-xs text-gray-500">vs</div>
-                <div className="h-2 w-2 bg-green-500/50 rounded"></div>
-                <div className="text-xs text-gray-400 ml-1">Economize até 99% do seu tempo</div>
+              {/* Exemplo prático com métricas */}
+              <div className="mt-4 p-3 bg-gray-800/70 rounded-md border border-gray-700/50">
+                <div className="text-xs text-gray-400 mb-2 font-medium">Exemplo prático:</div>
+                
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-xs text-red-300">Manual: <span className="font-medium text-white">120 min</span></span>
+                  </div>
+                  <div className="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span className="text-xs text-green-300">IDEIASCREEN: <span className="font-medium text-white">5 seg</span></span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2 mb-2">
+                  <div className="h-2 w-full bg-gray-700 rounded-full overflow-hidden relative">
+                    <div className="absolute left-0 top-0 h-full w-[99.93%] bg-green-500 rounded-full"></div>
+                    <div className="absolute right-0 top-0 h-full w-[0.07%] bg-red-400 rounded-full"></div>
+                  </div>
+                </div>
+                
+                <div className="text-xs text-center text-gray-400">
+                  Crie <span className="text-white">1440+</span> roteiros no tempo que levaria para fazer apenas 1 manualmente
+                </div>
               </div>
             </div>
           </div>
