@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Conteúdo para Redes Sociais | Gere Scripts e Legendas em Segundos</title>
+    <meta name="description" content="Crie conteúdo de alta qualidade para Instagram, TikTok e outras redes sociais em poucos cliques. Experimente agora!" />
+    <style>
+        /* Estilos básicos */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #FFCC00;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #FFCC00;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .benefits {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+        }
+        .benefit {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .benefit i {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="logo.png" alt="Logo" width="100">
+            </div>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Planos</a></li>
+                <li><button>Entrar</button></li>
+                <li><button style="background-color: #FFCC00;">Assinar Agora</button></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="container">
+        <h1>Gerador de Conteúdo Para Redes Sociais</h1>
+        <p>Gere scripts, legendas e ideias para suas redes sociais em segundos</p>
+        <form>
+            <label for="platform">Escolha a rede social:</label>
+            <select id="platform" name="platform">
+                <option value="instagram">Instagram</option>
+                <option value="tiktok">TikTok</option>
+                <option value="facebook">Facebook</option>
+            </select>
+            <label for="genre">Escolha o gênero ou tema:</label>
+            <select id="genre" name="genre">
+                <option value="drama">Dramático</option>
+                <option value="comedy">Cômico</option>
+                <option value="educational">Educacional</option>
+            </select>
+            <label for="idea">Digite sua ideia ou tópico:</label>
+            <input type="text" id="idea" name="idea" placeholder="Ex: Como ganhar seguidores no Instagram">
+            <button type="submit">Gerar Conteúdo Agora</button>
+        </form>
+        <section class="benefits">
+            <div class="benefit">
+                <i class="fas fa-clock"></i>
+                <h3>Economize tempo</h3>
+                <p>Crie conteúdo de qualidade em segundos, não horas.</p>
+            </div>
+            <div class="benefit">
+                <i class="fas fa-chart-line"></i>
+                <h3>Aumente engajamento</h3>
+                <p>Conteúdo otimizado para maximizar alcance e interação.</p>
+            </div>
+            <div class="benefit">
+                <i class="fas fa-lightbulb"></i>
+                <h3>Nunca fique sem ideias</h3>
+                <p>Inspiração constante para todas as plataformas e nichos.</p>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>© 2023 Gerador de Conteúdo para Redes Sociais. Todos os direitos reservados.</p>
+        <p><a href="#">Termos de Uso</a> | <a href="#">Política de Privacidade</a></p>
+    </footer>
+</body>
+</html>
