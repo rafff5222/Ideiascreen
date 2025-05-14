@@ -63,10 +63,10 @@ export default function Home() {
   return (
     <>
       <Helmet>
-        <title>IdeiaScreen - Crie Roteiros Profissionais e Cinematográficos com IA</title>
+        <title>IdeiaScreen – Crie Roteiros com IA</title>
         <meta 
           name="description" 
-          content="Crie roteiros profissionais para vídeos, podcasts e apresentações em segundos usando IA. Estrutura narrativa profissional e resultados impressionantes."
+          content="IdeiaScreen – Gere roteiros cinematográficos com inteligência artificial. Transforme suas ideias em roteiros prontos para a tela usando IA avançada."
         />
         <meta 
           name="keywords" 
@@ -74,11 +74,11 @@ export default function Home() {
         />
         <meta 
           property="og:title" 
-          content="IdeiaScreen - Roteiros Profissionais Gerados por IA" 
+          content="IdeiaScreen – Crie Roteiros com IA" 
         />
         <meta 
           property="og:description" 
-          content="Transforme ideias em roteiros cinematográficos em segundos. IA especializada em narrativa com estrutura profissional."
+          content="Transforme suas ideias em roteiros prontos para a tela usando IA avançada. IA especializada em narrativa com estrutura profissional."
         />
         <meta 
           property="og:image" 
@@ -86,7 +86,7 @@ export default function Home() {
         />
         <meta 
           property="og:url" 
-          content="https://seusite.com/gerador-roteiros" 
+          content="https://ideiascreen.com.br" 
         />
         <meta name="twitter:card" content="summary_large_image" />
         
@@ -108,8 +108,8 @@ export default function Home() {
               },
               {
                 "@type": "Offer",
-                "name": "Iniciante",
-                "price": "27.90",
+                "name": "Starter",
+                "price": "29.90",
                 "priceCurrency": "BRL"
               },
               {
@@ -130,7 +130,12 @@ export default function Home() {
               "ratingValue": "4.8",
               "ratingCount": "2400"
             },
-            "featureList": "37 gêneros cinematográficos, Análise de Crítico de Cinema, Modo Diretor, Exportação em múltiplos formatos"
+            "featureList": "37 gêneros cinematográficos, Análise de Crítico de Cinema, Modo Diretor, Exportação em múltiplos formatos",
+            "sameAs": [
+              "https://facebook.com/ideiascreen",
+              "https://instagram.com/ideiascreen",
+              "https://twitter.com/ideiascreen"
+            ]
           })}
         </script>
         
