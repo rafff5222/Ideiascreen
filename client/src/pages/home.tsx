@@ -82,13 +82,22 @@ export default function Home() {
         />
         <meta 
           property="og:image" 
-          content="https://contentpro.com.br/social-preview.jpg" 
+          content="https://ideiascreen.com.br/social-preview.jpg" 
         />
         <meta 
           property="og:url" 
           content="https://ideiascreen.com.br" 
         />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="IdeiaScreen – Crie Roteiros com IA" />
+        <meta name="twitter:description" content="Transforme suas ideias em roteiros prontos para a tela usando IA avançada." />
+        <meta name="twitter:image" content="https://ideiascreen.com.br/social-preview.jpg" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="IdeiaScreen" />
+        <meta property="og:locale" content="pt_BR" />
+        
+        {/* Palavras-chave adicionais para SEO */}
+        <meta name="keywords" content="gerador de roteiros, roteiro com IA, inteligência artificial para roteiros, textos criativos, criação de conteúdo automático, assistente de escrita" />
         
         {/* Schema.org markup para melhorar a visualização nos resultados do Google */}
         <script type="application/ld+json">

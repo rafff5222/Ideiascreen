@@ -114,9 +114,37 @@
   }
   .hamburger {
     display: block;
+    cursor: pointer;
+    font-size: 28px;
+    transition: transform 0.3s ease;
+  }
+  
+  .hamburger:hover {
+    transform: scale(1.1);
   }
   
   .mobile-menu.active {
     display: flex;
+    animation: slideDown 0.3s ease-in-out;
+  }
+  
+  .navbar {
+    padding: 10px 0;
+  }
+  
+  .logo svg {
+    width: 32px;
+    height: 32px;
+  }
+  
+  @keyframes slideDown {
+    0% {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }

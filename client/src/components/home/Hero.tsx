@@ -40,7 +40,7 @@ export default function Hero() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-5">
-            <Link href="/roteiros">
+            <Link href="/script-generator">
               <div className="btn btn-primary bg-gradient-to-r from-amber-500 to-amber-600 text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-amber-500/20 transition-all duration-300 inline-block transform hover:-translate-y-1 cursor-pointer">
                 <span className="flex items-center justify-center">
                   <Sparkles className="w-5 h-5 mr-2" />

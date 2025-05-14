@@ -1,53 +1,63 @@
 import {
-  Camera,
-  Edit3,
-  Compass,
-  Zap,
+  BookText,
+  Sparkles,
+  PenTool,
+  FileText,
   BarChart2,
   Clock,
   Film,
-  AlarmClock
+  Zap,
+  ThumbsUp,
+  Download,
+  History,
+  Save,
+  PieChart,
+  Lightbulb,
+  FileCheck,
+  Video,
+  Bookmark,
+  Brain
 } from "lucide-react";
 
 export default function Features() {
   const features = [
     {
-      icon: <Edit3 className="h-10 w-10 text-primary" />,
+      icon: <BookText className="h-10 w-10 text-amber-400" />,
       title: "Geração de Scripts",
       description: "Crie roteiros envolventes para Stories e Reels com a nossa IA treinada para gerar conteúdo viral."
     },
     {
-      icon: <Compass className="h-10 w-10 text-primary" />,
+      icon: <Lightbulb className="h-10 w-10 text-amber-400" />,
       title: "Ideias de Conteúdo",
       description: "Nunca mais fique sem ideias. Nossa IA sugere tópicos relevantes para seu nicho e público-alvo."
     },
     {
-      icon: <Zap className="h-10 w-10 text-primary" />,
+      icon: <FileText className="h-10 w-10 text-amber-400" />,
       title: "Legendas Otimizadas",
       description: "Aumente seu engajamento com legendas criadas para maximizar comentários, curtidas e compartilhamentos."
     },
     {
-      icon: <BarChart2 className="h-10 w-10 text-primary" />,
+      icon: <Bookmark className="h-10 w-10 text-amber-400" />,
       title: "Hashtags Estratégicas",
       description: "Conjuntos de hashtags personalizadas para cada tipo de conteúdo, aumentando seu alcance orgânico."
     },
     {
-      icon: <Film className="h-10 w-10 text-primary" />,
+      icon: <Brain className="h-10 w-10 text-amber-400" />,
       title: "Modo Diretor",
       description: "Análise cinematográfica profissional que aprimora seus roteiros com sugestões de estrutura narrativa."
     },
     {
-      icon: <AlarmClock className="h-10 w-10 text-primary" />,
+      icon: <Clock className="h-10 w-10 text-amber-400" />,
       title: "Economia de Tempo",
       description: "Reduza em até 80% o tempo gasto criando conteúdo para suas redes sociais."
     },
     {
-      icon: <Camera className="h-10 w-10 text-primary" />,
+      icon: <FileCheck className="h-10 w-10 text-amber-400" />,
       title: "Templates Premium",
       description: "Biblioteca com dezenas de templates profissionais para Stories, Reels e vídeos verticais."
     },
     {
-      icon: <Clock className="h-10 w-10 text-primary" />,
+      icon: <PieChart className="h-10 w-10 text-amber-400" />,
       title: "Cronograma Inteligente",
       description: "Sugestões de calendário editorial baseadas nos melhores horários para seu público específico."
     }
