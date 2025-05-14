@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AlertCircle, Users, ShoppingCart } from 'lucide-react';
+import { Portal } from '@/components/ui/portal';
 
 type Purchase = {
   id: number;
@@ -84,20 +85,22 @@ export default function SocialProof() {
     };
   }, []);
   
-  // Renderiza notificação de visitantes ativos
+  // Renderiza notificação de visitantes ativos (usando Portal)
   const renderVisitorsNotification = () => {
     return (
-      <div className="fixed bottom-5 left-5 bg-white shadow-lg rounded-lg p-3 max-w-xs z-30 flex items-center border border-gray-200 animate-fade-in">
-        <div className="bg-blue-100 rounded-full p-2 mr-3">
-          <Users size={16} className="text-blue-600" />
+      <Portal>
+        <div className="fixed bottom-5 left-5 bg-white shadow-lg rounded-lg p-3 max-w-xs z-30 flex items-center border border-gray-200 animate-fade-in">
+          <div className="bg-blue-100 rounded-full p-2 mr-3">
+            <Users size={16} className="text-blue-600" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-800">
+              <span className="font-bold text-blue-600">{visitorsCount}</span> pessoas estão vendo esta página
+            </p>
+            <p className="text-xs text-gray-500">Nos últimos 15 minutos</p>
+          </div>
         </div>
-        <div>
-          <p className="text-sm font-medium text-gray-800">
-            <span className="font-bold text-blue-600">{visitorsCount}</span> pessoas estão vendo esta página
-          </p>
-          <p className="text-xs text-gray-500">Nos últimos 15 minutos</p>
-        </div>
-      </div>
+      </Portal>
     );
   };
   
@@ -106,20 +109,23 @@ export default function SocialProof() {
     return null;
   }
   
+  // Usar Portal para renderizar fora da hierarquia do DOM
   return (
-    <div className="fixed bottom-5 right-5 bg-white shadow-lg rounded-lg p-3 max-w-xs z-30 flex items-center border border-gray-200 animate-slide-in">
-      <div className="bg-green-100 rounded-full p-2 mr-3">
-        <ShoppingCart size={16} className="text-green-600" />
+    <Portal>
+      <div className="fixed bottom-5 right-5 bg-white shadow-lg rounded-lg p-3 max-w-xs z-30 flex items-center border border-gray-200 animate-slide-in">
+        <div className="bg-green-100 rounded-full p-2 mr-3">
+          <ShoppingCart size={16} className="text-green-600" />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-gray-800">
+            <span className="font-bold">{currentPurchase.name}</span> comprou
+          </p>
+          <p className="text-xs">
+            <span className="font-medium text-green-600">Plano {currentPurchase.plan}</span>
+            <span className="text-gray-500"> • {currentPurchase.timeAgo}</span>
+          </p>
+        </div>
       </div>
-      <div>
-        <p className="text-sm font-medium text-gray-800">
-          <span className="font-bold">{currentPurchase.name}</span> comprou
-        </p>
-        <p className="text-xs">
-          <span className="font-medium text-green-600">Plano {currentPurchase.plan}</span>
-          <span className="text-gray-500"> • {currentPurchase.timeAgo}</span>
-        </p>
-      </div>
-    </div>
+    </Portal>
   );
 }

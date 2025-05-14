@@ -48,7 +48,7 @@ export default function Hero() {
                 </span>
               </div>
             </Link>
-            <Link href="/planos">
+            <Link href="/plans">
               <div className="btn btn-secondary bg-gray-700 hover:bg-gray-600 text-white px-8 py-4 rounded-lg font-semibold text-lg inline-block transition-all duration-300 cursor-pointer">
                 Ver Planos
               </div>
@@ -68,7 +68,7 @@ export default function Hero() {
         </div>
         
         {/* Como Funciona - Seção com título */}
-        <div className="mb-24">
+        <div id="como-funciona" className="mb-24">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Como Funciona</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">O IdeiaScreen torna a criação de roteiros profissionais tão simples quanto 1-2-3. Veja como a mágica acontece:</p>
