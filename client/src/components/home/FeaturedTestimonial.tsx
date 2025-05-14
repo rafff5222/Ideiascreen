@@ -3,7 +3,7 @@ import marciaAvatar from "@/assets/testimonials/marcia.svg";
 
 export default function FeaturedTestimonial() {
   return (
-    <section className="py-16 md:py-24 bg-gray-900">
+    <section id="depoimentos" className="py-16 md:py-24 bg-gray-900">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl overflow-hidden">
           <div className="grid md:grid-cols-2 gap-0">

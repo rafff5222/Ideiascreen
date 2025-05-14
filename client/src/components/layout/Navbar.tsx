@@ -19,7 +19,7 @@ export default function Navbar() {
   const navLinks = [
     { name: "Recursos", href: "/#recursos", icon: "📋" },
     { name: "Como Funciona", href: "/#como-funciona", icon: "🔄" },
-    { name: "Preços", href: "/planos", icon: "💰" },
+    { name: "Preços", href: "/plans", icon: "💰" },
     { name: "Depoimentos", href: "/#depoimentos", icon: "💬" },
   ];
 
