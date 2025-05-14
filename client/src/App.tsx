@@ -15,6 +15,7 @@ import Generator from "@/pages/generator";
 import ScriptGenerator from "@/pages/script-generator";
 import Settings from "@/pages/Settings";
 import PlansPage from "@/pages/plans-table";
+import Login from "@/pages/login";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ErrorMonitor from "@/components/ErrorMonitor";
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/settings" component={Settings} />
       <Route path="/plans" component={PlansPage} />
       <Route path="/planos" component={PlansPage} />
+      <Route path="/login" component={Login} />
       <Route component={NotFound} />
     </Switch>
   );
