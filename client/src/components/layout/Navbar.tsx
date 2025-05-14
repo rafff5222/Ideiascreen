@@ -39,7 +39,7 @@ export default function Navbar() {
             <a 
               key={link.name}
               href={link.href}
-              className="font-bold text-xl px-4 py-3 hover:text-primary transition border-b-2 border-transparent hover:border-primary/50 mx-2"
+              className="font-black text-2xl px-4 py-3 hover:text-primary transition border-b-2 border-transparent hover:border-primary/50 mx-2 tracking-wide text-shadow uppercase"
             >
               {link.icon} {link.name}
             </a>
@@ -100,7 +100,7 @@ export default function Navbar() {
                   <a
                     key={link.name}
                     href={link.href}
-                    className="py-3 text-xl font-semibold hover:text-primary transition flex items-center"
+                    className="py-3 text-2xl font-black hover:text-primary transition flex items-center tracking-wide text-shadow uppercase"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <span className="mr-3 bg-gray-100 text-primary rounded-full w-10 h-10 flex items-center justify-center">{link.icon}</span>

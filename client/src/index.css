@@ -240,6 +240,11 @@ h2 {
   -webkit-animation: pulse 2s infinite;
 }
 
+/* Sombra de texto para melhorar legibilidade */
+.text-shadow {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 /* Efeito de digitação para o roteiro */
 @keyframes typing {
   from { width: 0 }
