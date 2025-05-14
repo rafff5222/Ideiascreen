@@ -18,6 +18,8 @@ import Settings from "@/pages/Settings";
 import PlansPage from "@/pages/plans-table";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
+import ForgotPassword from "@/pages/forgot-password";
+import ResetPassword from "@/pages/reset-password";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ErrorMonitor from "@/components/ErrorMonitor";
@@ -44,6 +46,9 @@ function Router() {
       <Route path="/register" component={Register} />
       <Route path="/signup" component={Register} />
       <Route path="/cadastro" component={Register} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password" component={ResetPassword} />
+      <Route path="/reset-password/:token" component={ResetPassword} />
       <Route component={NotFound} />
     </Switch>
   );

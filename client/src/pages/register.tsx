@@ -75,7 +75,7 @@ export default function Register() {
       toast({
         title: "Registro realizado com sucesso!",
         description: "Você já pode acessar todos os recursos da plataforma.",
-        variant: "success"
+        variant: "default"
       });
       
       // Redirecionar após 2 segundos
@@ -119,7 +119,7 @@ export default function Register() {
           
           {/* Mensagem de sucesso */}
           {success && (
-            <Alert variant="success" className="mb-4 bg-green-50 text-green-800 border-green-200">
+            <Alert className="mb-4 bg-green-50 text-green-800 border-green-200">
               <CheckCircle2 className="h-4 w-4 text-green-600" />
               <AlertTitle>Conta criada com sucesso!</AlertTitle>
               <AlertDescription>Redirecionando para a página inicial...</AlertDescription>
