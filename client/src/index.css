@@ -52,6 +52,31 @@
     font-size: 16px !important; /* Evita zoom indesejado no iOS */
     touch-action: manipulation; /* Melhora resposta ao toque */
   }
+  
+  /* Layout aprimorado para exibição de conteúdo no mobile */
+  .script-version {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  /* Barra de progresso mais visível no mobile */
+  .animate-progress {
+    height: 3px !important;
+  }
+  
+  /* Ajustes para mensagens de status no mobile */
+  .bg-green-500\/20 {
+    padding: 1rem 0.75rem !important;
+  }
+  
+  /* Ajustes para o estado de carregamento no mobile */
+  .flex-wrap.justify-center.gap-2 {
+    gap: 0.25rem !important;
+  }
+  
+  /* Melhoria para botões de ação no mobile */
+  [aria-label="Copiar conteúdo"] {
+    padding: 0.5rem !important;
+  }
 }
 
 /* Correção específica para mobile em formulários */
@@ -396,6 +421,19 @@ button:hover {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* Animação da barra de progresso */
+@keyframes progress {
+  0% { width: 0%; }
+  50% { width: 70%; }
+  80% { width: 90%; }
+  100% { width: 100%; }
+}
+
+.animate-progress {
+  animation: progress 3s ease-in-out;
+  width: 100%;
 }
 
 @-webkit-keyframes shake {

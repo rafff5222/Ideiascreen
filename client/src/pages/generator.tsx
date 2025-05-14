@@ -145,7 +145,7 @@ export default function Generator() {
                     onValueChange={setPlatform}
                   >
                     <SelectTrigger id="platform" className="bg-gray-900 border-gray-700 text-white focus:ring-amber-500 h-14 text-base sm:h-12 sm:text-sm">
-                      <SelectValue placeholder="Instagram, TikTok, YouTube..." />
+                      <SelectValue placeholder="Selecione a plataforma para otimização" />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-900 border-gray-700 text-white">
                       {platforms.map((item) => (
@@ -173,7 +173,7 @@ export default function Generator() {
                   onValueChange={setStyle}
                 >
                   <SelectTrigger id="style" className="bg-gray-900 border-gray-700 text-white focus:ring-amber-500 h-14 text-base sm:h-12 sm:text-sm">
-                    <SelectValue placeholder="Dramático, Casual, Humorístico..." />
+                    <SelectValue placeholder="Escolha o estilo de comunicação do roteiro" />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-900 border-gray-700 text-white">
                     {communicationStyles.map((item) => (
@@ -195,7 +195,7 @@ export default function Generator() {
               <div className="relative">
                 <Input
                   id="prompt"
-                  placeholder="Digite sua ideia ou tópico (ex: 'Como ganhar seguidores no Instagram')"
+                  placeholder="Ex: Como criar conteúdo viral no Instagram | Dicas para aumentar engajamento no TikTok"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   className="bg-gray-900 border-gray-700 text-white h-14 sm:h-12 pl-4 pr-12 focus:ring-amber-500 placeholder-gray-500 text-base sm:text-sm"
@@ -232,13 +232,32 @@ export default function Generator() {
               
               {/* Estado de carregamento - controlado pelo estado isGenerating */}
               {isGenerating && (
-                <div className="w-full bg-gray-900/80 py-7 rounded-xl mt-4 text-center flex flex-col items-center justify-center">
+                <div className="w-full bg-gray-900/80 py-7 rounded-xl mt-4 text-center flex flex-col items-center justify-center border border-amber-500/20 relative overflow-hidden">
+                  {/* Efeito visual de progresso */}
+                  <div className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 animate-progress"></div>
+                  
                   <div className="flex items-center mb-3">
-                    <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-3"></div>
+                    <div className="animate-spin w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full mr-3"></div>
                     <span className="text-white text-lg font-medium">Gerando roteiro profissional...</span>
                   </div>
-                  <div className="text-gray-400 text-sm max-w-md px-4">
-                    Estamos aplicando técnicas de narrativa cinematográfica para criar um roteiro otimizado para {platforms.find(p => p.id === platform)?.label || platform}
+                  
+                  <div className="text-gray-400 text-sm max-w-md px-4 mb-2">
+                    <p className="mb-2">Estamos aplicando técnicas de narrativa cinematográfica para criar um roteiro otimizado para <span className="text-amber-400 font-medium">{platforms.find(p => p.id === platform)?.label || platform}</span></p>
+                    
+                    <div className="flex flex-wrap justify-center gap-2 mt-3">
+                      <div className="bg-gray-800 px-2 py-1 rounded text-xs text-gray-300 flex items-center">
+                        <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
+                        Analisando tema
+                      </div>
+                      <div className="bg-gray-800 px-2 py-1 rounded text-xs text-gray-300 flex items-center">
+                        <span className="w-2 h-2 bg-blue-500 rounded-full mr-1.5 animate-pulse"></span>
+                        Estruturando argumento
+                      </div>
+                      <div className="bg-gray-800 px-2 py-1 rounded text-xs text-gray-300 flex items-center">
+                        <span className="w-2 h-2 bg-purple-500 rounded-full mr-1.5 animate-pulse"></span>
+                        Adaptando estilo
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -261,16 +280,47 @@ export default function Generator() {
           </div>
         </div>
 
-        {/* Mensagem de sucesso após geração */}
+        {/* Mensagem de sucesso após geração - Design melhorado */}
         {showSuccessMessage && (
-          <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4 mb-6 flex items-start">
-            <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4 mb-6 flex items-start relative overflow-hidden">
+            {/* Efeito decorativo */}
+            <div className="absolute -top-10 -right-10 w-20 h-20 bg-green-500 opacity-20 rounded-full"></div>
+            
+            <svg className="w-6 h-6 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <div>
-              <h4 className="text-green-500 font-medium text-sm">Roteiro gerado com sucesso!</h4>
-              <p className="text-gray-300 text-xs mt-1">Seu roteiro profissional com estrutura cinematográfica está pronto para uso.</p>
+            
+            <div className="flex-grow">
+              <h4 className="text-green-500 font-medium text-base">Roteiro gerado com sucesso!</h4>
+              <p className="text-gray-300 text-sm mt-1">Seu roteiro profissional com estrutura cinematográfica está pronto para uso.</p>
+              
+              <div className="flex flex-wrap gap-3 mt-3">
+                <div className="flex items-center text-xs text-gray-300 bg-gray-800/70 px-2 py-1 rounded">
+                  <svg className="w-3 h-3 mr-1 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 11l4-4 4 4M7 17h10"></path>
+                  </svg>
+                  Otimizado para {platforms.find(p => p.id === platform)?.label || platform}
+                </div>
+                
+                <div className="flex items-center text-xs text-gray-300 bg-gray-800/70 px-2 py-1 rounded">
+                  <svg className="w-3 h-3 mr-1 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                  Pronto para copiar e usar
+                </div>
+              </div>
             </div>
+            
+            {/* Botão de fechar */}
+            <button 
+              className="text-gray-400 hover:text-white absolute top-2 right-2"
+              onClick={() => setShowSuccessMessage(false)}
+              aria-label="Fechar mensagem"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
           </div>
         )}
         
