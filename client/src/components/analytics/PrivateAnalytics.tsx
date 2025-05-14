@@ -1,6 +1,13 @@
 import { useEffect } from 'react';
 import { useLocation } from 'wouter';
 
+// Definições de tipagem para interface global
+declare global {
+  interface Window {
+    trackEvent?: (event: string, data?: Record<string, any>) => void;
+  }
+}
+
 /**
  * Sistema de análise próprio que não depende de Google Analytics
  * - Rastreia navegação, eventos e interações
@@ -125,10 +132,11 @@ export default function PrivateAnalytics() {
   // Configura API pública para outros componentes
   useEffect(() => {
     // Expõe a função de tracking globalmente para outros componentes
-    (window as any).trackEvent = trackEvent;
+    window.trackEvent = trackEvent;
     
     return () => {
-      delete (window as any).trackEvent;
+      // @ts-ignore - Para evitar erro de tipagem ao fazer delete
+      delete window.trackEvent;
     };
   }, []);
   

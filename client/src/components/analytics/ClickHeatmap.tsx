@@ -84,38 +84,45 @@ export default function ClickHeatmap() {
   
   // Cria elemento visual para o clique (apenas em desenvolvimento)
   const createClickVisual = (x: number, y: number) => {
-    // Cria elemento visual
-    const visual = document.createElement('div');
-    visual.style.position = 'absolute';
-    visual.style.left = `${x}px`;
-    visual.style.top = `${y}px`;
-    visual.style.width = '10px';
-    visual.style.height = '10px';
-    visual.style.borderRadius = '50%';
-    visual.style.backgroundColor = 'rgba(255, 0, 0, 0.5)';
-    visual.style.pointerEvents = 'none';
-    visual.style.zIndex = '9999';
-    visual.style.transform = 'translate(-50%, -50%)';
-    
-    // Adiciona ao documento
-    document.body.appendChild(visual);
-    
-    // Efeito de fade-out
-    visual.animate(
-      [
-        { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
-        { opacity: 0, transform: 'translate(-50%, -50%) scale(2)' }
-      ],
-      {
-        duration: 1000,
-        easing: 'ease-out'
-      }
-    );
-    
-    // Remove após a animação
-    setTimeout(() => {
-      document.body.removeChild(visual);
-    }, 1000);
+    try {
+      // Cria elemento visual
+      const visual = document.createElement('div');
+      visual.style.position = 'absolute';
+      visual.style.left = `${x}px`;
+      visual.style.top = `${y}px`;
+      visual.style.width = '10px';
+      visual.style.height = '10px';
+      visual.style.borderRadius = '50%';
+      visual.style.backgroundColor = 'rgba(255, 0, 0, 0.5)';
+      visual.style.pointerEvents = 'none';
+      visual.style.zIndex = '9999';
+      visual.style.transform = 'translate(-50%, -50%)';
+      
+      // Adiciona ao documento
+      document.body.appendChild(visual);
+      
+      // Efeito de fade-out
+      visual.animate(
+        [
+          { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
+          { opacity: 0, transform: 'translate(-50%, -50%) scale(2)' }
+        ],
+        {
+          duration: 1000,
+          easing: 'ease-out'
+        }
+      );
+      
+      // Remove após a animação
+      setTimeout(() => {
+        // Verifica se o elemento ainda existe no DOM
+        if (document.body.contains(visual)) {
+          document.body.removeChild(visual);
+        }
+      }, 1000);
+    } catch (error) {
+      console.error("Erro ao criar visualização de clique:", error);
+    }
   };
   
   // Componente não renderiza nada visualmente

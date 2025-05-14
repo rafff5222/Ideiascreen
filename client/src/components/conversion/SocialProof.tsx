@@ -39,18 +39,29 @@ export default function SocialProof() {
   
   // Exibe notificações em intervalos aleatórios
   useEffect(() => {
+    let isMounted = true; // Flag para verificar se o componente está montado
+    
     // Primeira notificação após 10-20 segundos
     const firstTimeout = setTimeout(() => {
+      if (!isMounted) return; // Evita atualizar state se o componente foi desmontado
+      
       const purchase = generateRandomPurchase();
       setCurrentPurchase(purchase);
       setIsVisible(true);
       
       // Esconde a notificação após 5 segundos
-      setTimeout(() => setIsVisible(false), 5000);
+      const hideTimeout = setTimeout(() => {
+        if (!isMounted) return;
+        setIsVisible(false);
+      }, 5000);
+      
+      return () => clearTimeout(hideTimeout);
     }, Math.random() * 10000 + 10000);
     
     // Configura intervalo para notificações subsequentes
     const interval = setInterval(() => {
+      if (!isMounted) return;
+      
       // Mostra apenas se a anterior não estiver visível
       if (!isVisible) {
         const purchase = generateRandomPurchase();
@@ -58,15 +69,20 @@ export default function SocialProof() {
         setIsVisible(true);
         
         // Esconde após 5 segundos
-        setTimeout(() => setIsVisible(false), 5000);
+        setTimeout(() => {
+          if (!isMounted) return;
+          setIsVisible(false);
+        }, 5000);
       }
     }, Math.random() * 20000 + 25000); // A cada 25-45 segundos
     
+    // Cleanup function
     return () => {
+      isMounted = false; // Marca o componente como desmontado
       clearTimeout(firstTimeout);
       clearInterval(interval);
     };
-  }, [isVisible]);
+  }, []);
   
   // Renderiza notificação de visitantes ativos
   const renderVisitorsNotification = () => {

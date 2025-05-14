@@ -5,6 +5,7 @@ declare global {
   interface Window {
     microConversionsInitialized?: boolean;
     trackMicroConversion?: (event: string, data: any) => void;
+    trackEvent?: (event: string, data?: Record<string, any>) => void;
   }
 }
 
@@ -299,14 +300,6 @@ export default function MicroConversionsTracker() {
         console.error('Erro ao processar micro conversão:', error);
       }
     };
-    
-    // Adiciona para o objeto window no TypeScript
-    declare global {
-      interface Window {
-        microConversionsInitialized: boolean;
-        trackMicroConversion: (event: string, data: any) => void;
-      }
-    }
     
     // Exporta funções para uso externo
     window.trackMicroConversion = trackEvent;
