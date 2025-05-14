@@ -15,13 +15,12 @@ export default function Navbar() {
   
   const isHomePage = location === "/";
   
+  // Apenas os itens de menu principais solicitados
   const navLinks = [
     { name: "Recursos", href: "/#recursos", icon: "📋" },
     { name: "Como Funciona", href: "/#como-funciona", icon: "🔄" },
     { name: "Preços", href: "/planos", icon: "💰" },
     { name: "Depoimentos", href: "/#depoimentos", icon: "💬" },
-    { name: "Gerador de Roteiros", href: "/roteiros", highlight: true, icon: "✨" },
-    { name: "Dashboard", href: "/dashboard", icon: "📊" },
   ];
 
   // Fixed DOM nesting by using div instead of a when using Link component
@@ -35,14 +34,14 @@ export default function Navbar() {
           </div>
         </Link>
         
-        <div className="hidden md:flex items-center space-x-12">
+        <div className="hidden md:flex items-center space-x-16">
           {isHomePage && navLinks.map((link) => (
             <a 
               key={link.name}
               href={link.href}
-              className={`font-semibold text-lg px-3 py-2 hover:text-primary transition border-b-2 border-transparent hover:border-primary/50 ${link.highlight ? 'text-purple-600 font-bold' : ''}`}
+              className="font-bold text-xl px-4 py-3 hover:text-primary transition border-b-2 border-transparent hover:border-primary/50 mx-2"
             >
-              {link.name}
+              {link.icon} {link.name}
             </a>
           ))}
           
@@ -64,15 +63,15 @@ export default function Navbar() {
           )}
         </div>
         
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-6">
           {location === "/" ? (
             <>
               <Link href="/dashboard">
-                <div className="hidden md:block font-medium hover:text-primary transition cursor-pointer">Entrar</div>
+                <div className="hidden md:block font-semibold text-lg hover:text-primary transition cursor-pointer">Entrar</div>
               </Link>
               <Link href="/roteiros">
-                <div className="bg-gradient-to-r from-accent to-primary text-white font-medium px-5 py-2 rounded-lg shadow-md hover:opacity-90 transition flex items-center gap-2 cursor-pointer">
-                  <Sparkles className="h-4 w-4" />
+                <div className="bg-gradient-to-r from-amber-500 to-amber-700 text-white font-bold px-6 py-3 rounded-lg shadow-md hover:opacity-90 transition flex items-center gap-2 cursor-pointer">
+                  <Sparkles className="h-5 w-5" />
                   <span>Começar Grátis</span>
                 </div>
               </Link>
@@ -101,9 +100,7 @@ export default function Navbar() {
                   <a
                     key={link.name}
                     href={link.href}
-                    className={`py-3 text-xl font-semibold hover:text-primary transition flex items-center ${
-                      link.highlight ? 'text-purple-600 font-bold' : ''
-                    }`}
+                    className="py-3 text-xl font-semibold hover:text-primary transition flex items-center"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <span className="mr-3 bg-gray-100 text-primary rounded-full w-10 h-10 flex items-center justify-center">{link.icon}</span>
