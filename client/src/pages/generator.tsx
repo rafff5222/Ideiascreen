@@ -144,7 +144,7 @@ export default function Generator() {
                     value={platform}
                     onValueChange={setPlatform}
                   >
-                    <SelectTrigger id="platform" className="bg-gray-900 border-gray-700 text-white focus:ring-amber-500">
+                    <SelectTrigger id="platform" className="bg-gray-900 border-gray-700 text-white focus:ring-amber-500 h-14 text-base sm:h-12 sm:text-sm">
                       <SelectValue placeholder="Instagram, TikTok, YouTube..." />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-900 border-gray-700 text-white">
@@ -172,7 +172,7 @@ export default function Generator() {
                   value={style}
                   onValueChange={setStyle}
                 >
-                  <SelectTrigger id="style" className="bg-gray-900 border-gray-700 text-white focus:ring-amber-500">
+                  <SelectTrigger id="style" className="bg-gray-900 border-gray-700 text-white focus:ring-amber-500 h-14 text-base sm:h-12 sm:text-sm">
                     <SelectValue placeholder="Dramático, Casual, Humorístico..." />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-900 border-gray-700 text-white">
@@ -198,7 +198,7 @@ export default function Generator() {
                   placeholder="Digite sua ideia ou tópico (ex: 'Como ganhar seguidores no Instagram')"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  className="bg-gray-900 border-gray-700 text-white h-12 pl-4 pr-12 focus:ring-amber-500 placeholder-gray-500"
+                  className="bg-gray-900 border-gray-700 text-white h-14 sm:h-12 pl-4 pr-12 focus:ring-amber-500 placeholder-gray-500 text-base sm:text-sm"
                 />
                 
                 {/* Botão de informação */}
@@ -215,7 +215,7 @@ export default function Generator() {
             <div className="pt-4">
               <Button 
                 onClick={handleGenerate}
-                className="w-full py-7 text-xl bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold relative overflow-hidden group shadow-lg shadow-green-800/30 hover:shadow-green-700/50 transform transition-all duration-300 hover:-translate-y-1 rounded-xl"
+                className="w-full py-6 sm:py-7 text-lg sm:text-xl bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold relative overflow-hidden group shadow-lg shadow-green-800/30 hover:shadow-green-700/50 transform transition-all duration-300 hover:-translate-y-1 rounded-xl"
                 disabled={!prompt}
               >
                 {/* Efeito de brilho animado mais intenso */}
@@ -281,6 +281,54 @@ export default function Generator() {
             style={style}
           />
         )}
+        
+        {/* Seção de Benefícios Principais */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div className="bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-700/50 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-white">Economize Tempo</h3>
+            </div>
+            <p className="text-gray-300 mb-3">Gere roteiros profissionais em segundos, não horas.</p>
+            <div className="bg-gray-900/70 p-3 rounded-md text-xs text-gray-400 border border-gray-700/50">
+              <strong className="text-amber-400">Exemplo:</strong> Um roteiro que demoraria 2 horas para escrever manualmente é gerado em apenas 5 segundos.
+            </div>
+          </div>
+          
+          <div className="bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-700/50 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-white">Aumente Engajamento</h3>
+            </div>
+            <p className="text-gray-300 mb-3">Conteúdo otimizado para os algoritmos das redes sociais.</p>
+            <div className="bg-gray-900/70 p-3 rounded-md text-xs text-gray-400 border border-gray-700/50">
+              <strong className="text-amber-400">Exemplo:</strong> Nossos usuários reportam aumento médio de 47% em engajamento após adotar roteiros estruturados.
+            </div>
+          </div>
+          
+          <div className="bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-700/50 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-white">Inspiração Ilimitada</h3>
+            </div>
+            <p className="text-gray-300 mb-3">Nunca mais fique sem ideias para seu conteúdo.</p>
+            <div className="bg-gray-900/70 p-3 rounded-md text-xs text-gray-400 border border-gray-700/50">
+              <strong className="text-amber-400">Exemplo:</strong> Transforme um simples conceito como "café da manhã" em 5 abordagens diferentes para 3 plataformas distintas.
+            </div>
+          </div>
+        </div>
         
         <div className="bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-700/50 p-8 mt-12 relative overflow-hidden">
           {/* Efeito visual de fundo */}
