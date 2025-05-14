@@ -135,7 +135,7 @@ export default function Login() {
                       <FormLabel>Senha</FormLabel>
                       <Link 
                         href="/forgot-password" 
-                        className="text-xs text-amber-500 hover:text-amber-600"
+                        className="text-xs text-amber-500 hover:text-amber-600 hover:underline"
                       >
                         Esqueceu a senha?
                       </Link>

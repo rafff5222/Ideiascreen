@@ -1,199 +1,225 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Link, useLocation, useRoute } from "wouter";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import * as z from "zod";
+import { Link, useLocation } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
+
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, KeyRound, ArrowRight, CheckCircle2 } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { ArrowLeft, Lock, Loader2, Check, AlertTriangle } from "lucide-react";
 
-// Esquema de validação
+// Schema de validação
 const resetPasswordSchema = z.object({
-  password: z.string()
-    .min(6, { message: "Senha deve ter pelo menos 6 caracteres" }),
-  confirmPassword: z.string()
+  password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
+  confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "As senhas não coincidem",
-  path: ["confirmPassword"]
+  message: "As senhas não conferem",
+  path: ["confirmPassword"],
 });
 
 type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
 export default function ResetPassword() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [, setLocation] = useLocation();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const [resetError, setResetError] = useState("");
+  const [location, setLocation] = useLocation();
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
   
-  // Redirecionar se já estiver autenticado
+  // Extrair o token da URL (usando URLSearchParams)
+  const searchParams = new URLSearchParams(window.location.search);
+  const token = searchParams.get("token");
+
+  // Validar se existe um token
   useEffect(() => {
-    if (isAuthenticated) {
-      setLocation("/");
+    if (!token) {
+      setResetError("Token de redefinição inválido ou ausente.");
     }
-  }, [isAuthenticated, setLocation]);
+  }, [token]);
 
-  // Pegar token da URL
-  const [matched, params] = useRoute('/reset-password/:token');
-  const token = params?.token;
-
-  // Inicializar form
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       password: "",
-      confirmPassword: ""
-    }
+      confirmPassword: "",
+    },
   });
 
-  // Função para lidar com o envio do formulário
   const onSubmit = async (values: ResetPasswordFormValues) => {
+    if (!token) {
+      setResetError("Token de redefinição inválido ou ausente.");
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
-      setIsLoading(true);
-      setError(null);
-      
-      // Verificar se o token está disponível
-      if (!token) {
-        throw new Error("Token de redefinição inválido ou ausente");
-      }
-      
-      // Enviar requisição para o backend
       const response = await apiRequest("POST", "/api/auth/reset-password", {
-        ...values,
-        token
+        token,
+        password: values.password,
       });
       
       const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || "Erro ao redefinir senha");
+
+      if (data.success) {
+        setResetSuccess(true);
+        toast({
+          title: "Senha redefinida",
+          description: "Sua senha foi redefinida com sucesso. Você já pode fazer login.",
+          variant: "default",
+        });
+      } else {
+        setResetError(data.message || "Ocorreu um erro ao redefinir sua senha.");
+        toast({
+          title: "Erro",
+          description: data.message || "Ocorreu um erro ao redefinir sua senha.",
+          variant: "destructive",
+        });
       }
-      
-      // Mostrar mensagem de sucesso
-      setSuccess(true);
-      toast({
-        title: "Senha redefinida!",
-        description: "Sua senha foi alterada com sucesso.",
-        variant: "default"
-      });
-      
-      // Redirecionar após 2 segundos
-      setTimeout(() => {
-        setLocation("/login");
-      }, 2000);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Erro ao redefinir senha";
-      setError(errorMessage);
+    } catch (error) {
+      console.error("Erro ao redefinir senha:", error);
+      setResetError("Ocorreu um erro ao processar sua solicitação. Tente novamente mais tarde.");
       toast({
         title: "Erro",
-        description: errorMessage,
-        variant: "destructive"
+        description: "Ocorreu um erro ao processar sua solicitação. Tente novamente mais tarde.",
+        variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
+  // Redirecionar para login após 5 segundos em caso de sucesso
+  useEffect(() => {
+    let redirectTimer: ReturnType<typeof setTimeout>;
+    
+    if (resetSuccess) {
+      redirectTimer = setTimeout(() => {
+        setLocation("/login");
+      }, 5000);
+    }
+    
+    return () => {
+      if (redirectTimer) clearTimeout(redirectTimer);
+    };
+  }, [resetSuccess, setLocation]);
+
   return (
-    <div className="container flex items-center justify-center min-h-[calc(100vh-80px)] py-8">
-      <Card className="w-full max-w-md shadow-lg border-amber-100/20">
-        <CardHeader className="space-y-1">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-2xl font-bold">Redefinir Senha</CardTitle>
-            <KeyRound className="h-6 w-6 text-amber-500" />
-          </div>
-          <CardDescription>
-            Crie uma nova senha para sua conta.
+    <div className="container mx-auto flex flex-col justify-center items-center min-h-screen py-10">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center">Redefinição de Senha</CardTitle>
+          <CardDescription className="text-center">
+            {!resetSuccess 
+              ? "Crie uma nova senha segura para sua conta"
+              : "Senha redefinida com sucesso!"}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Mensagem de erro */}
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertCircle className="h-4 w-4" />
+        <CardContent>
+          {resetError && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertTriangle className="h-4 w-4" />
               <AlertTitle>Erro</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          
-          {/* Mensagem de sucesso */}
-          {success && (
-            <Alert className="mb-4 bg-green-50 text-green-800 border-green-200">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <AlertTitle>Senha redefinida!</AlertTitle>
               <AlertDescription>
-                Sua senha foi alterada com sucesso. Redirecionando para a página de login...
+                {resetError}
               </AlertDescription>
             </Alert>
           )}
-          
-          {/* Formulário de redefinição de senha */}
-          {!success && (
+
+          {resetSuccess ? (
+            <div className="text-center py-4">
+              <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-green-100 mb-4">
+                <Check className="h-6 w-6 text-green-600" />
+              </div>
+              <p className="mb-4 text-green-600 font-medium">
+                Sua senha foi redefinida com sucesso!
+              </p>
+              <p className="text-sm text-muted-foreground mb-2">
+                Você será redirecionado para a página de login em alguns segundos...
+              </p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setLocation("/login")}
+                className="mt-2"
+              >
+                Ir para o login agora
+              </Button>
+            </div>
+          ) : (
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
                   control={form.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nova senha</FormLabel>
+                      <FormLabel>Nova Senha</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="password" 
-                          placeholder="Digite sua nova senha" 
-                          {...field} 
-                          disabled={isLoading}
-                        />
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            className="pl-10"
+                            {...field}
+                          />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirmar nova senha</FormLabel>
+                      <FormLabel>Confirme a Nova Senha</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="password" 
-                          placeholder="Confirme sua nova senha" 
-                          {...field} 
-                          disabled={isLoading}
-                        />
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            className="pl-10"
+                            {...field}
+                          />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
-                <Button 
-                  type="submit" 
-                  disabled={isLoading} 
-                  className="w-full bg-amber-500 hover:bg-amber-600 text-white"
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isSubmitting || !!resetError}
                 >
-                  {isLoading ? "Processando..." : "Redefinir senha"}
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Redefinindo...
+                    </>
+                  ) : (
+                    "Redefinir Senha"
+                  )}
                 </Button>
               </form>
             </Form>
           )}
         </CardContent>
-        <CardFooter className="flex flex-col">
-          <div className="flex justify-center w-full mt-4">
-            <Link href="/login" className="text-gray-600 hover:text-amber-600 text-sm flex items-center">
-              <ArrowRight className="mr-1 h-4 w-4" />
-              Voltar para login
-            </Link>
-          </div>
+        <CardFooter className="flex justify-center border-t pt-4">
+          <Button variant="ghost" size="sm" onClick={() => setLocation("/login")}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar para o login
+          </Button>
         </CardFooter>
       </Card>
     </div>
