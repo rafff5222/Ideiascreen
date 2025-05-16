@@ -101,3 +101,7 @@ export default defineConfig({
     target: 'esnext'
   }
 });
+# Execute localmente para testar:
+rm -rf node_modules .svelte-kit package-lock.json
+npm install
+npm run build
