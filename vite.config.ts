@@ -52,3 +52,37 @@ export default defineConfig({
     }
   }
 })
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  
+  // Configurações de segurança
+  build: {
+    target: 'esnext',          // Elimina eval() em produção
+    minify: 'terser',          // Ofuscação do código
+    sourcemap: false,          // Remove mapas para produção
+    chunkSizeWarningLimit: 1000 // Ajuste para projetos grandes
+  },
+
+  // Configurações do servidor de desenvolvimento
+  server: {
+    headers: {
+      "Content-Security-Policy": 
+        "default-src 'none'; " +
+        "script-src 'self' 'unsafe-eval'; " + // Permite Vite em dev
+        "style-src 'self' 'unsafe-inline'; " +
+        "img-src 'self' data:; " +
+        "connect-src 'self'; " +
+        "worker-src 'self' blob:"
+    },
+    port: 3000,                // Porta fixa para evitar conflitos
+    strictPort: true           // Impede fallback para outras portas
+  },
+
+  // Otimizações adicionais
+  esbuild: {
+    legalComments: 'none'      // Remove comentários de licença
+  }
+});
