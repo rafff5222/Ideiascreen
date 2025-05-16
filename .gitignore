@@ -4,3 +4,7 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+/Ambiente\ de\ Impressão/
+/Ambiente\ de\ Rede/
+/AppData/Local/Dados\ de\ Aplicativos/
+/AppData/Local/ElevatedDiagnostics/
