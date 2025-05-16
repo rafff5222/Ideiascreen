@@ -127,3 +127,15 @@ export default defineConfig({
     target: 'esnext' // Elimina eval() desnecessários em produção
   }
 })
+export default defineConfig({
+  server: {
+    headers: {
+      "Content-Security-Policy": 
+        "script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' https://*.vercel.app https://*.vercel-insights.com; " +
+        "connect-src 'self' https:; " +
+        "style-src 'self' 'unsafe-inline'; " +
+        "worker-src 'self' blob:; " +
+        "frame-src 'none'"
+    }
+  }
+})
