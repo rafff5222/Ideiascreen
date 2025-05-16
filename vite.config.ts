@@ -105,3 +105,9 @@ export default defineConfig({
 rm -rf node_modules .svelte-kit package-lock.json
 npm install
 npm run build
+// vite.config.ts
+export default defineConfig({
+  server: {
+    headers: {} // Desativa CSP para emergências
+  }
+})
