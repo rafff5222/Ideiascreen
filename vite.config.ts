@@ -111,3 +111,19 @@ export default defineConfig({
     headers: {} // Desativa CSP para emergências
   }
 })
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  server: {
+    headers: {
+      "Content-Security-Policy": 
+        "script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' https://*.vercel.app https://*.vercel-insights.com; " +
+        "connect-src 'self' https://*.vercel.app; " +
+        "worker-src 'self' blob:; " +
+        "default-src 'self'"
+    }
+  },
+  build: {
+    target: 'esnext' // Elimina eval() desnecessários em produção
+  }
+})
