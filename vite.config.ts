@@ -29,3 +29,15 @@ export default defineConfig({
     emptyOutDir: true,
   },
 });
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  build: {
+    target: 'esnext', // Remove eval() em produção
+  },
+  server: {
+    headers: {
+      "Content-Security-Policy": "script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval'; worker-src 'self' blob:"
+    }
+  }
+})
