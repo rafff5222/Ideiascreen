@@ -41,3 +41,14 @@ export default defineConfig({
     }
   }
 })
+export default defineConfig({
+  build: {
+    target: 'esnext',       // Elimina eval() em produção
+    sourcemap: false        // Melhora segurança
+  },
+  server: {
+    headers: {
+      "Content-Security-Policy": "script-src 'self' 'unsafe-eval'"
+    }
+  }
+})
