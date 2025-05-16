@@ -89,3 +89,15 @@ export default defineConfig({
 # Execute localmente para testar:
 rm -rf node_modules && npm install
 npm run build
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    headers: {} // ⚠️ Desativa o CSP temporariamente
+  },
+  build: {
+    target: 'esnext'
+  }
+});
