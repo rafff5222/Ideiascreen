@@ -139,3 +139,23 @@ export default defineConfig({
     }
   }
 })
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  server: {
+    headers: {
+      "Content-Security-Policy": 
+        `default-src 'self';
+         script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' https://*.vercel.app https://*.vercel-insights.com;
+         connect-src 'self' https://*.vercel.app ws://localhost:*;
+         style-src 'self' 'unsafe-inline';
+         img-src 'self' data: https:;
+         font-src 'self';
+         worker-src 'self' blob:;
+         frame-src 'none'`
+    }
+  },
+  build: {
+    target: 'esnext'
+  }
+})
