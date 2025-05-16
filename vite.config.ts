@@ -86,3 +86,6 @@ export default defineConfig({
     legalComments: 'none'      // Remove comentários de licença
   }
 });
+# Execute localmente para testar:
+rm -rf node_modules && npm install
+npm run build
