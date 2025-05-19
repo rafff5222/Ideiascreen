@@ -11,6 +11,3 @@
     }
   ]
 }
-git add .
-git commit -m "Adicionando vercel.json para corrigir Content-Type"
-git push
