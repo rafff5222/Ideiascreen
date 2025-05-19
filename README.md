@@ -46,3 +46,4 @@ Gerador de roteiros automatizado usando Inteligência Artificial. Basta inserir 
 - Para usar modelos gratuitos do Hugging Face, configure `USE_HUGGINGFACE=true` no arquivo `.env`
 - Personalize os templates no arquivo `client/public/index.html`
 - Ajuste os parâmetros de geração de texto no servidor para controlar criatividade e comprimento
+- Atualizando para novo deploy
